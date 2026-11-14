@@ -46,7 +46,6 @@ RARITY_EPIC,Épico!,Epic!,¡Épica!,Épique !
 RARITY_LEGEND,Lendário!,Legendary!,¡Legendaria!,Légendaire !
 CARD_NEW,Carta nova!,New card!,¡Carta nueva!,Nouvelle carte !
 CARD_REAL,De verdade:,This is real:,Es de verdad:,C'est réel :
-CARD_LOCKED,Em breve,Coming soon,Próximamente,Bientôt
 EV_SOLAR_TITLE,Tempestade solar chegando!,Solar storm coming!,¡Viene una tormenta solar!,Tempête solaire en approche !
 EV_SOLAR_REAL,Aconteceu de verdade: {date}. Dado da NASA.,This really happened: {date}. NASA data.,Real: {date} · datos de la NASA (DONKI),Réel : {date} · données de la NASA (DONKI)
 EV_SOLAR_Q,Levantar o escudo?,Raise the shield?,¿Subir el escudo?,Lever le bouclier ?
@@ -66,9 +65,8 @@ LOCK_OXYGEN,Pouco oxigênio. O Mike espera aqui dentro.,Low oxygen. Mike waits i
 LOCK_ENERGY,Pouca energia. A estufa ficou mais lenta.,Low energy. The greenhouse slowed down.,Poca energía. El invernadero va más lento.,Peu d'énergie. La serre ralentit.
 AWAY_TITLE,Enquanto você estava fora…,While you were away…,Mientras no estabas…,Pendant ton absence…
 AWAY_PLANTS,{n} plantas ficaram prontas!,{n} plants are ready!,¡{n} plantas están listas!,{n} plantes sont prêtes !
-ALBUM_COUNT,{n}/40 cartas,{n}/40 cards,{n}/40 cartas,{n}/40 cartes
+ALBUM_COUNT,{n}/{total} cartas,{n}/{total} cards,{n}/{total} cartas,{n}/{total} cartes
 POSTCARD,Sol {n} · Cratera Gale,Sol {n} · Gale Crater,Sol {n} · Cráter Gale,Sol {n} · Cratère Gale
-MAP_SOON,Em breve,Coming soon,Próximamente,Bientôt
 TUT_BUILD,"Toque num item, depois no chão.","Tap an item, then tap the ground.",Toca un objeto y luego el suelo.,"Touche un objet, puis le sol."
 TUT_EXPLORE,Toque em Explorar para achar amostras.,Tap Explore to find samples.,Toca Explorar para buscar muestras.,Touche Explorer pour trouver des échantillons.
 LEVEL,Nível {n},Level {n},Nivel {n},Niveau {n}
@@ -111,6 +109,9 @@ PHOTO_SAVED,Foto salva!,Photo saved!,¡Foto guardada!,Photo enregistrée !
 AWAY_SOLS,Passaram {n} sóis.,{n} sols went by.,Pasaron {n} soles.,{n} sols sont passés.
 B_KILOPOWER,Kilopower,Kilopower,Kilopower,Kilopower
 NEED_SPACE,Precisa de espaço livre ao lado para crescer.,It needs free space next to it to grow.,Necesita espacio libre al lado para crecer.,Il faut de la place libre à côté pour grandir.
+NEED_HOUSE,"Primeiro, melhore a Casa do Mike.","First, upgrade Mike's habitat.","Primero, mejora la Casa de Mike.","D'abord, améliore la Maison de Mike."
+MAP_GROW,A base cresceu! Tem mais lugar para construir.,The base grew! There is more room to build.,¡La base creció! Hay más lugar para construir.,La base a grandi ! Il y a plus de place pour construire.
+MAP_LOCKED,Melhore a Casa do Mike para abrir esta área.,Upgrade Mike's habitat to open this area.,Mejora la Casa de Mike para abrir esta zona.,Améliore la Maison de Mike pour ouvrir cette zone.
 HOW_TITLE,Como ganhar esta carta,How to get this card,Cómo ganar esta carta,Comment gagner cette carte
 HOW_HARVEST,Colha {name} na estufa.,Harvest {name} in the greenhouse.,Cosecha {name} en el invernadero.,Récolte {name} dans la serre.
 HOW_SEED,A semente aparece depois de {n} colheitas.,The seed shows up after {n} harvests.,La semilla aparece después de {n} cosechas.,La graine apparaît après {n} récoltes.
@@ -126,7 +127,6 @@ HOW_EARTH,Construa a antena e espere. Sorte!,Build the antenna and wait. Luck!,C
 HOW_PACKAGE,"Chega no pacote da Terra, depois do evento Sem sinal.","It comes in the package from Earth, after the No signal event.","Llega en el paquete de la Tierra, después del evento Sin señal.","Elle arrive dans le colis de la Terre, après l'événement Pas de signal."
 HOW_TIME,Continue jogando: ela chega com o tempo.,Keep playing: it comes with time.,Sigue jugando: llega con el tiempo.,Continue à jouer : elle arrive avec le temps.
 HOW_TUBE,Explore: pode vir no tubo de amostra.,Explore: it can come in the sample tube.,Explora: puede venir en el tubo de muestra.,Explore : elle peut venir dans le tube d'échantillon.
-HOW_LOCKED,Em breve: está em outro lugar de Marte.,Coming soon: it's in another place on Mars.,Próximamente: está en otro lugar de Marte.,Bientôt : elle est dans un autre endroit de Mars.
 BTN_ROTATE,Girar,Rotate,Girar,Tourner
 OUT_ENERGY,Apagão! Acabou a energia.,Blackout! The energy ran out.,¡Apagón! Se acabó la energía.,Panne ! Plus d'énergie.
 OUT_OXYGEN,Acabou o oxigênio! O Mike ficou em casa.,Out of oxygen! Mike stays inside.,¡Se acabó el oxígeno! Mike se queda adentro.,Plus d'oxygène ! Mike reste à l'intérieur.

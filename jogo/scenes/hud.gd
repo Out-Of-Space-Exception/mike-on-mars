@@ -155,6 +155,12 @@ func on_cell_tapped(c: Vector2i) -> void:
 		_build_menu.visible = false
 		return
 	var free: bool = c != base.OUTSIDE and State.item_at(c).is_empty()
+	# Área ainda fechada: abre quando a Casa do Mike sobe de nível.
+	if c != base.OUTSIDE and free and not State.cell_open(c) and mode != Mode.MOVE:
+		_show_toast(tr("MAP_LOCKED"), true)
+		Sfx.play("travado")
+		_close_panel()
+		return
 	match mode:
 		Mode.BUILD:
 			if c != base.OUTSIDE and State.build(build_type, c):
@@ -518,10 +524,10 @@ func _on_card_source() -> void:
 
 # ───────────── Álbum ─────────────
 func _refresh_album() -> void:
-	_album_title.text = tr("ALBUM_COUNT").format({"n": State.cards.size()})
+	_album_title.text = tr("ALBUM_COUNT").format({"n": State.cards.size(), "total": State.cards_total()})
 	for c in _album_grid.get_children():
 		c.queue_free()
-	for id in range(1, State.cards_total() + 1):
+	for id in State.card_ids():
 		var info := State.card_info(id)
 		var owned := State.cards.has(str(id))
 		var b := Button.new()
@@ -543,9 +549,8 @@ func _refresh_album() -> void:
 			b.text = tr("CARD_%d_NAME" % id)
 			b.pressed.connect(_queue_card.bind(id, false))
 		else:
-			b.text = tr("CARD_LOCKED") if info.get("locked", false) else "?"
-			if b.text == "?":
-				b.add_theme_font_size_override("font_size", 48)
+			b.text = "?"
+			b.add_theme_font_size_override("font_size", 48)
 			# Carta que falta: o toque diz como ganhar.
 			b.pressed.connect(func() -> void: _show_info(tr("HOW_TITLE"), State.card_hint(id), Callable()))
 		_album_grid.add_child(b)
