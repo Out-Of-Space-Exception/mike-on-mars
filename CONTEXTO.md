@@ -65,8 +65,8 @@ Você está ajudando o time **Out of Space Exception** (Brasil) no NASA Space Ap
 - **Ingenuity:** modelo 3D oficial da NASA ([link](https://science.nasa.gov/resource/mars-ingenuity-helicopter-3d-model/)), recolorido no estilo das máquinas da Kenney: cinza vira branco, com faixas azul e vermelho. Crédito: NASA/JPL-Caltech.
 - **Céu de Marte de dia:** cor de caramelo (é a cor real).
 - **MOXIE:** máquina pequena do Space Kit pintada de dourado (o MOXIE de verdade é dourado).
-- **Paleta da interface:** _(a dupla de design preenche aqui: 5 cores em hex)_
-- **Fonte:** _(a dupla de design preenche aqui: 1 fonte do Google Fonts)_
+- **Paleta da interface:** [cores.csv](design/02-cores-e-fonte/cores.csv)
+- **Fonte:** [Rubik](design/02-cores-e-fonte/fonte.md)
 - **Clima:** divertido e "de verdade", nunca infantil demais.
 
 ---
