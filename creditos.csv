@@ -21,3 +21,5 @@ som,Kenney Sci-Fi Sounds,construir.wav; tubo-abrir.wav; alerta.wav; escudo.wav; 
 som,Crystal Cave (song18),musica-base.wav,Cynicmusic (Alex Smith),CC-BY-SA 3.0,https://opengameart.org/content/crystal-cave-song18,Conteúdo
 som,Magic Space,aurora.wav,CodeManu,CC0,https://opengameart.org/content/magic-space,Conteúdo
 modelo,Mars Ingenuity Helicopter 3D Model (oficial),jogo/models/nasa/ingenuity.glb (pet que voa atrás do Mike),NASA/JPL-Caltech,uso livre com crédito (diretrizes de mídia da NASA),https://science.nasa.gov/resource/mars-ingenuity-helicopter-3d-model/,Dev
+modelo,Modular Dungeon Kit (pacote 3D),chão e paredes do cenário (cores repintadas),Kenney,CC0,https://kenney.nl/assets/modular-dungeon-kit,Design
+ia,Claude (Anthropic): modelou a casa do Mike no Blender (casa-do-mike.py) e repintou as paredes do Modular Dungeon Kit,design/03-itens-do-jogo,Anthropic,-,https://claude.ai,Design

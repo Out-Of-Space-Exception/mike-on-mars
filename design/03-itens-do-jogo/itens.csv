@@ -16,3 +16,5 @@ decoracao-bandeira,feito pelo time (Blender),decoracao-bandeira.glb,mastro doura
 decoracao-luzinhas,feito pelo time (Blender),decoracao-luzinhas.glb,postes dourados e lâmpadas que brilham; arquivo nesta pasta
 decoracao-vaso,Nature Kit,pot_small.glb,creme para não sumir no chão de Marte: design/04-cores-das-coisas/decoracao-vaso.glb
 decoracao-antena,Space Kit,satelliteDish.glb,arquivo: design/03-itens-do-jogo/kenney/satellite-dish.glb
+casa-do-mike,feito pelo time (Blender),casa-do-mike.glb,base espacial com cúpula + porta com placa MIKE + escotilhas + módulo lateral; branco/creme/dourado/vinho; arquivo nesta pasta (receita: casa-do-mike.py)
+cenario-paredes,Modular Dungeon Kit,colormap-marte.png,paredes creme com base dourada e pilares vinho; chão de terra do kit; troque o Textures/colormap.png do kit por design/03-itens-do-jogo/kenney/modular-dungeon-kit/colormap-marte.png
