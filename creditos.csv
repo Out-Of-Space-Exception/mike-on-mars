@@ -23,3 +23,4 @@ som,Magic Space,aurora.wav,CodeManu,CC0,https://opengameart.org/content/magic-sp
 modelo,Mars Ingenuity Helicopter 3D Model (oficial),jogo/models/nasa/ingenuity.glb (pet que voa atrás do Mike),NASA/JPL-Caltech,uso livre com crédito (diretrizes de mídia da NASA),https://science.nasa.gov/resource/mars-ingenuity-helicopter-3d-model/,Dev
 modelo,Modular Dungeon Kit (pacote 3D),chão e paredes do cenário (cores repintadas),Kenney,CC0,https://kenney.nl/assets/modular-dungeon-kit,Design
 ia,Claude (Anthropic): modelou a casa do Mike no Blender (casa-do-mike.py) e repintou as paredes do Modular Dungeon Kit,design/03-itens-do-jogo,Anthropic,-,https://claude.ai,Design
+ia,Claude (Anthropic): modelou no Blender os 3 níveis de casa do Mike + estufa + painel solar (niveis/construcoes.py),design/03-itens-do-jogo/niveis,Anthropic,-,https://claude.ai,Design
