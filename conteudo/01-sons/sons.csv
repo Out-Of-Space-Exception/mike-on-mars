@@ -1,26 +1,26 @@
 arquivo,quando_toca,como_soa,onde_procurar,prioridade,fonte_e_licenca
-toque-botao.ogg,qualquer botão,clique curto e macio,Kenney Interface Sounds,1 essencial,
-abrir-menu.ogg,abre o menu de construir ou o álbum,"""fuuump"" curtinho",Kenney Interface Sounds,1 essencial,
-construir.ogg,item colocado no chão,"""tum"" com encaixe de metal",Kenney Impact Sounds ou Sci-Fi Sounds,1 essencial,
-melhorar.ogg,item melhorado,3 notas subindo com brilho,Kenney Interface Sounds ou Digital Audio,1 essencial,
-colher.ogg,colher uma planta,"""pop"" alegre",Kenney Interface Sounds,1 essencial,
-tubo-abrir.ogg,tubo de amostra tremendo antes de abrir,chocalho + chiado,Kenney Sci-Fi Sounds,1 essencial,
-revelar-comum.ogg,ganhou carta comum,"""ding"" simples",Kenney Interface Sounds,1 essencial,
-revelar-raro.ogg,ganhou carta rara,"""ding"" maior com brilho",Kenney Digital Audio,1 essencial,
+toque-botao.wav,qualquer botão,clique curto e macio,Kenney Interface Sounds,1 essencial,Kenney Interface Sounds (kenney.nl/assets) — Licença CC0
+abrir-menu.wav,abre o menu de construir ou o álbum,"""fuuump"" curtinho",Kenney Interface Sounds,1 essencial,Kenney Interface Sounds (kenney.nl/assets) — Licença CC0
+construir.wav,item colocado no chão,"""tum"" com encaixe de metal",Kenney Impact Sounds ou Sci-Fi Sounds,1 essencial,Kenney Sci-Fi Sounds (kenney.nl/assets) — Licença CC0
+melhorar.wav,item melhorado,3 notas subindo com brilho,Kenney Interface Sounds ou Digital Audio,1 essencial,Kenney Interface Sounds (kenney.nl/assets) — Licença CC0
+colher.wav,colher uma planta,"""pop"" alegre",Kenney Interface Sounds,1 essencial,Kenney Interface Sounds (kenney.nl/assets) — Licença CC0
+tubo-abrir.wav,tubo de amostra tremendo antes de abrir,chocalho + chiado,Kenney Sci-Fi Sounds,1 essencial,Kenney Sci-Fi Sounds (kenney.nl/assets) — Licença CC0
+revelar-comum.wav,ganhou carta comum,"""ding"" simples",Kenney Interface Sounds,1 essencial,Kenney Interface Sounds (kenney.nl/assets) — Licença CC0
+revelar-raro.wav,ganhou carta rara,"""ding"" maior com brilho",Kenney Digital Audio,1 essencial,Kenney Interface Sounds (kenney.nl/assets) — Licença CC0
 revelar-epico.ogg,ganhou carta épica,"brilho roxo + ""ding"" subindo",Kenney Digital Audio,1 essencial,
 revelar-lendario.ogg,ganhou carta lendária,fanfarra curta (2 a 3 s),Kenney Music Jingles,1 essencial,
-alerta.ogg,evento chegando (tempestade etc.),"alarme suave, que avisa sem assustar",Kenney Sci-Fi Sounds,1 essencial,
-escudo.ogg,levantou o escudo,"""vuuum"" elétrico",Kenney Sci-Fi Sounds,1 essencial,
-energia-cai.ogg,energia acabando,som descendo (desligando),Kenney Sci-Fi Sounds,1 essencial,
-travado.ogg,ação travada porque a barra está baixa,"""blop"" grave, sem parecer bronca",Kenney Interface Sounds,1 essencial,
+alerta.wav,evento chegando (tempestade etc.),"alarme suave, que avisa sem assustar",Kenney Sci-Fi Sounds,1 essencial,Kenney Sci-Fi Sounds (kenney.nl/assets) — Licença CC0
+escudo.wav,levantou o escudo,"""vuuum"" elétrico",Kenney Sci-Fi Sounds,1 essencial,Kenney Sci-Fi Sounds (kenney.nl/assets) — Licença CC0
+energia-cai.wav,energia acabando,som descendo (desligando),Kenney Sci-Fi Sounds,1 essencial,Kenney Interface Sounds (kenney.nl/assets) — Licença CC0
+travado.wav,ação travada porque a barra está baixa,"""blop"" grave, sem parecer bronca",Kenney Interface Sounds,1 essencial,Kenney Interface Sounds (kenney.nl/assets) — Licença CC0
 musica-base.ogg,"fundo do jogo, em loop","calma, espacial, 1 a 2 min",procurar CC0 ou CC-BY (OpenGameArt etc.),1 essencial,
-remover.ogg,item removido,"""pop"" ao contrário",Kenney Interface Sounds,2 se der tempo,
-plantar.ogg,semente na estufa,"""puf"" de terra fofa",Kenney Impact Sounds,2 se der tempo,
-crescer.ogg,planta muda de fase,"""blim"" suave",Kenney Interface Sounds,2 se der tempo,
+remover.wav,item removido,"""pop"" ao contrário",Kenney Interface Sounds,2 se der tempo,Kenney Interface Sounds (kenney.nl/assets) — Licença CC0
+plantar.wav,semente na estufa,"""puf"" de terra fofa",Kenney Impact Sounds,2 se der tempo,Kenney Interface Sounds (kenney.nl/assets) — Licença CC0
+crescer.wav,planta muda de fase,"""blim"" suave",Kenney Interface Sounds,2 se der tempo,Kenney Interface Sounds (kenney.nl/assets) — Licença CC0
 passos.ogg,Mike andando,passos na areia,Kenney Impact Sounds,2 se der tempo,
-energia-volta.ogg,energia voltou,som subindo (ligando),Kenney Sci-Fi Sounds,2 se der tempo,
+energia-volta.wav,energia voltou,som subindo (ligando),Kenney Sci-Fi Sounds,2 se der tempo,Kenney Interface Sounds (kenney.nl/assets) — Licença CC0
 aurora.ogg,aurora aparece no céu,brilho mágico longo,Kenney Digital Audio ou procurar CC0,2 se der tempo,
 vento-poeira.ogg,"tempestade de poeira, em loop",vento forte com areia,procurar CC0 ou CC-BY,2 se der tempo,
-helice-ingenuity.ogg,"Ingenuity voando, em loop",zumbido de hélice,Kenney Sci-Fi Sounds,2 se der tempo,
-foto.ogg,tirou o cartão-postal,clique de câmera,procurar CC0,2 se der tempo,
-bem-vindo.ogg,"""Enquanto você estava fora…""",sininho,Kenney Interface Sounds,2 se der tempo,
+helice-ingenuity.wav,"Ingenuity voando, em loop",zumbido de hélice,Kenney Sci-Fi Sounds,2 se der tempo,Kenney Sci-Fi Sounds (kenney.nl/assets) — Licença CC0
+foto.wav,tirou o cartão-postal,clique de câmera,procurar CC0,2 se der tempo,Kenney Interface Sounds (kenney.nl/assets) — Licença CC0
+bem-vindo.wav,"""Enquanto você estava fora…""",sininho,Kenney Interface Sounds,2 se der tempo,Kenney Interface Sounds (kenney.nl/assets) — Licença CC0
