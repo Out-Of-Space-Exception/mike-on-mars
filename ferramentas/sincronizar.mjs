@@ -85,7 +85,8 @@ if (existsSync(itensCsv)) {
   for (const it of objetos(parse(readFileSync(itensCsv, 'utf8')))) {
     const citado = (it.observacao.match(/design\/[\w\-/]+\.(glb|png)/) || [])[0];
     const kebab = it.arquivo_do_modelo.replace(/_/g, '-').replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-    const candidatos = [citado, `design/03-itens-do-jogo/${it.arquivo_do_modelo}`, `design/03-itens-do-jogo/kenney/${kebab}`].filter(Boolean);
+    const nivel1 = (it.observacao.match(/niveis\/[\w-]+-n1\.glb/) || [])[0];
+    const candidatos = [nivel1 && `design/03-itens-do-jogo/${nivel1}`, `design/03-itens-do-jogo/${it.arquivo_do_modelo}`, citado, `design/03-itens-do-jogo/kenney/${kebab}`].filter(Boolean);
     const achado = candidatos.find(c => existsSync(join(RAIZ, c)));
     if (!achado) continue;
     const nome = achado.split('/').pop();

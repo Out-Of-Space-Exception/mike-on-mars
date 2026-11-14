@@ -44,6 +44,15 @@ var _type_scale := {}       # escala de cada construção com níveis (a mesma e
 var whole_grid := false     # o HUD liga ao construir ou mover: a câmera mostra a grade inteira
 var _cam_goal := Vector3(INF, INF, INF)
 var _cam_tween: Tween
+var _rig: Node3D
+var _manual_cam := false
+var _touches := {}          # dedo -> posição na tela
+var _press_pos := Vector2.ZERO
+var _dragging := false
+
+const DRAG_START := 14.0    # pixels: menos que isso é toque, mais é arrastar
+const ZOOM_MIN := 6.0
+const ZOOM_MAX := 28.0
 
 
 func _ready() -> void:
@@ -88,14 +97,17 @@ func highlight(cells: Array) -> void:
 
 
 ## A câmera enquadra a base: perto quando ela é pequena, a grade inteira ao construir ou mover.
+## Depois que a criança mexe na câmera com os dedos, ela só se ajusta sozinha ao construir ou mover.
 func _frame_camera() -> void:
+	if _manual_cam and not whole_grid:
+		return
 	var lo := Vector2i(0, 0)
 	var hi := Vector2i(State.GRID_W - 1, State.GRID_H - 1)
 	if not whole_grid:
 		lo = Vector2i(State.GRID_W, State.GRID_H)
 		hi = Vector2i(-1, -1)
 		for k in State.items:
-			for c in State.cells_of(State.parse_key(k), State.items[k].type, int(State.items[k].level)):
+			for c in State.item_cells(k, State.items[k]):
 				lo = lo.min(c)
 				hi = hi.max(c)
 		lo = (lo - Vector2i(1, 1)).clamp(Vector2i.ZERO, Vector2i(State.GRID_W - 1, State.GRID_H - 1))
@@ -108,13 +120,116 @@ func _frame_camera() -> void:
 	if goal.is_equal_approx(_cam_goal):
 		return
 	_cam_goal = goal
-	# A barra de cima é maior que a de baixo: sobe um pouco a câmera para a base ficar no meio do que sobra.
-	var pos := center + camera.transform.basis.z * 40.0 + camera.transform.basis.y * size * 0.08
 	if _cam_tween:
 		_cam_tween.kill()
 	_cam_tween = create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	_cam_tween.tween_property(camera, "position", pos, 0.6)
+	_cam_tween.tween_property(_rig, "position", center, 0.6)
 	_cam_tween.tween_property(camera, "size", size, 0.6)
+
+
+# ───────────── Dedos na tela: arrastar mexe, pinça dá zoom, dois dedos girando giram o mundo ─────────────
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch:
+		_on_touch(event)
+	elif event is InputEventScreenDrag:
+		_on_drag(event)
+	elif event is InputEventMouseButton and event.device != InputEvent.DEVICE_ID_EMULATION:
+		_on_mouse_button(event)
+	elif event is InputEventMouseMotion and event.device != InputEvent.DEVICE_ID_EMULATION:
+		if event.button_mask & MOUSE_BUTTON_MASK_LEFT:
+			if not _dragging and event.position.distance_to(_press_pos) > DRAG_START:
+				_dragging = true
+			if _dragging:
+				_pan(event.position - event.relative, event.position)
+		elif event.button_mask & MOUSE_BUTTON_MASK_RIGHT:
+			_turn(-event.relative.x * 0.01)
+
+
+func _on_touch(event: InputEventScreenTouch) -> void:
+	if event.pressed:
+		_touches[event.index] = event.position
+		if _touches.size() == 1:
+			_press_pos = event.position
+			_dragging = false
+		return
+	var was_single := _touches.size() == 1
+	_touches.erase(event.index)
+	if was_single and not _dragging:
+		cell_tapped.emit(_cell_from_screen(event.position))
+	if _touches.is_empty():
+		_dragging = false
+
+
+func _on_drag(event: InputEventScreenDrag) -> void:
+	var before: Vector2 = _touches.get(event.index, event.position - event.relative)
+	_touches[event.index] = event.position
+	if _touches.size() == 1:
+		if not _dragging and event.position.distance_to(_press_pos) > DRAG_START:
+			_dragging = true
+		if _dragging:
+			_pan(before, event.position)
+		return
+	# Dois dedos: a distância entre eles dá o zoom, o ângulo entre eles gira o mundo.
+	_dragging = true
+	var ids := _touches.keys()
+	var a: Vector2 = _touches[ids[0]]
+	var b: Vector2 = _touches[ids[1]]
+	var a0: Vector2 = before if ids[0] == event.index else a
+	var b0: Vector2 = before if ids[1] == event.index else b
+	_zoom((a0 - b0).length() / maxf((a - b).length(), 1.0))
+	_turn((b - a).angle() - (b0 - a0).angle())
+
+
+func _on_mouse_button(event: InputEventMouseButton) -> void:
+	match event.button_index:
+		MOUSE_BUTTON_WHEEL_UP:
+			if event.pressed:
+				_zoom(0.9)
+		MOUSE_BUTTON_WHEEL_DOWN:
+			if event.pressed:
+				_zoom(1.1)
+		MOUSE_BUTTON_LEFT:
+			if event.pressed:
+				_press_pos = event.position
+				_dragging = false
+			elif not _dragging:
+				cell_tapped.emit(_cell_from_screen(event.position))
+
+
+## Arrastar: o chão "gruda" no dedo.
+func _pan(from: Vector2, to: Vector2) -> void:
+	var p0 := _ground_point(from)
+	var p1 := _ground_point(to)
+	if p0 == Vector3.INF or p1 == Vector3.INF:
+		return
+	_take_camera()
+	var limit := Vector3(State.GRID_W * CELL / 2.0 + CELL * 2.0, 0.0, State.GRID_H * CELL / 2.0 + CELL * 2.0)
+	_rig.position = (_rig.position + p0 - p1).clamp(-limit, limit)
+
+
+func _zoom(factor: float) -> void:
+	_take_camera()
+	camera.size = clampf(camera.size * factor, ZOOM_MIN, ZOOM_MAX)
+
+
+func _turn(angle: float) -> void:
+	_take_camera()
+	_rig.rotate_y(-angle)
+
+
+func _take_camera() -> void:
+	_manual_cam = true
+	if _cam_tween:
+		_cam_tween.kill()
+	_cam_goal = Vector3(INF, INF, INF)
+
+
+func _ground_point(p: Vector2) -> Vector3:
+	var o := camera.project_ray_origin(p)
+	var d := camera.project_ray_normal(p)
+	if absf(d.y) < 0.0001:
+		return Vector3.INF
+	return o + d * (-o.y / d.y)
 
 
 ## O Mike anda até a frente da casa tocada.
@@ -143,17 +258,10 @@ func jump() -> void:
 	t.tween_property(mike, "position:y", 0.0, 0.22).set_ease(Tween.EASE_IN)
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		cell_tapped.emit(_cell_from_screen(event.position))
-
-
 func _cell_from_screen(p: Vector2) -> Vector2i:
-	var o := camera.project_ray_origin(p)
-	var d := camera.project_ray_normal(p)
-	if absf(d.y) < 0.0001:
+	var hit := _ground_point(p)
+	if hit == Vector3.INF:
 		return OUTSIDE
-	var hit := o + d * (-o.y / d.y)
 	var c := Vector2i(floori((hit.x + State.GRID_W * CELL / 2.0) / CELL), floori((hit.z + State.GRID_H * CELL / 2.0) / CELL))
 	return c if State.in_grid(c) else OUTSIDE
 
@@ -174,6 +282,11 @@ func _sync_mood() -> void:
 	elif dust:
 		light = Color(0.9, 0.75, 0.6)
 		ambient = Color(0.75, 0.55, 0.4)
+	# Apagão (sem energia): a base fica na penumbra até a energia voltar.
+	var blackout: bool = State.energy <= 0.0
+	_sun.light_energy = 0.45 if blackout else 1.1
+	if blackout:
+		ambient = ambient.darkened(0.45)
 	_sun.light_color = light
 	_env.ambient_light_color = ambient
 	_dome.visible = State.storm_active() and State.storm_shielded
@@ -225,22 +338,64 @@ func _build_world() -> void:
 	_sun.shadow_enabled = true
 	add_child(_sun)
 
+	# Câmera num "tripé": o tripé fica no ponto que a câmera olha; girar o tripé gira o mundo.
+	_rig = Node3D.new()
+	_rig.rotation_degrees.y = 45.0
+	add_child(_rig)
 	camera = Camera3D.new()
 	camera.projection = Camera3D.PROJECTION_ORTHOGONAL
 	camera.keep_aspect = Camera3D.KEEP_WIDTH
 	camera.size = 19.0
-	camera.rotation_degrees = Vector3(-35.264, 45.0, 0.0)
-	add_child(camera)
+	camera.rotation_degrees = Vector3(-35.264, 0.0, 0.0)
+	_rig.add_child(camera)
 	camera.position = camera.transform.basis.z * 40.0
 	camera.current = true
 
-	var ground := MeshInstance3D.new()
-	var plane := PlaneMesh.new()
-	plane.size = Vector2(160.0, 160.0)
-	ground.mesh = plane
-	ground.material_override = _mat(Palette.GROUND)
-	ground.position.y = -0.02
-	add_child(ground)
+	# Céu 360° do design/03 (com Sol, Fobos e Deimos).
+	var sky_file := State.model_file("ceu")
+	if sky_file.ends_with(".png") and ResourceLoader.exists(ITEMS_DIR + sky_file):
+		var sky_mat := PanoramaSkyMaterial.new()
+		sky_mat.panorama = load(ITEMS_DIR + sky_file)
+		var sky := Sky.new()
+		sky.sky_material = sky_mat
+		_env.sky = sky
+		_env.background_mode = Environment.BG_SKY
+
+	# Terreno com relevo e crateras do design/03 (centro plano para a base). Sem ele, um chão liso.
+	var terrain := _load_model(State.model_file("chao"), 1000.0, 1000.0)
+	if terrain:
+		terrain.scale = Vector3.ONE
+		terrain.position = Vector3(0.0, -_center_height(terrain) - 0.03, 0.0)
+		add_child(terrain)
+	else:
+		var ground := MeshInstance3D.new()
+		var plane := PlaneMesh.new()
+		plane.size = Vector2(160.0, 160.0)
+		ground.mesh = plane
+		ground.material_override = _mat(Palette.GROUND)
+		ground.position.y = -0.02
+		add_child(ground)
+
+	# Poeirinha dourada flutuando (efeito do design/03).
+	var dust_file := State.model_file("efeito-poeira")
+	if dust_file.ends_with(".gd") and ResourceLoader.exists(ITEMS_DIR + dust_file):
+		var dust: Node3D = (load(ITEMS_DIR + dust_file) as GDScript).new()
+		dust.set("area", Vector3(State.GRID_W * CELL + 10.0, 5.0, State.GRID_H * CELL + 10.0))
+		add_child(dust)
+
+
+## Altura do terreno no meio do mapa (onde fica a base), para a grade ficar rente ao chão.
+func _center_height(terrain: Node3D) -> float:
+	var total := 0.0
+	var n := 0
+	for mi in terrain.find_children("*", "MeshInstance3D", true, false):
+		var mesh := (mi as MeshInstance3D).mesh
+		for s in mesh.get_surface_count():
+			for v in mesh.surface_get_arrays(s)[Mesh.ARRAY_VERTEX]:
+				if absf(v.x) < 6.0 and absf(v.z) < 6.0:
+					total += v.y
+					n += 1
+	return total / n if n > 0 else 0.0
 
 
 func _build_grid() -> void:
@@ -327,10 +482,13 @@ func _sync_items() -> void:
 			_nodes[k] = n
 		var node: Node3D = _nodes[k]
 		var w := State.width_of(it.type, level)
-		node.position = cell_center(State.parse_key(k)) + Vector3((w - 1) * CELL / 2.0, 0.0, 0.0)
-		# Quem tem modelo por nível já cresce no modelo; os outros crescem um pouco a cada nível.
-		var s := 1.0 if State.FOOTPRINT.has(it.type) else 1.0 + 0.15 * (level - 1)
-		node.scale = Vector3(s, s, s)
+		var rot := int(it.get("rot", 0))
+		# O meio da fileira de casas; girado de lado, a fileira vai para a frente (+Z).
+		var along := Vector3((w - 1) * CELL / 2.0, 0.0, 0.0) if rot % 2 == 0 else Vector3(0.0, 0.0, (w - 1) * CELL / 2.0)
+		node.position = cell_center(State.parse_key(k)) + along
+		var model: Node3D = node.get_node_or_null("Model")
+		if model:
+			model.rotation.y = -rot * PI / 2.0
 		var label: Label3D = node.get_node("Label")
 		label.text = tr(State.item_name(it))
 		_update_plant(node, it)
@@ -344,26 +502,37 @@ func _make_item(type: String, level: int) -> Node3D:
 	root.set_meta("level", level)
 	var h: float = State.ITEMS[type].height
 	var model_name: String = State.ITEMS[type].get("model", "")
-	var model := _load_model(State.model_file(model_name, level), CELL * 0.9, CELL * 1.3)
+	var file := State.model_file(model_name, level)
+	var model := _load_model(file, CELL * 0.9, CELL * 1.3)
+	var target_h := State.model_height(type) * MIKE_HEIGHT / DESIGN_MIKE
 	if model:
-		if State.FOOTPRINT.has(type):
-			# Mesma escala em todos os níveis: o nível 1 cabe numa casa; os outros crescem para o lado.
+		if type == "rtg" and level >= State.MAX_LEVEL and file.begins_with("kilopower"):
+			# O Kilopower é um modelo à parte: um reator maior que o RTG, cabendo na casa.
+			_fit(model, CELL * 0.95, maxf(target_h, 0.8) * 1.8)
+		elif State.FOOTPRINT.has(type) or file.contains("-n%d." % level):
+			# Mesma escala em todos os níveis (o modelo de cada nível já vem maior).
+			# Quem ocupa várias casas: o nível 1 cabe numa casa. Os outros: o nível 1 tem a altura do tamanhos.csv.
 			if not _type_scale.has(type):
 				var first := _load_model(State.model_file(model_name, 1), 1.0, 1.0)
 				first.scale = Vector3.ONE
 				var size1 := _merged_aabb(first).size
-				_type_scale[type] = CELL * 0.95 / maxf(size1.x, 0.001)
+				if State.FOOTPRINT.has(type) or target_h <= 0.0:
+					_type_scale[type] = CELL * 0.95 / maxf(maxf(size1.x, size1.z), 0.001)
+				else:
+					_type_scale[type] = minf(target_h / maxf(size1.y, 0.001), CELL * 0.95 / maxf(maxf(size1.x, size1.z), 0.001))
 				first.free()
 			_scale_model(model, _type_scale[type])
-		elif State.model_height(type) > 0.0:
-			_fit(model, CELL * 0.95, State.model_height(type) * MIKE_HEIGHT / DESIGN_MIKE)
-		root.add_child(model)
+		elif target_h > 0.0:
+			_fit(model, CELL * 0.95, target_h)
+		var holder := Node3D.new()
+		holder.name = "Model"
+		holder.add_child(model)
+		root.add_child(holder)
 		h = _merged_aabb(model).end.y * model.scale.y + model.position.y
 	else:
-		root.add_child(_placeholder(type, h))
-	if type == "rtg" and level >= State.MAX_LEVEL:
-		root.add_child(_kilopower_radiator(h))
-		h += 0.5
+		var holder := _placeholder(type, h)
+		holder.name = "Model"
+		root.add_child(holder)
 	var label := Label3D.new()
 	label.name = "Label"
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
@@ -517,30 +686,6 @@ func _scale_model(holder: Node3D, s: float) -> void:
 	var box := _merged_aabb(holder)
 	holder.scale = Vector3.ONE * s
 	holder.position = Vector3(-box.get_center().x * s, -box.position.y * s, -box.get_center().z * s)
-
-
-## Kilopower (RTG no nível 3): um radiador dourado em forma de guarda-chuva, como o reator de verdade.
-func _kilopower_radiator(top: float) -> Node3D:
-	var holder := Node3D.new()
-	var mast := MeshInstance3D.new()
-	var cyl := CylinderMesh.new()
-	cyl.top_radius = 0.06
-	cyl.bottom_radius = 0.06
-	cyl.height = 0.4
-	mast.mesh = cyl
-	mast.material_override = _mat(Palette.SUIT)
-	mast.position.y = top + 0.2
-	holder.add_child(mast)
-	var umbrella := MeshInstance3D.new()
-	var cone := CylinderMesh.new()
-	cone.top_radius = 0.75
-	cone.bottom_radius = 0.08
-	cone.height = 0.35
-	umbrella.mesh = cone
-	umbrella.material_override = _mat(Palette.GOLD)
-	umbrella.position.y = top + 0.5
-	holder.add_child(umbrella)
-	return holder
 
 
 func _fit(holder: Node3D, max_width: float, max_height: float) -> void:
