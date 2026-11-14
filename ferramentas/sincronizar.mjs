@@ -76,3 +76,27 @@ mkdirSync(join(RAIZ, 'jogo/web'), {recursive: true});
 mkdirSync(join(RAIZ, 'jogo/ui/fonts'), {recursive: true});
 for (const f of ['nave.png', 'rubik.ttf']) if (existsSync(join(carregamento, f))) copyFileSync(join(carregamento, f), join(RAIZ, 'jogo/web', f));
 if (existsSync(join(carregamento, 'rubik.ttf'))) copyFileSync(join(carregamento, 'rubik.ttf'), join(RAIZ, 'jogo/ui/fonts/rubik.ttf'));
+
+// 7. Modelos dos itens (design/03 e design/04), pelo itens.csv do Design → jogo/models/items/ + data/itens.json
+const itensCsv = join(RAIZ, 'design/03-itens-do-jogo/itens.csv');
+const itens = {};
+if (existsSync(itensCsv)) {
+  mkdirSync(join(RAIZ, 'jogo/models/items'), {recursive: true});
+  for (const it of objetos(parse(readFileSync(itensCsv, 'utf8')))) {
+    const citado = (it.observacao.match(/design\/[\w\-/]+\.(glb|png)/) || [])[0];
+    const kebab = it.arquivo_do_modelo.replace(/_/g, '-').replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+    const candidatos = [citado, `design/03-itens-do-jogo/${it.arquivo_do_modelo}`, `design/03-itens-do-jogo/kenney/${kebab}`].filter(Boolean);
+    const achado = candidatos.find(c => existsSync(join(RAIZ, c)));
+    if (!achado) continue;
+    const nome = achado.split('/').pop();
+    copyFileSync(join(RAIZ, achado), join(RAIZ, 'jogo/models/items', nome));
+    itens[it.item_do_jogo] = nome;
+  }
+}
+writeFileSync(join(RAIZ, 'jogo/data/itens.json'), JSON.stringify(itens, null, 1) + '\n');
+
+// 8. Ícones do design/05
+const icones = join(RAIZ, 'design/05-telas/telas-godot');
+mkdirSync(join(RAIZ, 'jogo/ui/icons'), {recursive: true});
+if (existsSync(icones)) for (const f of readdirSync(icones)) if (/^ic-.*\.png$/.test(f) || f === 'mike.png') copyFileSync(join(icones, f), join(RAIZ, 'jogo/ui/icons', f));
+console.log(`modelos de itens: ${Object.keys(itens).length} (${Object.keys(itens).join(', ')})`);

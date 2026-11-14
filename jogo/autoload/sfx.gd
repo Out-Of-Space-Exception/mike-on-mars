@@ -4,6 +4,7 @@ extends Node
 
 var _players: Array[AudioStreamPlayer] = []
 var _cache := {}
+var _music: AudioStreamPlayer
 
 
 func _ready() -> void:
@@ -22,6 +23,20 @@ func play(sound_name: String) -> void:
 			p.stream = stream
 			p.play()
 			return
+
+
+## Música de fundo em loop (começa no "Jogar": o navegador só deixa tocar som depois de um toque).
+func play_music(sound_name: String) -> void:
+	var stream := _load(sound_name)
+	if stream == null:
+		return
+	if _music == null:
+		_music = AudioStreamPlayer.new()
+		_music.volume_db = -10.0
+		_music.finished.connect(_music.play)
+		add_child(_music)
+	_music.stream = stream
+	_music.play()
 
 
 func _load(sound_name: String) -> AudioStream:

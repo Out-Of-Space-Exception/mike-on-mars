@@ -84,6 +84,31 @@ STORM_OVER,A tempestade passou!,The storm is over!,The storm is over!,The storm 
 EXPLORING,Explorando · {n} sóis,Exploring · {n} sols,Exploring · {n} sols,Exploring · {n} sols
 TUBE_READY,Abrir o tubo!,Open the tube!,Open the tube!,Open the tube!
 LOCK_STORM,O Mike espera a tempestade passar.,Mike waits for the storm to pass.,Mike waits for the storm to pass.,Mike waits for the storm to pass.
+D_FLAG,Bandeira,Flag,Flag,Flag
+D_LIGHTS,Luzinhas,String lights,String lights,String lights
+D_POT,Vaso,Flower pot,Flower pot,Flower pot
+LOCKED_DECOR,Junte mais cartas para destravar.,Collect more cards to unlock it.,Collect more cards to unlock it.,Collect more cards to unlock it.
+NEED_MAX,Você já tem uma.,You already have one.,You already have one.,You already have one.
+LOCK_NOSIGNAL,Sem sinal: o piloto automático está no comando.,No signal: the autopilot is in charge.,No signal: the autopilot is in charge.,No signal: the autopilot is in charge.
+NOSIGNAL_LEFT,Sem sinal · {n} sóis,No signal · {n} sols,No signal · {n} sols,No signal · {n} sols
+EV_NOSIGNAL_TEXT,O Sol ficou entre a Terra e Marte. Sem mensagens por um tempo.,The Sun is between Earth and Mars. No messages for a while.,The Sun is between Earth and Mars. No messages for a while.,The Sun is between Earth and Mars. No messages for a while.
+PLAN_SAVE,Economizar energia,Save energy,Save energy,Save energy
+PLAN_PLANT,Continuar plantando,Keep planting,Keep planting,Keep planting
+EV_COLD_TEXT,"Na Gale, a noite chega perto de −70 °C.","In Gale, nights get close to −70 °C.","In Gale, nights get close to −70 °C.","In Gale, nights get close to −70 °C."
+EV_COLD_A,Aquecer a estufa,Heat the greenhouse,Heat the greenhouse,Heat the greenhouse
+EV_COLD_B,Deixar esfriar,Let it cool,Let it cool,Let it cool
+COLD_LEFT,Noite fria · {n} sóis,Cold night · {n} sols,Cold night · {n} sols,Cold night · {n} sols
+DUST_LEFT,Painéis sujos · {n} sóis,Dirty panels · {n} sols,Dirty panels · {n} sols,Dirty panels · {n} sols
+BTN_NASA,Dados da NASA,NASA data,NASA data,NASA data
+BTN_SOURCE,Fonte,Source,Source,Source
+NASA_TITLE,Dados reais da NASA neste jogo,Real NASA data in this game,Real NASA data in this game,Real NASA data in this game
+NASA_DONKI,"Tempestades solares: {n} eventos reais de 2024 do DONKI, o banco de clima espacial da NASA. São dados arquivados, não ao vivo.","Solar storms: {n} real events from 2024, from DONKI, NASA's space weather database. This is archived data, not live.","Solar storms: {n} real events from 2024, from DONKI, NASA's space weather database. This is archived data, not live.","Solar storms: {n} real events from 2024, from DONKI, NASA's space weather database. This is archived data, not live."
+NASA_CARDS,Cartas: cada uma traz um fato real e o link da fonte.,Cards: each one has a real fact and a link to its source.,Cards: each one has a real fact and a link to its source.,Cards: each one has a real fact and a link to its source.
+NASA_MODEL,Ingenuity: modelo 3D oficial da NASA/JPL-Caltech.,Ingenuity: official 3D model by NASA/JPL-Caltech.,Ingenuity: official 3D model by NASA/JPL-Caltech.,Ingenuity: official 3D model by NASA/JPL-Caltech.
+UNLOCK_DECOR,Decoração nova: {name}!,New decoration: {name}!,New decoration: {name}!,New decoration: {name}!
+SEED_NEW,Semente nova: {name}!,New seed: {name}!,New seed: {name}!,New seed: {name}!
+PHOTO_SAVED,Foto salva!,Photo saved!,Photo saved!,Photo saved!
+AWAY_SOLS,Passaram {n} sóis.,{n} sols went by.,{n} sols went by.,{n} sols went by.
 CARD_1_NAME,Alface,Lettuce,Lettuce,Lettuce
 CARD_1_FACT,"Os astronautas comeram alface plantada no espaço, em 10/08/2015.","Astronauts ate lettuce grown in space on August 10, 2015.","Astronauts ate lettuce grown in space on August 10, 2015.","Astronauts ate lettuce grown in space on August 10, 2015."
 CARD_2_NAME,Rabanete,Radish,Radish,Radish

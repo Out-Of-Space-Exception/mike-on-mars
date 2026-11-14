@@ -8,3 +8,7 @@ node_modules/
 # gerado pela importação da Godot
 *.translation
 ferramentas/.donki-cache/
+# texturas extraídas pela importação da Godot
+jogo/models/**/*.jpg
+jogo/models/**/*_colormap.png
+jogo/models/**/*-tex.png
