@@ -25,7 +25,7 @@ A banca do evento vê estes slides. E, se o vídeo der problema, o Space Apps ac
    | 2 | Problem | o desafio em palavras simples: crianças de 7 a 12 anos sentirem as escolhas difíceis de uma missão real |
    | 3 | Solution | o jogo: cuidar de uma base em Marte, no navegador do celular, sem login e sem download |
    | 4 | How it works | 3 barras, construir, plantar, explorar, eventos com lado bom e lado ruim, sem game over + 1 print do jogo |
-   | 5 | NASA data | DONKI (tempestades solares reais) + 25 cartas com fato e foto da NASA, com as fontes |
+   | 5 | NASA data | DONKI (tempestades solares reais) + 40 cartas com fato e foto da NASA, com as fontes |
    | 6 | Impact | o que a criança aprende, grátis, 4 idiomas, nenhum dado da criança |
    | 7 | Team | nome do time e de cada pessoa, com a função |
 

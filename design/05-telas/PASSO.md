@@ -38,7 +38,7 @@
 |---|---|---|
 | `tela-inicial.png` | logo, Mike e botão de jogar | Mike on Mars · Play |
 | `hud-barras.png` | a base, as 3 barras em cima e os botões embaixo | Energy · Oxygen · Shield · Sol 12 · Gale Crater · Build · Explore · Album · Photo |
-| `album.png` | as 25 cartas em grade; as que faltam ficam apagadas | 8/25 cards |
+| `album.png` | as 40 cartas em grade; as que faltam ficam apagadas; a borda de cada carta tem a cor da raridade | 8/40 cards |
 | `carta.png` | foto real da NASA + nome + 1 linha de fato | New card! · This is real: · MOXIE · Turns Mars air into oxygen. |
 | `aviso-tempestade.png` | aviso de tempestade solar com 2 escolhas | Solar storm coming! · Raise the shield? · Shield (uses energy) · Mike stays inside |
 | `tubo-revelacao.png` | o tubo de amostra tremendo e brilhando na cor da raridade | Tap to open! · Rare |
@@ -75,6 +75,6 @@ Modelo do `telas.md`:
 ```text
 Siga o AGENTS.md e o CONTEXTO.md do repositório https://github.com/Out-Of-Space-Exception/mike-on-mars. Se você não consegue abrir links, eu colo os arquivos abaixo, junto com o textos.csv, o cores.csv e o fonte.md.
 Tarefa: Design · 05 · As telas. A tela é retrato, 720 x 1280.
-Para cada tela (tela inicial, 3 barras sobre a base, álbum das 25 cartas, carta, aviso de tempestade solar com a escolha, revelação do tubo de amostra, cartão-postal "Sol 47 · Gale Crater"), liste de cima para baixo o que aparece, qual cor do cores.csv usar e quais textos da coluna en do textos.csv entram. Botões com ícone + 1 palavra, de pelo menos 96 x 96 px. Não invente texto novo: se faltar, escreva CONFERIR.
+Para cada tela (tela inicial, 3 barras sobre a base, álbum das 40 cartas, carta, aviso de tempestade solar com a escolha, revelação do tubo de amostra, cartão-postal "Sol 47 · Gale Crater"), liste de cima para baixo o que aparece, qual cor do cores.csv usar e quais textos da coluna en do textos.csv entram. Botões com ícone + 1 palavra, de pelo menos 96 x 96 px. Não invente texto novo: se faltar, escreva CONFERIR.
 Depois, responda com o telas.md pronto: 1ª linha "# Telas", uma linha "- Link: <link>" e 1 linha por tela no formato "- nome-do-arquivo.png: descrição".
 ```

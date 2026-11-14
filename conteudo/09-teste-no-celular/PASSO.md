@@ -22,7 +22,7 @@ Jurados e crianças vão abrir o jogo no celular. Bug que só aparece no celular
    - [ ] Construir: toca no item, toca no chão. Depois mover, melhorar e remover.
    - [ ] Plantar e colher na estufa.
    - [ ] Explorar: o tubo treme, abre e mostra a carta.
-   - [ ] Álbum: a carta nova aparece e a conta `n/25` sobe.
+   - [ ] Álbum: a carta nova aparece e a conta `n/40` sobe.
    - [ ] Eventos (tempestade solar, poeira, noite congelante, sem sinal): aparecem e dá para escolher.
    - [ ] Barra baixa só trava ou desacelera a ação, sem game over.
    - [ ] Fechar e abrir de novo: a base continua salva e aparece o aviso "enquanto você estava fora".

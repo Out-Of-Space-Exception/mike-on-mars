@@ -21,7 +21,7 @@ As cores contam a história real: o MOXIE é dourado, o céu de Marte de dia é 
 1. No Figma ou no Canva, crie uma tela com fundo caramelo (o céu) e, para cada linha da tabela abaixo, faça um quadrado e teste a cor por cima.
 2. Para as cores "de verdade" (MOXIE, céu, pedras), ache uma foto real (por exemplo, nos links da NASA da seção 6), cole no Figma e pegue a cor com o conta-gotas (tecla `I`).
 3. Ingenuity: o cinza vira branco, com uma faixa azul e uma vermelha, no estilo das máquinas da Kenney.
-4. Tubo de amostra: 3 cores bem diferentes, do comum ao lendário. O raro pode usar a cor `destaque-raro` do `cores.csv`. Teste com o celular longe do rosto: dá para ver a diferença?
+4. Tubo de amostra: 4 cores, uma por raridade, seguindo o que as crianças já conhecem de outros jogos: comum = **cinza**, raro = **azul**, épico = **roxo**, lendário = **dourado**. Vocês escolhem o tom exato (hex). Teste com o celular longe do rosto: dá para ver a diferença?
 5. Crie o `cores-das-coisas.csv`: na pasta `design/04-cores-das-coisas` do GitHub, **Add file → Create new file**, cole o modelo, troque cada `#RRGGBB` e clique em **Commit changes**.
 6. Marque `[x]` no [TAREFAS.md](../../TAREFAS.md) e avise o Dev no grupo.
 
@@ -36,7 +36,7 @@ As cores contam a história real: o MOXIE é dourado, o céu de Marte de dia é 
 | `ingenuity-faixa-azul` | uma faixa do Ingenuity | azul |
 | `ingenuity-faixa-vermelha` | a outra faixa | vermelho |
 | `ceu` | o céu de dia | caramelo |
-| `tubo-comum` / `tubo-raro` / `tubo-lendario` | o tubo de amostra em cada raridade | do mais discreto ao mais brilhante |
+| `tubo-comum` / `tubo-raro` / `tubo-epico` / `tubo-lendario` | o tubo de amostra em cada raridade | cinza, azul, roxo e dourado |
 
 Modelo do `cores-das-coisas.csv`:
 ```text
@@ -52,6 +52,7 @@ ingenuity-faixa-vermelha,#RRGGBB,
 ceu,#RRGGBB,
 tubo-comum,#RRGGBB,
 tubo-raro,#RRGGBB,
+tubo-epico,#RRGGBB,
 tubo-lendario,#RRGGBB,
 ```
 
@@ -64,7 +65,7 @@ tubo-lendario,#RRGGBB,
 - [ ] A 1ª linha é `coisa,hex,observacao`.
 - [ ] Tem as 12 linhas, nesta ordem e com esta grafia.
 - [ ] Não sobrou nenhum `#RRGGBB`: todo hex tem `#` e 6 letras/números.
-- [ ] As 3 cores do tubo dão para distinguir de longe, no celular, e o céu combina com o `cores.csv`.
+- [ ] As 4 cores do tubo (cinza, azul, roxo, dourado) dão para distinguir de longe, no celular, e o céu combina com o `cores.csv`.
 - [ ] O GitHub mostra o arquivo como tabela.
 
 ## Não pode
@@ -79,6 +80,6 @@ Siga o AGENTS.md e o CONTEXTO.md do repositório https://github.com/Out-Of-Space
 Tarefa: Design · 04 · As cores das coisas. Esta é a nossa paleta (cores.csv):
 [cole aqui o cores.csv]
 Sugira 1 hex para cada coisa abaixo, combinando com a paleta e com o céu caramelo:
-hematita (cinza-escuro), enxofre (amarelo), leopardo-base (rocha avermelhada), leopardo-manchas (manchinhas escuras), moxie (dourado, como o MOXIE de verdade), ingenuity-corpo (branco), ingenuity-faixa-azul, ingenuity-faixa-vermelha, ceu (caramelo, a cor real do céu de Marte de dia), tubo-comum, tubo-raro, tubo-lendario (3 cores fáceis de distinguir de longe).
+hematita (cinza-escuro), enxofre (amarelo), leopardo-base (rocha avermelhada), leopardo-manchas (manchinhas escuras), moxie (dourado, como o MOXIE de verdade), ingenuity-corpo (branco), ingenuity-faixa-azul, ingenuity-faixa-vermelha, ceu (caramelo, a cor real do céu de Marte de dia), tubo-comum (cinza), tubo-raro (azul), tubo-epico (roxo), tubo-lendario (dourado), fáceis de distinguir de longe.
 Responda só com o cores-das-coisas.csv: 1ª linha exatamente coisa,hex,observacao e as 12 linhas nesta ordem e com esta grafia. Observação curta e sem vírgula.
 ```

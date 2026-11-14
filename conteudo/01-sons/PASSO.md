@@ -13,7 +13,7 @@ Som faz o jogo parecer pronto: o "ding" da carta nova é metade da graça. Mas s
 ## Leia antes
 - [CONTEXTO.md, seção 3](../../CONTEXTO.md#3-como-o-jogo-funciona): quando cada som toca no jogo.
 - [CONTEXTO.md, seção 7](../../CONTEXTO.md#7-regras-do-space-apps-resumo): regras do Space Apps.
-- [sons.csv](sons.csv): os 24 sons. Os 14 `1 essencial` vêm primeiro.
+- [sons.csv](sons.csv): os 25 sons. Os 15 `1 essencial` vêm primeiro.
 - [creditos.csv](../../creditos.csv) e a regra 6 do [AGENTS.md](../../AGENTS.md#3-as-regras).
 
 ## Passo a passo
@@ -49,7 +49,7 @@ Som faz o jogo parecer pronto: o "ding" da carta nova é metade da graça. Mas s
 | [`creditos.csv`](../../creditos.csv) (na raiz) | 1 linha por pacote ou som de fora | `.csv` |
 
 ## Pronto quando
-- [ ] Os 14 sons `1 essencial` estão em `conteudo/01-sons/sons/`.
+- [ ] Os 15 sons `1 essencial` estão em `conteudo/01-sons/sons/`.
 - [ ] Cada nome é igual ao da coluna `arquivo` (minúsculas, hífen, `.ogg`).
 - [ ] Toda linha com som tem `fonte_e_licenca` preenchida.
 - [ ] Todo pacote ou som de fora tem linha no `creditos.csv`.

@@ -53,7 +53,7 @@
 - [ ] Todo `BTN_*` tem 1 palavra em `en` e em `pt_BR`.
 - [ ] Nenhuma `keys` mudou e o número de linhas é o mesmo.
 - [ ] Todo `{n}` e `{date}` continua no lugar, em `en` e em `pt_BR`.
-- [ ] Os 25 `fato_en` são 1 frase curta, com o mesmo número do `fato_pt`.
+- [ ] Os 40 `fato_en` são 1 frase curta, com o mesmo número do `fato_pt`.
 - [ ] Li tudo em voz alta e nada ficou difícil nem bobo.
 
 ## Não pode

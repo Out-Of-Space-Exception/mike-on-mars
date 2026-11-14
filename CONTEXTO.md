@@ -39,7 +39,7 @@ Você está ajudando o time **Out of Space Exception** (Brasil) no NASA Space Ap
 - **Construir:** toca no item, toca no chão (sem arrastar). Dá para **mover, remover sem perder nada e melhorar** (o painel cresce, a estufa aumenta). O álbum destrava **decorações**.
 - **Plantar:** na estufa. A luz da estufa gasta energia. As plantas crescem num tempo proporcional ao real (alface ≈ 1 min 20 s; pimenta ≈ 5 min).
 - **Explorar:** gasta oxigênio. O Mike volta com um **tubo de amostra** (igual aos que o rover Perseverance lacra em Marte), que treme, brilha na cor da raridade e revela uma **carta**.
-- **Cartas:** umas **25**, de comum a lendária. Cada uma tem **foto real da NASA**, nome de verdade e **1 linha de fato**, que aparece como **prêmio** depois que a criança ganha (nunca como lição).
+- **Cartas:** **40**, em 4 raridades com cor fixa: comum (cinza), raro (azul), épico (roxo) e lendário (dourado). As mesmas cores que as crianças já conhecem de outros jogos. Cada uma tem **foto real da NASA**, nome de verdade e **1 linha de fato**, que aparece como **prêmio** depois que a criança ganha (nunca como lição).
 - **A base fica salva** no aparelho e **cresce até com o jogo fechado** ("enquanto você estava fora, 3 alfaces ficaram prontas!").
 - **Sem game over:** barra baixa só **trava ou desacelera** uma ação até recuperar (sem oxigênio, o Mike não sai; sem energia, a estufa desacelera).
 - **Escolha de verdade:** painel solar dá muita energia, mas sofre com a poeira. Bateria nuclear (RTG) dá pouca, mas nunca para.
@@ -137,6 +137,6 @@ Você está ajudando o time **Out of Space Exception** (Brasil) no NASA Space Ap
 ## 9. Pedidos prontos (copie e adapte)
 
 - **Design:** *"Seguindo o contexto, sugira 3 paletas de 5 cores (em hex) para a interface do Mike on Mars, combinando com o céu caramelo e o estilo low-poly da Kenney. Para cada uma, diga por que não parece infantil."*
-- **Cartas:** *"Seguindo o contexto, escreva a carta de [ITEM] em inglês simples: nome, raridade (comum, raro ou lendário), 1 linha de fato com o link oficial da NASA e 1 linha de 'saiba mais'. Use só fatos da seção 6 ou de fonte oficial."*
+- **Cartas:** *"Seguindo o contexto, escreva a carta de [ITEM] em inglês simples: nome, raridade (comum, raro, épico ou lendário), 1 linha de fato com o link oficial da NASA e 1 linha de 'saiba mais'. Use só fatos da seção 6 ou de fonte oficial."*
 - **Traduções:** *"Traduza estes textos do jogo para português do Brasil, espanhol e francês, mantendo frases curtas e o mesmo tom divertido."*
 - **Pitch:** *"Seguindo o contexto, escreva o roteiro de um vídeo de 30 s em inglês, cena por cena (o que aparece na tela + legenda), mostrando o primeiro minuto do jogo."*

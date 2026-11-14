@@ -20,11 +20,11 @@
    - **Redemoinho:** limpa os painéis.
    - **Noite congelante:** a criança escolhe aquecer a estufa (−20 de energia) ou deixar as plantas desacelerarem. De manhã, há chance da carta "Geada em Marte".
    - **Sem sinal da Terra:** a criança escolhe um plano (ex.: "economizar energia" ou "plantar") e não dá para mexer por 10 sóis. Quando o sinal volta, chega um pacote com sementes novas.
-2. **Cartas:** a 1ª colheita de cada planta, a 1ª construção de cada tecnologia e o 1º evento de cada tipo dão a carta da linha certa do `cartas.csv`.
+2. **Cartas:** a 1ª colheita de cada planta, a 1ª construção de cada tecnologia e o 1º evento de cada tipo dão a carta da linha certa do `cartas.csv`. As cartas do céu seguem a coluna `como_ganha` (ex.: "passar 3 noites", "chance em cada pôr do sol", "chance à noite com a antena construída").
 3. **Melhorias:** o nível 1 → 2 → 3 aparece na tela (o painel cresce, a estufa aumenta).
 4. **Decorações:** destravam com o álbum. A cada 5 cartas, a criança ganha 1 decoração do `design/03`.
 5. **Enquanto você estava fora:** ao abrir, o jogo avança o tempo desde `saved_at` (no máximo 8 h) e mostra `AWAY_TITLE` + `AWAY_PLANTS`.
-6. **Álbum:** as 25 cartas. As de Meridiani e Jezero ficam trancadas ("em breve"). Contador `ALBUM_COUNT`.
+6. **Álbum:** as 40 cartas, com a borda na cor da raridade. As de Meridiani e Jezero ficam trancadas ("em breve"). Contador `ALBUM_COUNT`.
 7. **Mapa:** Gale aberta; Meridiani e Jezero com `MAP_SOON`.
 8. **Cartão-postal:** o botão Foto tira um print da base com "Sol N · Gale Crater" e baixa o PNG no aparelho (no navegador, via `JavaScriptBridge`).
 9. **Ingenuity:** modelo 3D oficial da NASA (crédito NASA/JPL-Caltech no `creditos.csv`), recolorido com o `design/04`.

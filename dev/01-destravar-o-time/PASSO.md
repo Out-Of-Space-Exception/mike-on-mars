@@ -25,8 +25,8 @@ Se as outras duplas ficam esperando, o dia acaba e o jogo fica sem som, sem cart
 | Arquivo | O que tem | Formato |
 |---|---|---|
 | [creditos.csv](../../creditos.csv) | tudo o que veio de fora + uso de IA | `.csv` |
-| [sons.csv](../../conteudo/01-sons/sons.csv) | 24 sons (14 essenciais) | `.csv` |
-| [cartas.csv](../../conteudo/02-cartas/cartas.csv) | 25 cartas com fato e fonte | `.csv` |
+| [sons.csv](../../conteudo/01-sons/sons.csv) | 25 sons (15 essenciais) | `.csv` |
+| [cartas.csv](../../conteudo/02-cartas/cartas.csv) | 40 cartas com fato e fonte (4 raridades) | `.csv` |
 | [textos.csv](../../conteudo/03-textos/textos.csv) | todos os textos do jogo em PT e EN | `.csv` no formato de tradução da Godot |
 
 ## Pronto quando

@@ -18,8 +18,8 @@ O tubo é o momento "uau" do jogo: a revelação da raridade prende a criança. 
 ## Passo a passo
 1. **Explorar:** o botão Explorar gasta 20 de oxigênio. Com oxigênio abaixo de 20, mostrar `LOCK_OXYGEN` e o Mike não sai.
 2. O Mike sai, some por 3 s e volta segurando um tubo.
-3. **Sorteio:** comum 70%, raro 25%, lendário 5%. Vale só para as cartas com `como_ganha` = `tubo de amostra` ou `explorar` e `onde` = `Gale`. Carta repetida vira "+1" no álbum.
-4. **Revelação:** o tubo treme (tween) e brilha na cor da raridade (`tubo-comum`, `tubo-raro` ou `tubo-lendario`, do `design/04`). Com um toque, abre a carta: foto real, nome e fato (via `tr()`). Toca o som `revelar-*`.
+3. **Sorteio:** comum 60%, raro 27%, épico 10%, lendário 3% (hoje são 13 cartas no tubo da Gale: 5 comuns, 4 raras, 3 épicas e 1 lendária). Vale só para as cartas com `como_ganha` = `tubo de amostra` ou `explorar` e `onde` = `Gale`. Carta repetida vira "+1" no álbum.
+4. **Revelação:** o tubo treme (tween) e brilha na cor da raridade (`tubo-comum`, `tubo-raro`, `tubo-epico` ou `tubo-lendario`, do `design/04`: cinza, azul, roxo e dourado). Com um toque, abre a carta: foto real, nome e fato (via `tr()`). Toca o som `revelar-*`.
 5. **Dados do DONKI:** rodar uma vez, em casa, um script que baixa do DONKI (api.nasa.gov) os eventos de 2024: CME com impacto em Marte e SEP. Salvar em `jogo/data/donki.json` com `date`, `kind` e `note`. Incluir sempre o evento real de 20/05/2024. Nenhuma chave de API vai para o repositório.
 6. **Tempestade solar:** a cada 30 a 50 sóis (sorteado), escolher um evento do `donki.json`. O jogo pausa e mostra `EV_SOLAR_TITLE`, `EV_SOLAR_REAL` (com a data real) e a escolha:
    - **Escudo:** gasta 30 de energia, e o Mike segue livre.

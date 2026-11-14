@@ -1,6 +1,6 @@
 # Conteúdo · 02 · As cartas
 
-> **Em 1 frase:** conferir o fato, a fonte da NASA e a foto real de cada uma das 25 cartas.
+> **Em 1 frase:** conferir o fato, a fonte da NASA e a foto real de cada uma das 40 cartas.
 
 - **Dupla:** Conteúdo e pitch (Carolina e Davi)
 - **Prazo e status:** no [TAREFAS.md](../../TAREFAS.md)
@@ -16,7 +16,7 @@ As cartas são o prêmio do jogo e o lugar onde os dados da NASA aparecem. Um fa
 - [textos.csv](../../conteudo/03-textos/textos.csv): nomes em inglês que o jogo já usa (ex.: `P_LETTUCE` = `Lettuce`).
 
 ## Passo a passo
-1. Dividam a pesquisa (ex.: uma pessoa faz 1 a 13, a outra 14 a 25). **Só uma pessoa edita o `cartas.csv` de cada vez.**
+1. Dividam a pesquisa (ex.: uma pessoa faz 1 a 20, a outra 21 a 40; as cartas 26 a 40 já vêm com fato e fonte conferidos, só falta a foto). **Só uma pessoa edita o `cartas.csv` de cada vez.**
 2. Para cada carta, abra o link da coluna `fonte` e ache na página o fato e o número de `numero_real`. Não bateu? Corrija `numero_real` e `fato_pt` com o que a página diz e avise no grupo (o `fato_en` muda no passo 03).
 3. Resolva a coluna `status`:
    - `trocar a fonte por uma da NASA` (ou fonte fora de nasa.gov, science.nasa.gov, jpl.nasa.gov): ache o mesmo fato num site da NASA e troque o link.
@@ -40,6 +40,9 @@ As cartas são o prêmio do jogo e o lugar onde os dados da NASA aparecem. Um fa
    11-painel-solar.jpg   12-rtg.jpg          13-moxie.jpg        14-kilopower.jpg     15-ingenuity.jpg
    16-curiosity.jpg      17-opportunity.jpg  18-perseverance.jpg 19-sol.jpg           20-frio-da-gale.jpg
    21-tempestade-de-poeira.jpg  22-redemoinho-de-poeira.jpg  23-tempestade-solar.jpg  24-geada.jpg  25-aurora.jpg
+   26-veios-brancos.jpg  27-olivina.jpg  28-dunas-bagnold.jpg  29-monte-sharp.jpg  30-lagos-antigos.jpg
+   31-rachaduras-de-lama.jpg  32-oxido-de-manganes.jpg  33-boro.jpg  34-rocha-john-klein.jpg  35-meteorito-lebanon.jpg
+   36-moleculas-organicas.jpg  37-fobos-e-deimos.jpg  38-por-do-sol-azul.jpg  39-terra-vista-de-marte.jpg  40-tomate-anao.jpg
    ```
 7. Anote o crédito escrito na página da foto (ex.: `NASA/JPL-Caltech`). O crédito não tem "NASA"? Escolha outra foto.
 8. Preencha `nome_en`. Se o nome já está no `textos.csv`, use igual (ex.: `Hatch chile`). Nome real não muda: MOXIE, Curiosity, Ingenuity.
@@ -54,15 +57,15 @@ As cartas são o prêmio do jogo e o lugar onde os dados da NASA aparecem. Um fa
 ## O que entregar (nesta pasta)
 | Arquivo | O que tem | Formato |
 |---|---|---|
-| `cartas.csv` | `nome_en`, `foto_nasa`, `fonte` e `status` preenchidos nas 25 linhas | `.csv` |
-| `fotos/` | 25 fotos com os nomes da lista do item 6 | `.jpg` |
+| `cartas.csv` | `nome_en`, `foto_nasa`, `fonte` e `status` preenchidos nas 40 linhas | `.csv` |
+| `fotos/` | 40 fotos com os nomes da lista do item 6 | `.jpg` |
 | [`creditos.csv`](../../creditos.csv) (na raiz) | 1 linha por foto, com o crédito da página | `.csv` |
 
 ## Pronto quando
-- [ ] As 25 linhas têm `status` = `ok`.
+- [ ] As 40 linhas têm `status` = `ok`.
 - [ ] Toda `fonte` é de nasa.gov, science.nasa.gov ou jpl.nasa.gov.
 - [ ] Todo `numero_real` aparece escrito na página da fonte.
-- [ ] As 25 fotos estão em `fotos/`, com o nome da lista.
+- [ ] As 40 fotos estão em `fotos/`, com o nome da lista.
 - [ ] Toda foto tem `foto_nasa` preenchido e linha no `creditos.csv`.
 
 ## Não pode

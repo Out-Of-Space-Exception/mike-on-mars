@@ -21,7 +21,7 @@ Com 4 idiomas, o jogo serve para crianças de muitos países, e isso conta como 
 2. Dividam: uma pessoa no `textos.csv`, a outra no `cartas.csv`. **Uma pessoa por arquivo de cada vez.**
 3. Revise o `pt_BR` do `textos.csv`: acentos, erros de digitação, frases curtas, botão com 1 palavra.
 4. Preencha `es` e `fr` em todas as linhas do `textos.csv`. O nome do jogo já está pronto: `Mike en Marte` e `Mike sur Mars`.
-5. Preencha no `cartas.csv`: `nome_es`, `nome_fr`, `fato_es` e `fato_fr`, nas 25 linhas.
+5. Preencha no `cartas.csv`: `nome_es`, `nome_fr`, `fato_es` e `fato_fr`, nas 40 linhas.
 6. Fica igual nos 4 idiomas: `{n}`, `{date}`, os números e os nomes reais (MOXIE, Curiosity, Ingenuity, Perseverance, Opportunity, InSight).
 7. Espanhol e francês costumam ficar mais compridos. Botão passou de 1 palavra ou a frase ficou longa? Troque por uma palavra mais curta.
 8. Ninguém do time sabe espanhol ou francês? Peça para alguém que saiba ou use IA. O melhor: a IA traduz e uma pessoa que fala o idioma confere.
@@ -43,7 +43,7 @@ Os arquivos ficam onde já estão (regra 2 do [AGENTS.md](../../AGENTS.md#3-as-r
 
 ## Pronto quando
 - [ ] Nenhuma célula vazia em `es` e `fr` do `textos.csv`.
-- [ ] As 25 cartas têm `nome_es`, `nome_fr`, `fato_es` e `fato_fr`.
+- [ ] As 40 cartas têm `nome_es`, `nome_fr`, `fato_es` e `fato_fr`.
 - [ ] `{n}` e `{date}` aparecem nas mesmas linhas nos 4 idiomas.
 - [ ] Botões com 1 palavra nos 4 idiomas.
 - [ ] Os números dos fatos são os mesmos nos 4 idiomas.
