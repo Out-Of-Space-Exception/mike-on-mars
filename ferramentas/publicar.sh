@@ -5,6 +5,8 @@ set -e
 RAIZ="$(cd "$(dirname "$0")/.." && pwd)"
 GODOT="${GODOT:-/c/Users/Flaflum/Tools/godot/Godot_v4.7.2-stable_win64_console.exe}"
 REMOTO="$(git -C "$RAIZ" remote get-url origin)"
+NODE="$(command -v node || echo "/c/Program Files/nodejs/node.exe")"
+"$NODE" "$RAIZ/ferramentas/sincronizar.mjs"
 rm -rf "$RAIZ/build" && mkdir -p "$RAIZ/build"
 "$GODOT" --headless --path "$RAIZ/jogo" --import
 "$GODOT" --headless --path "$RAIZ/jogo" --export-release "Web" "$RAIZ/build/index.html"

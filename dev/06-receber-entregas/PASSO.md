@@ -18,7 +18,7 @@ Depois das 20h, as outras duplas vão embora. O que faltar e não for pedido ago
 ## Passo a passo
 1. Abrir o TAREFAS.md e ver o que **não** está marcado.
 2. Conferir os arquivos de cada pasta de Design e de Conteúdo: nome certo, formato certo, no lugar certo.
-3. Rodar `bash ferramentas/sincronizar.sh` e abrir o jogo para ver se os textos e as cartas novas aparecem.
+3. Rodar `node ferramentas/sincronizar.mjs` e abrir o jogo para ver se os textos e as cartas novas aparecem.
 4. Conferir o `creditos.csv`: todo asset e todo uso de IA tem uma linha.
 5. Pedir na hora, pessoalmente, o que faltar. Combinar quem resolve no domingo (até 22h).
 6. Anotar em `recebido.md` o que chegou e o que ficou pendente.
@@ -30,7 +30,7 @@ Depois das 20h, as outras duplas vão embora. O que faltar e não for pedido ago
 
 ## Pronto quando
 - [ ] todos os arquivos esperados estão no repositório ou anotados como pendentes, com o nome de quem resolve
-- [ ] o `sincronizar.sh` roda sem erro
+- [ ] o `sincronizar.mjs` roda sem erro
 - [ ] o `creditos.csv` está completo
 
 ## Não pode

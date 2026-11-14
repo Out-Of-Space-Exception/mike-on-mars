@@ -41,12 +41,12 @@ jogo/
 | Tela | Retrato 720 × 1280. Botão com no mínimo 96 px de altura, com ícone + 1 palavra. |
 | Salvar | `user://save.json` (no navegador vira IndexedDB), com `version`, `saved_at` (Unix), barras, itens, cartas e sol. Salvar a cada ação e a cada 10 s. |
 | Tempo | 1 sol = 2,5 s. Alface = 33 sóis (~80 s), zínia ~60 sóis, pimenta ~120 sóis (~5 min). |
-| Conteúdo | Nunca editar `jogo/data/` à mão: rodar `bash ferramentas/sincronizar.sh`, que copia o `textos.csv`, converte o `cartas.csv` em `cartas.json` e copia os sons. |
+| Conteúdo | Nunca editar `jogo/data/` à mão: rodar `node ferramentas/sincronizar.mjs`, que copia o `textos.csv`, converte o `cartas.csv` em `cartas.json` e copia os sons. |
 | Kenney | Baixar os pacotes **fora** do repositório e copiar para `jogo/models/kenney/<pacote>/` só os `.glb` usados (e a textura que eles usam). |
 
 ## Passo a passo
 1. Criar a estrutura de pastas acima e os 2 autoloads (`State`, `Sfx`).
-2. Criar `ferramentas/sincronizar.sh` (copia `textos.csv`, gera `cartas.json`, copia os sons) e rodar.
+2. Criar `ferramentas/sincronizar.mjs` (copia `textos.csv`, gera `cartas.json`, copia os sons) e rodar.
 3. Montar a base: chão marciano, câmera isométrica (ortogonal, de cima, em diagonal) e uma **grade de 6 × 8 quadrados**. Céu caramelo provisório.
 4. Construir: toque no item do menu → os quadrados livres acendem → toque num quadrado = constrói. Toque num item construído → menu **Mover / Melhorar / Remover**. Mover = tocar em outro quadrado. Remover devolve tudo, sem multa.
 5. Itens do esqueleto: Casa do Mike (já começa construída), Estufa, Painel solar, RTG, MOXIE. Enquanto os modelos não chegam, usar caixas coloridas.
@@ -65,7 +65,7 @@ jogo/
 |---|---|---|
 | `animacoes.md` | lista das animações do Mike que vieram no pacote | `.md` |
 | o jogo em [jogo/](../../jogo/) | o esqueleto, no padrão acima | projeto Godot |
-| [ferramentas/sincronizar.sh](../../ferramentas/) | o script de cópia do conteúdo | `.sh` |
+| [ferramentas/sincronizar.mjs](../../ferramentas/) | o script de cópia do conteúdo | `.mjs` |
 
 ## Pronto quando
 - [ ] abre no celular pelo QR em menos de 10 s

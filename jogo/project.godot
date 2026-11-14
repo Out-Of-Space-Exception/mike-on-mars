@@ -1,4 +1,4 @@
-; Mike on Mars (Godot 4.7, web, celular primeiro).
+; Mike on Mars (Godot 4.7, web, celular primeiro). Padrão do código: dev/03-esqueleto/PASSO.md
 config_version=5
 
 [application]
@@ -8,12 +8,23 @@ run/main_scene="res://main.tscn"
 run/max_fps=60
 config/features=PackedStringArray("4.7", "GL Compatibility")
 
+[autoload]
+
+State="*res://autoload/state.gd"
+Sfx="*res://autoload/sfx.gd"
+
 [display]
 
 window/size/viewport_width=720
 window/size/viewport_height=1280
 window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
 window/handheld/orientation=1
+
+[internationalization]
+
+locale/translations=PackedStringArray("res://data/textos.en.translation", "res://data/textos.pt_BR.translation", "res://data/textos.es.translation", "res://data/textos.fr.translation")
+locale/fallback="en"
 
 [rendering]
 

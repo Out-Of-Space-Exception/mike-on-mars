@@ -4,3 +4,6 @@
 # versão web gerada (vai para a branch gh-pages)
 /build/
 node_modules/
+
+# gerado pela importação da Godot
+*.translation

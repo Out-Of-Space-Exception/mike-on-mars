@@ -1,0 +1,159 @@
+keys,pt_BR,en,es,fr
+GAME_TITLE,Mike em Marte,Mike on Mars,Mike en Marte,Mike sur Mars
+BTN_PLAY,Jogar,Play,Play,Play
+BTN_BUILD,Construir,Build,Build,Build
+BTN_MOVE,Mover,Move,Move,Move
+BTN_UPGRADE,Melhorar,Upgrade,Upgrade,Upgrade
+BTN_REMOVE,Remover,Remove,Remove,Remove
+BTN_PLANT,Plantar,Plant,Plant,Plant
+BTN_HARVEST,Colher,Harvest,Harvest,Harvest
+BTN_EXPLORE,Explorar,Explore,Explore,Explore
+BTN_ALBUM,Álbum,Album,Album,Album
+BTN_PHOTO,Foto,Photo,Photo,Photo
+BTN_OK,OK,OK,OK,OK
+BTN_LANGUAGE,Idioma,Language,Language,Language
+BTN_SOUND,Som,Sound,Sound,Sound
+BTN_CREDITS,Créditos,Credits,Credits,Credits
+BAR_ENERGY,Energia,Energy,Energy,Energy
+BAR_OXYGEN,Oxigênio,Oxygen,Oxygen,Oxygen
+BAR_SHIELD,Escudo,Shield,Shield,Shield
+HUD_SOL,Sol {n},Sol {n},Sol {n},Sol {n}
+HUD_PLACE,Cratera Gale,Gale Crater,Gale Crater,Gale Crater
+B_HABITAT,Casa do Mike,Mike's habitat,Mike's habitat,Mike's habitat
+B_GREENHOUSE,Estufa,Greenhouse,Greenhouse,Greenhouse
+B_GREENHOUSE_DESC,Aqui as plantas crescem. A luz gasta energia.,Plants grow here. The lights use energy.,Plants grow here. The lights use energy.,Plants grow here. The lights use energy.
+B_SOLAR,Painel solar,Solar panel,Solar panel,Solar panel
+B_SOLAR_DESC,"Muita energia, mas a poeira atrapalha.","Lots of energy, but dust gets in the way.","Lots of energy, but dust gets in the way.","Lots of energy, but dust gets in the way."
+B_RTG,Bateria nuclear (RTG),Nuclear battery (RTG),Nuclear battery (RTG),Nuclear battery (RTG)
+B_RTG_DESC,"Pouca energia, mas nunca para.","A little energy, but it never stops.","A little energy, but it never stops.","A little energy, but it never stops."
+B_MOXIE,MOXIE,MOXIE,MOXIE,MOXIE
+B_MOXIE_DESC,Transforma o ar de Marte em oxigênio.,Turns Mars air into oxygen.,Turns Mars air into oxygen.,Turns Mars air into oxygen.
+B_ANTENNA,Antena,Antenna,Antenna,Antenna
+B_ANTENNA_DESC,Fala com a Terra.,Talks to Earth.,Talks to Earth.,Talks to Earth.
+B_PAD,Pista do Ingenuity,Ingenuity pad,Ingenuity pad,Ingenuity pad
+B_DECOR,Decoração,Decoration,Decoration,Decoration
+P_LETTUCE,Alface,Lettuce,Lettuce,Lettuce
+P_RADISH,Rabanete,Radish,Radish,Radish
+P_KALE,Couve,Kale,Kale,Kale
+P_POTATO,Batata,Potato,Potato,Potato
+P_ZINNIA,Zínia,Zinnia,Zinnia,Zinnia
+P_CHILE,Pimenta Hatch,Hatch chile,Hatch chile,Hatch chile
+P_TOMATO,Tomate-anão,Dwarf tomato,Dwarf tomato,Dwarf tomato
+TUBE_TAP,Toque para abrir!,Tap to open!,Tap to open!,Tap to open!
+RARITY_COMMON,Comum,Common,Common,Common
+RARITY_RARE,Raro,Rare,Rare,Rare
+RARITY_EPIC,Épico!,Epic!,Epic!,Epic!
+RARITY_LEGEND,Lendário!,Legendary!,Legendary!,Legendary!
+CARD_NEW,Carta nova!,New card!,New card!,New card!
+CARD_REAL,De verdade:,This is real:,This is real:,This is real:
+CARD_LOCKED,Em breve,Coming soon,Coming soon,Coming soon
+EV_SOLAR_TITLE,Tempestade solar chegando!,Solar storm coming!,Solar storm coming!,Solar storm coming!
+EV_SOLAR_REAL,De verdade: {date} · medida pelo Curiosity,Real: {date} · measured by Curiosity,Real: {date} · measured by Curiosity,Real: {date} · measured by Curiosity
+EV_SOLAR_Q,Levantar o escudo?,Raise the shield?,Raise the shield?,Raise the shield?
+EV_SOLAR_A,Escudo (gasta energia),Shield (uses energy),Shield (uses energy),Shield (uses energy)
+EV_SOLAR_B,Mike fica em casa,Mike stays inside,Mike stays inside,Mike stays inside
+EV_DUST_TITLE,Tempestade de poeira!,Dust storm!,Dust storm!,Dust storm!
+EV_DUST_TEXT,Os painéis ficaram sujos.,The panels got dirty.,The panels got dirty.,The panels got dirty.
+EV_DEVIL_TITLE,Redemoinho de poeira!,Dust devil!,Dust devil!,Dust devil!
+EV_DEVIL_TEXT,Ele limpou os painéis!,It cleaned the panels!,It cleaned the panels!,It cleaned the panels!
+EV_COLD_TITLE,Noite congelante!,Freezing night!,Freezing night!,Freezing night!
+EV_COLD_Q,Aquecer a estufa?,Heat the greenhouse?,Heat the greenhouse?,Heat the greenhouse?
+EV_NOSIGNAL_TITLE,Sem sinal da Terra!,No signal from Earth!,No signal from Earth!,No signal from Earth!
+EV_NOSIGNAL_Q,Escolha o plano do piloto automático:,Pick the autopilot plan:,Pick the autopilot plan:,Pick the autopilot plan:
+EV_NOSIGNAL_BACK,Sinal de volta! Chegou um pacote.,Signal is back! A package arrived.,Signal is back! A package arrived.,Signal is back! A package arrived.
+EV_AURORA,Uma aurora em Marte!,An aurora on Mars!,An aurora on Mars!,An aurora on Mars!
+LOCK_OXYGEN,Pouco oxigênio. O Mike espera aqui dentro.,Low oxygen. Mike waits inside.,Low oxygen. Mike waits inside.,Low oxygen. Mike waits inside.
+LOCK_ENERGY,Pouca energia. A estufa ficou mais lenta.,Low energy. The greenhouse slowed down.,Low energy. The greenhouse slowed down.,Low energy. The greenhouse slowed down.
+AWAY_TITLE,Enquanto você estava fora…,While you were away…,While you were away…,While you were away…
+AWAY_PLANTS,{n} plantas ficaram prontas!,{n} plants are ready!,{n} plants are ready!,{n} plants are ready!
+ALBUM_COUNT,{n}/40 cartas,{n}/40 cards,{n}/40 cards,{n}/40 cards
+POSTCARD,Sol {n} · Cratera Gale,Sol {n} · Gale Crater,Sol {n} · Gale Crater,Sol {n} · Gale Crater
+MAP_SOON,Em breve,Coming soon,Coming soon,Coming soon
+TUT_BUILD,"Toque num item, depois no chão.","Tap an item, then tap the ground.","Tap an item, then tap the ground.","Tap an item, then tap the ground."
+TUT_EXPLORE,Toque em Explorar para achar amostras.,Tap Explore to find samples.,Tap Explore to find samples.,Tap Explore to find samples.
+LEVEL,Nível {n},Level {n},Level {n},Level {n}
+NEED_ENERGY,Falta energia.,Not enough energy.,Not enough energy.,Not enough energy.
+MOVE_HINT,Toque no lugar novo.,Tap the new spot.,Tap the new spot.,Tap the new spot.
+TUT_PLANT,Toque na estufa para plantar.,Tap the greenhouse to plant.,Tap the greenhouse to plant.,Tap the greenhouse to plant.
+PLANT_GROWING,{plant} · {n}/{max} sóis,{plant} · {n}/{max} sols,{plant} · {n}/{max} sols,{plant} · {n}/{max} sols
+PLANT_READY,{plant} pronta para colher!,{plant} is ready to harvest!,{plant} is ready to harvest!,{plant} is ready to harvest!
+CARD_1_NAME,Alface,Lettuce,Lettuce,Lettuce
+CARD_1_FACT,"Os astronautas comeram alface plantada no espaço, em 10/08/2015.","Astronauts ate lettuce grown in space on August 10, 2015.","Astronauts ate lettuce grown in space on August 10, 2015.","Astronauts ate lettuce grown in space on August 10, 2015."
+CARD_2_NAME,Rabanete,Radish,Radish,Radish
+CARD_2_FACT,Cresceu em só 27 dias na Estação Espacial (2020).,It grew in just 27 days on the Space Station (2020).,It grew in just 27 days on the Space Station (2020).,It grew in just 27 days on the Space Station (2020).
+CARD_3_NAME,Couve,Kale,Kale,Kale
+CARD_3_FACT,Foi colhida no espaço para um feriado (Ação de Graças de 2018).,It was harvested in space for Thanksgiving (2018).,It was harvested in space for Thanksgiving (2018).,It was harvested in space for Thanksgiving (2018).
+CARD_4_NAME,Batata,Potato,Potato,Potato
+CARD_4_FACT,A NASA testou batata em um solo que imita o de Marte.,NASA tested potatoes in soil that copies Mars soil.,NASA tested potatoes in soil that copies Mars soil.,NASA tested potatoes in soil that copies Mars soil.
+CARD_5_NAME,Zínia,Zinnia,Zinnia,Zinnia
+CARD_5_FACT,"Primeira flor a florescer no espaço (16/01/2016), salva de um fungo.","The first flower to bloom in space (January 16, 2016), saved from mold.","The first flower to bloom in space (January 16, 2016), saved from mold.","The first flower to bloom in space (January 16, 2016), saved from mold."
+CARD_6_NAME,Pimenta Hatch,Hatch chile,Hatch chile,Hatch chile
+CARD_6_FACT,Cresceu uns 4 meses no espaço e virou noite do taco (2021).,It grew for about 4 months in space and became taco night (2021).,It grew for about 4 months in space and became taco night (2021).,It grew for about 4 months in space and became taco night (2021).
+CARD_7_NAME,"Hematita (""blueberries"")","Hematite (""blueberries"")","Hematite (""blueberries"")","Hematite (""blueberries"")"
+CARD_7_FACT,Bolinhas que mostram que já teve água em Marte.,Tiny balls that show Mars once had water.,Tiny balls that show Mars once had water.,Tiny balls that show Mars once had water.
+CARD_8_NAME,Jarosita,Jarosite,Jarosite,Jarosite
+CARD_8_FACT,Um mineral que precisa de água para se formar.,A mineral that needs water to form.,A mineral that needs water to form.,A mineral that needs water to form.
+CARD_9_NAME,Enxofre,Sulfur,Sulfur,Sulfur
+CARD_9_FACT,Cristais amarelos que o Curiosity achou ao quebrar uma pedra (2024).,Yellow crystals Curiosity found when it cracked a rock (2024).,Yellow crystals Curiosity found when it cracked a rock (2024).,Yellow crystals Curiosity found when it cracked a rock (2024).
+CARD_10_NAME,Manchas de leopardo,Leopard spots,Leopard spots,Leopard spots
+CARD_10_FACT,Manchinhas na rocha Cheyava Falls: talvez um sinal de vida antiga.,Little spots on the rock Cheyava Falls: maybe a sign of ancient life.,Little spots on the rock Cheyava Falls: maybe a sign of ancient life.,Little spots on the rock Cheyava Falls: maybe a sign of ancient life.
+CARD_11_NAME,Painel solar,Solar panel,Solar panel,Solar panel
+CARD_11_FACT,Marte recebe no máximo 45% da luz do Sol que chega na Terra.,Mars gets at most 45% of the sunlight that reaches Earth.,Mars gets at most 45% of the sunlight that reaches Earth.,Mars gets at most 45% of the sunlight that reaches Earth.
+CARD_12_NAME,Bateria nuclear (RTG),Nuclear battery (RTG),Nuclear battery (RTG),Nuclear battery (RTG)
+CARD_12_FACT,"Dá pouca energia, mas funciona dia e noite, com ou sem poeira. O Curiosity usa uma.","A little power, but it works day and night, dust or no dust. Curiosity uses one.","A little power, but it works day and night, dust or no dust. Curiosity uses one.","A little power, but it works day and night, dust or no dust. Curiosity uses one."
+CARD_13_NAME,MOXIE,MOXIE,MOXIE,MOXIE
+CARD_13_FACT,Fez 122 g de oxigênio com o ar de Marte: o que um cachorro pequeno respira em 10 h.,It made 122 g of oxygen from Mars air: what a small dog breathes in 10 hours.,It made 122 g of oxygen from Mars air: what a small dog breathes in 10 hours.,It made 122 g of oxygen from Mars air: what a small dog breathes in 10 hours.
+CARD_14_NAME,Kilopower,Kilopower,Kilopower,Kilopower
+CARD_14_FACT,Uma mini usina nuclear que a NASA testou para futuras bases.,A mini nuclear power plant NASA tested for future bases.,A mini nuclear power plant NASA tested for future bases.,A mini nuclear power plant NASA tested for future bases.
+CARD_15_NAME,Ingenuity,Ingenuity,Ingenuity,Ingenuity
+CARD_15_FACT,O primeiro helicóptero a voar em outro planeta: 72 voos.,The first helicopter to fly on another planet: 72 flights.,The first helicopter to fly on another planet: 72 flights.,The first helicopter to fly on another planet: 72 flights.
+CARD_16_NAME,Curiosity,Curiosity,Curiosity,Curiosity
+CARD_16_FACT,O robô que trabalha aqui na cratera Gale. Ele mediu a tempestade solar de 2024.,The rover working right here in Gale Crater. It measured the 2024 solar storm.,The rover working right here in Gale Crater. It measured the 2024 solar storm.,The rover working right here in Gale Crater. It measured the 2024 solar storm.
+CARD_17_NAME,Opportunity,Opportunity,Opportunity,Opportunity
+CARD_17_FACT,Parou de responder durante uma tempestade de poeira gigante (2018).,It stopped answering during a giant dust storm (2018).,It stopped answering during a giant dust storm (2018).,It stopped answering during a giant dust storm (2018).
+CARD_18_NAME,Perseverance,Perseverance,Perseverance,Perseverance
+CARD_18_FACT,Achou a rocha com manchas de leopardo e guarda amostras em tubos.,It found the rock with leopard spots and keeps samples in tubes.,It found the rock with leopard spots and keeps samples in tubes.,It found the rock with leopard spots and keeps samples in tubes.
+CARD_19_NAME,Sol (o dia de Marte),Sol (a Mars day),Sol (a Mars day),Sol (a Mars day)
+CARD_19_FACT,Um dia em Marte se chama sol e dura 24 h 39 min.,A day on Mars is called a sol and lasts 24 h 39 min.,A day on Mars is called a sol and lasts 24 h 39 min.,A day on Mars is called a sol and lasts 24 h 39 min.
+CARD_20_NAME,Frio da Gale,Gale cold,Gale cold,Gale cold
+CARD_20_FACT,"Na cratera Gale, o dia chega perto de 0 °C e a noite perto de −70 °C.","In Gale Crater, days get close to 0 °C and nights close to −70 °C.","In Gale Crater, days get close to 0 °C and nights close to −70 °C.","In Gale Crater, days get close to 0 °C and nights close to −70 °C."
+CARD_21_NAME,Tempestade de poeira,Dust storm,Dust storm,Dust storm
+CARD_21_FACT,A poeira derrubou a energia do robô InSight de 5.000 para 500.,"Dust cut the InSight lander's power from 5,000 to 500.","Dust cut the InSight lander's power from 5,000 to 500.","Dust cut the InSight lander's power from 5,000 to 500."
+CARD_22_NAME,Redemoinho de poeira,Dust devil,Dust devil,Dust devil
+CARD_22_FACT,Redemoinhos de vento já limparam os painéis solares de robôs em Marte.,Whirlwinds have cleaned the solar panels of rovers on Mars.,Whirlwinds have cleaned the solar panels of rovers on Mars.,Whirlwinds have cleaned the solar panels of rovers on Mars.
+CARD_23_NAME,Tempestade solar de 2024,2024 solar storm,2024 solar storm,2024 solar storm
+CARD_23_FACT,O Curiosity mediu o mesmo que 30 raios-X de uma vez (20/05/2024).,"Curiosity measured the same as 30 chest X-rays at once (May 20, 2024).","Curiosity measured the same as 30 chest X-rays at once (May 20, 2024).","Curiosity measured the same as 30 chest X-rays at once (May 20, 2024)."
+CARD_24_NAME,Geada em Marte,Frost on Mars,Frost on Mars,Frost on Mars
+CARD_24_FACT,A sonda Viking 2 fotografou geada no chão de Marte.,The Viking 2 lander photographed frost on the ground of Mars.,The Viking 2 lander photographed frost on the ground of Mars.,The Viking 2 lander photographed frost on the ground of Mars.
+CARD_25_NAME,Aurora em Marte,Aurora on Mars,Aurora on Mars,Aurora on Mars
+CARD_25_FACT,O Perseverance viu uma aurora no céu de Marte (2024).,Perseverance saw an aurora in the sky of Mars (2024).,Perseverance saw an aurora in the sky of Mars (2024).,Perseverance saw an aurora in the sky of Mars (2024).
+CARD_26_NAME,Veios brancos,White veins,White veins,White veins
+CARD_26_FACT,Riscos brancos nas rochas: a água passou pelas rachaduras e deixou minerais.,White lines in the rocks: water flowed through cracks and left minerals behind.,White lines in the rocks: water flowed through cracks and left minerals behind.,White lines in the rocks: water flowed through cracks and left minerals behind.
+CARD_27_NAME,Olivina,Olivine,Olivine,Olivine
+CARD_27_FACT,O solo da Gale tem olivina e parece solo de vulcão do Havaí.,Gale's soil has olivine and looks like volcano soil from Hawaii.,Gale's soil has olivine and looks like volcano soil from Hawaii.,Gale's soil has olivine and looks like volcano soil from Hawaii.
+CARD_28_NAME,Dunas Bagnold,Bagnold Dunes,Bagnold Dunes,Bagnold Dunes
+CARD_28_FACT,As primeiras dunas de Marte estudadas de perto: andam até 1 metro por ano.,The first Mars dunes studied up close: they move up to 1 meter a year.,The first Mars dunes studied up close: they move up to 1 meter a year.,The first Mars dunes studied up close: they move up to 1 meter a year.
+CARD_29_NAME,Monte Sharp,Mount Sharp,Mount Sharp,Mount Sharp
+CARD_29_FACT,A montanha no meio da cratera Gale tem 5 km de altura.,The mountain in the middle of Gale Crater is 5 km tall.,The mountain in the middle of Gale Crater is 5 km tall.,The mountain in the middle of Gale Crater is 5 km tall.
+CARD_30_NAME,Lagos antigos,Ancient lakes,Ancient lakes,Ancient lakes
+CARD_30_FACT,"Entre 3,8 e 3,3 bilhões de anos atrás, a Gale teve rios e lagos.","Between 3.8 and 3.3 billion years ago, Gale had rivers and lakes.","Between 3.8 and 3.3 billion years ago, Gale had rivers and lakes.","Between 3.8 and 3.3 billion years ago, Gale had rivers and lakes."
+CARD_31_NAME,Rachaduras de lama,Mud cracks,Mud cracks,Mud cracks
+CARD_31_FACT,Rachaduras em hexágono mostram que a Gale secava e molhava várias vezes.,Hexagon-shaped cracks show Gale dried out and got wet again and again.,Hexagon-shaped cracks show Gale dried out and got wet again and again.,Hexagon-shaped cracks show Gale dried out and got wet again and again.
+CARD_32_NAME,Óxido de manganês,Manganese oxide,Manganese oxide,Manganese oxide
+CARD_32_FACT,Esse mineral sugere que o ar de Marte antigo tinha mais oxigênio.,This mineral hints that ancient Mars air had more oxygen.,This mineral hints that ancient Mars air had more oxygen.,This mineral hints that ancient Mars air had more oxygen.
+CARD_33_NAME,Boro,Boron,Boron,Boron
+CARD_33_FACT,Nenhuma missão tinha achado boro em Marte antes do Curiosity (2016).,No mission had found boron on Mars before Curiosity (2016).,No mission had found boron on Mars before Curiosity (2016).,No mission had found boron on Mars before Curiosity (2016).
+CARD_34_NAME,Rocha John Klein,John Klein rock,John Klein rock,John Klein rock
+CARD_34_FACT,"Em 2013, a rocha John Klein mostrou que a Gale já foi boa para a vida.","In 2013, the John Klein rock showed Gale was once good for life.","In 2013, the John Klein rock showed Gale was once good for life.","In 2013, the John Klein rock showed Gale was once good for life."
+CARD_35_NAME,Meteorito Lebanon,Lebanon meteorite,Lebanon meteorite,Lebanon meteorite
+CARD_35_FACT,"Uma pedra de ferro caída do espaço, com uns 2 metros de largura.","An iron rock that fell from space, about 2 meters wide.","An iron rock that fell from space, about 2 meters wide.","An iron rock that fell from space, about 2 meters wide."
+CARD_36_NAME,Moléculas orgânicas,Organic molecules,Organic molecules,Organic molecules
+CARD_36_FACT,"Numa pedra da Gale, o Curiosity achou as maiores moléculas de carbono de Marte.","In a Gale rock, Curiosity found the biggest carbon molecules ever seen on Mars.","In a Gale rock, Curiosity found the biggest carbon molecules ever seen on Mars.","In a Gale rock, Curiosity found the biggest carbon molecules ever seen on Mars."
+CARD_37_NAME,Fobos e Deimos,Phobos and Deimos,Phobos and Deimos,Phobos and Deimos
+CARD_37_FACT,Marte tem duas luas; Fobos dá três voltas no planeta por dia.,Mars has two moons; Phobos goes around the planet three times a day.,Mars has two moons; Phobos goes around the planet three times a day.,Mars has two moons; Phobos goes around the planet three times a day.
+CARD_38_NAME,Pôr do sol azul,Blue sunset,Blue sunset,Blue sunset
+CARD_38_FACT,"Em Marte, o céu perto do Sol fica azul no pôr do sol.","On Mars, the sky near the Sun turns blue at sunset.","On Mars, the sky near the Sun turns blue at sunset.","On Mars, the sky near the Sun turns blue at sunset."
+CARD_39_NAME,Terra vista de Marte,Earth seen from Mars,Earth seen from Mars,Earth seen from Mars
+CARD_39_FACT,O Curiosity viu a Terra e a Lua como estrelas brilhantes no céu.,Curiosity saw Earth and the Moon as bright stars in the sky.,Curiosity saw Earth and the Moon as bright stars in the sky.,Curiosity saw Earth and the Moon as bright stars in the sky.
+CARD_40_NAME,Tomate-anão,Dwarf tomato,Dwarf tomato,Dwarf tomato
+CARD_40_FACT,"Na Estação Espacial, só 12 tomates amadureceram, e ninguém pôde comer.","On the Space Station, only 12 tomatoes ripened, and no one could eat them.","On the Space Station, only 12 tomatoes ripened, and no one could eat them.","On the Space Station, only 12 tomatoes ripened, and no one could eat them."
