@@ -33,32 +33,35 @@ As cartas são o prêmio do jogo e o lugar onde os dados da NASA aparecem. Um fa
    | 15 | `Ingenuity 72 flights` | 25 | `Perseverance aurora` |
 
 5. Ache a foto em https://images.nasa.gov (ou science.nasa.gov / jpl.nasa.gov): busque em inglês (ex.: `MOXIE`, `zinnia`), abra a foto e copie o link da página para `foto_nasa`. Prefira foto real; desenho ("artist's concept") só se não existir foto.
-6. Baixe em tamanho médio (não precisa da original gigante) e renomeie com o nome desta lista (aqui é `.jpg` mesmo):
+6. Baixe em tamanho médio (não precisa da original gigante) e renomeie com o nome desta lista (aqui é `.png` mesmo):
    ```
-   01-alface.jpg         02-rabanete.jpg     03-couve.jpg        04-batata.jpg        05-zinia.jpg
-   06-pimenta-hatch.jpg  07-hematita.jpg     08-jarosita.jpg     09-enxofre.jpg       10-manchas-de-leopardo.jpg
-   11-painel-solar.jpg   12-rtg.jpg          13-moxie.jpg        14-kilopower.jpg     15-ingenuity.jpg
-   16-curiosity.jpg      17-opportunity.jpg  18-perseverance.jpg 19-sol.jpg           20-frio-da-gale.jpg
-   21-tempestade-de-poeira.jpg  22-redemoinho-de-poeira.jpg  23-tempestade-solar.jpg  24-geada.jpg  25-aurora.jpg
-   26-veios-brancos.jpg  27-olivina.jpg  28-dunas-bagnold.jpg  29-monte-sharp.jpg  30-lagos-antigos.jpg
-   31-rachaduras-de-lama.jpg  32-oxido-de-manganes.jpg  33-boro.jpg  34-rocha-john-klein.jpg  35-meteorito-lebanon.jpg
-   36-moleculas-organicas.jpg  37-fobos-e-deimos.jpg  38-por-do-sol-azul.jpg  39-terra-vista-de-marte.jpg  40-tomate-anao.jpg
+   01-alface.png         02-rabanete.png     03-couve.png        04-batata.png        05-zinia.png
+   06-pimenta-hatch.png  07-hematita.png     08-jarosita.png     09-enxofre.png       10-manchas-de-leopardo.png
+   11-painel-solar.png   12-rtg.png          13-moxie.png        14-kilopower.png     15-ingenuity.png
+   16-curiosity.png      17-opportunity.png  18-perseverance.png 19-sol.png           20-frio-da-gale.png
+   21-tempestade-de-poeira.png  22-redemoinho-de-poeira.png  23-tempestade-solar.png  24-geada.png  25-aurora.png
+   26-veios-brancos.png  27-olivina.png  28-dunas-bagnold.png  29-monte-sharp.png  30-lagos-antigos.png
+   31-rachaduras-de-lama.png  32-oxido-de-manganes.png  33-boro.png  34-rocha-john-klein.png  35-meteorito-lebanon.png
+   36-moleculas-organicas.png  37-fobos-e-deimos.png  38-por-do-sol-azul.png  39-terra-vista-de-marte.png  40-tomate-anao.png
    ```
 7. Anote o crédito escrito na página da foto (ex.: `NASA/JPL-Caltech`). O crédito não tem "NASA"? Escolha outra foto.
 8. Preencha `nome_en`. Se o nome já está no `textos.csv`, use igual (ex.: `Hatch chile`). Nome real não muda: MOXIE, Curiosity, Ingenuity.
 9. Tudo conferido (fato, número, fonte da NASA, foto e crédito)? Escreva `ok` em `status`.
 10. Suba as fotos: abra `conteudo/02-cartas/` → **Add file → Upload files** → arraste a **pasta `fotos` inteira** → **Commit changes**.
 11. Ponha 1 linha por foto no [creditos.csv](../../creditos.csv). Ex.:
-    `foto,Foto da carta Enxofre,09-enxofre.jpg,CRÉDITO DA PÁGINA,imagem pública da NASA (com crédito),LINK DA PÁGINA DA FOTO,Conteúdo`
+    `foto,Foto da carta Enxofre,09-enxofre.png,CRÉDITO DA PÁGINA,imagem pública da NASA (com crédito),LINK DA PÁGINA DA FOTO,Conteúdo`
 12. Marque `[x]` no [TAREFAS.md](../../TAREFAS.md).
 
 **Como editar o `.csv`:** no GitHub, abra o arquivo → lápis ✏️ → edite → **Commit changes**. No Google Sheets: Arquivo → Importar → Fazer upload (desmarque "Converter texto em números, datas e fórmulas", senão as datas mudam). Depois Arquivo → Fazer download → Valores separados por vírgula (.csv), renomeie para `cartas.csv` e suba com **Add file → Upload files → Commit changes**.
 
 ## O que entregar (nesta pasta)
+
+**Formato solicitado pelo time:** PNG de 944 x 614 px, com recorte proporcional para preencher toda a janela, sem margens brancas ou transparentes adicionadas. Nao distorcer; registrar a limitacao de nitidez quando a fonte exigir ampliacao.
+
 | Arquivo | O que tem | Formato |
 |---|---|---|
 | `cartas.csv` | `nome_en`, `foto_nasa`, `fonte` e `status` preenchidos nas 40 linhas | `.csv` |
-| `fotos/` | 40 fotos com os nomes da lista do item 6 | `.jpg` |
+| `fotos/` | 40 fotos com os nomes da lista do item 6 | `.png` |
 | [`creditos.csv`](../../creditos.csv) (na raiz) | 1 linha por foto, com o crédito da página | `.csv` |
 
 ## Pronto quando
@@ -87,7 +90,7 @@ Para cada carta:
 3. Sugira o nome_en, curto e igual ao do textos.csv quando já existir.
 Depois devolva:
 - as linhas do cartas.csv com o mesmo cabeçalho, mudando só nome_en, fonte, foto_nasa e status (ok ou "CONFERIR: o que falta");
-- as linhas novas do creditos.csv (tipo,o_que,arquivo_ou_uso,autor,licenca,link,dupla): tipo "foto", arquivo NN-nome.jpg, autor = crédito da página, dupla "Conteúdo".
+- as linhas novas do creditos.csv (tipo,o_que,arquivo_ou_uso,autor,licenca,link,dupla): tipo "foto", arquivo NN-nome.png, autor = crédito da página, dupla "Conteúdo".
 Não invente fato, número, link nem crédito: se faltar, escreva CONFERIR.
 Saída: a lista curta e depois 2 blocos de código (cartas.csv e creditos.csv).
 [cole aqui as linhas e os textos das páginas]
