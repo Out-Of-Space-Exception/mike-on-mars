@@ -3,11 +3,11 @@ class_name Palette
 ## Nenhuma cor fica solta no código: use sempre estas constantes.
 
 # design/02 (cores.csv)
-const BG := Color("1f2533")       # noite: fundo
-const BUTTON := Color("1b6f91")   # azul-traje: botão principal
-const TEXT := Color("f4f1ea")     # creme: texto
-const GOLD := Color("d4a84b")     # ouro: destaque e raro
-const ALERT := Color("c92f2f")    # vermelho-alerta
+const BG := Color("73242a")       # vinho: fundo
+const BUTTON := Color("d96941")   # terracota: botão principal
+const TEXT := Color("f2d091")     # creme: texto
+const GOLD := Color("e8b23a")     # ouro: destaque e raro
+const ALERT := Color("bf2a2a")    # vermelho: alerta
 
 # design/01 (mike.md)
 const SUIT := Color("f4f4f8")
@@ -19,6 +19,14 @@ const GROUND := Color("b4532a")
 const TILE := Color("c46a3c")
 const TILE_HI := Color("f4d39b")
 const PLANT := Color("6cc04a")
+
+# Raridade: cores fixas que as crianças já conhecem (cinza, azul, roxo, dourado). Tom final: design/04.
+const RARITY := {"comum": Color("9aa3ad"), "raro": Color("3b82f6"), "épico": Color("9b5de5"), "lendário": GOLD}
+const RARITY_KEY := {"comum": "RARITY_COMMON", "raro": "RARITY_RARE", "épico": "RARITY_EPIC", "lendário": "RARITY_LEGEND"}
+
+# Tempestade solar
+const STORM_SKY := Color("8a5a8c")
+const DOME := Color(0.45, 0.75, 1.0, 0.18)
 
 # Barras
 const BAR := {"energy": GOLD, "oxygen": Color("7cc6e0"), "shield": SUIT_STRIPE}

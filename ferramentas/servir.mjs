@@ -1,7 +1,7 @@
 // Servidor local para testar o export web no PC e no celular (mesmo Wi-Fi).
 // Uso: node ferramentas/servir.mjs   → abre em http://localhost:8060 e mostra o endereço para o celular.
 import {createServer} from 'node:http';
-import {readFile} from 'node:fs/promises';
+import {readFile, stat} from 'node:fs/promises';
 import {networkInterfaces} from 'node:os';
 import {extname, join, normalize} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -21,8 +21,9 @@ createServer(async (req, res) => {
     let data = await readFile(file);
     const headers = {'Content-Type': TYPES[extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-store'};
     if (/gzip/.test(req.headers['accept-encoding'] || '') && ['.wasm', '.js', '.pck', '.html'].includes(extname(file))) {
-      if (!cache.has(file)) cache.set(file, gzipSync(data, {level: 9}));
-      data = cache.get(file);
+      const chave = `${file}:${(await stat(file)).mtimeMs}`;  // exportou de novo? a chave muda
+      if (!cache.has(chave)) cache.set(chave, gzipSync(data, {level: 9}));
+      data = cache.get(chave);
       headers['Content-Encoding'] = 'gzip';
     }
     res.writeHead(200, headers);

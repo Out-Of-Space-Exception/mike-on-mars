@@ -48,7 +48,7 @@ CARD_NEW,Carta nova!,New card!,New card!,New card!
 CARD_REAL,De verdade:,This is real:,This is real:,This is real:
 CARD_LOCKED,Em breve,Coming soon,Coming soon,Coming soon
 EV_SOLAR_TITLE,Tempestade solar chegando!,Solar storm coming!,Solar storm coming!,Solar storm coming!
-EV_SOLAR_REAL,De verdade: {date} · medida pelo Curiosity,Real: {date} · measured by Curiosity,Real: {date} · measured by Curiosity,Real: {date} · measured by Curiosity
+EV_SOLAR_REAL,De verdade: {date} · dados da NASA (DONKI),Real: {date} · NASA data (DONKI),Real: {date} · NASA data (DONKI),Real: {date} · NASA data (DONKI)
 EV_SOLAR_Q,Levantar o escudo?,Raise the shield?,Raise the shield?,Raise the shield?
 EV_SOLAR_A,Escudo (gasta energia),Shield (uses energy),Shield (uses energy),Shield (uses energy)
 EV_SOLAR_B,Mike fica em casa,Mike stays inside,Mike stays inside,Mike stays inside
@@ -77,6 +77,10 @@ MOVE_HINT,Toque no lugar novo.,Tap the new spot.,Tap the new spot.,Tap the new s
 TUT_PLANT,Toque na estufa para plantar.,Tap the greenhouse to plant.,Tap the greenhouse to plant.,Tap the greenhouse to plant.
 PLANT_GROWING,{plant} · {n}/{max} sóis,{plant} · {n}/{max} sols,{plant} · {n}/{max} sols,{plant} · {n}/{max} sols
 PLANT_READY,{plant} pronta para colher!,{plant} is ready to harvest!,{plant} is ready to harvest!,{plant} is ready to harvest!
+EV_SOLAR_CURIOSITY,O robô Curiosity mediu esta aqui na Gale!,The Curiosity rover measured this one here in Gale!,The Curiosity rover measured this one here in Gale!,The Curiosity rover measured this one here in Gale!
+STORM_SHIELDED,Escudo ligado · {n} sóis,Shield on · {n} sols,Shield on · {n} sols,Shield on · {n} sols
+STORM_INSIDE,Mike em casa · {n} sóis,Mike stays inside · {n} sols,Mike stays inside · {n} sols,Mike stays inside · {n} sols
+STORM_OVER,A tempestade passou!,The storm is over!,The storm is over!,The storm is over!
 CARD_1_NAME,Alface,Lettuce,Lettuce,Lettuce
 CARD_1_FACT,"Os astronautas comeram alface plantada no espaço, em 10/08/2015.","Astronauts ate lettuce grown in space on August 10, 2015.","Astronauts ate lettuce grown in space on August 10, 2015.","Astronauts ate lettuce grown in space on August 10, 2015."
 CARD_2_NAME,Rabanete,Radish,Radish,Radish

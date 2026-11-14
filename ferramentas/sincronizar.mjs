@@ -55,4 +55,17 @@ const copiar = (de, para) => {
 };
 const sons = copiar('conteudo/01-sons/sons', 'jogo/sounds');
 const fotos = copiar('conteudo/02-cartas/fotos', 'jogo/ui/cards');
-console.log(`textos: ${textos.length} + ${cartas.length * 2} das cartas · cartas: ${dados.length} · sons: ${sons} · fotos: ${fotos}`);
+
+// 4. O Mike do design/01 (modelo + animações idle/run/jump, quando chegarem)
+mkdirSync(join(RAIZ, 'jogo/models/mike'), {recursive: true});
+let mike = 0;
+for (const f of ['mike.glb', 'idle.fbx', 'run.fbx', 'jump.fbx']) {
+  const de = join(RAIZ, 'design/01-mike', f);
+  if (existsSync(de)) { copyFileSync(de, join(RAIZ, 'jogo/models/mike', f)); mike++; }
+}
+
+// 5. O nome da foto de cada carta (NN-nome.jpg), se já existir
+const fotosNoJogo = existsSync(join(RAIZ, 'jogo/ui/cards')) ? readdirSync(join(RAIZ, 'jogo/ui/cards')) : [];
+for (const d of dados) d.photo_file = fotosNoJogo.find(f => f.startsWith(String(d.id).padStart(2, '0') + '-')) || '';
+writeFileSync(join(RAIZ, 'jogo/data/cartas.json'), JSON.stringify(dados, null, 1) + '\n');
+console.log(`textos: ${textos.length} + ${cartas.length * 2} das cartas · cartas: ${dados.length} · sons: ${sons} · fotos: ${fotos} · mike: ${mike} arquivo(s)`);

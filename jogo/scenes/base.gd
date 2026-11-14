@@ -12,8 +12,17 @@ const ITEM_COLORS := {
 	"rtg": Palette.ALERT, "moxie": Palette.GOLD,
 }
 
+const MIKE_SCENE := "res://models/mike/mike.glb"
+const MIKE_MODEL_HEIGHT := 4.0   # altura do mike.glb em unidades do arquivo
+const MIKE_HEIGHT := 2.2         # altura do Mike no jogo (grande de propósito, para a criança ver)
+const MIKE_ANIMS := {"idle": "res://models/mike/idle.fbx", "run": "res://models/mike/run.fbx", "jump": "res://models/mike/jump.fbx"}
+
 var camera: Camera3D
 var mike: Node3D
+var _mike_anim: AnimationPlayer
+var _env: Environment
+var _sun: DirectionalLight3D
+var _dome: MeshInstance3D
 var _tiles := {}    # "x,y" -> MeshInstance3D
 var _nodes := {}    # "x,y" -> Node3D do item
 var _tile_mat: StandardMaterial3D
@@ -25,8 +34,38 @@ func _ready() -> void:
 	_build_world()
 	_build_grid()
 	_build_mike()
+	_build_dome()
 	State.changed.connect(_sync_items)
+	State.changed.connect(_sync_storm)
+	State.storm_started.connect(func(_e: Dictionary) -> void: _sync_storm())
 	_sync_items()
+	_sync_storm()
+
+
+## Tempestade: céu e luz arroxeados; com escudo, uma cúpula protege a base; sem escudo, o Mike some dentro de casa.
+func _sync_storm() -> void:
+	var storm: bool = State.storm_active() or State.paused
+	_sun.light_color = Palette.STORM_SKY.lightened(0.4) if storm else Color.WHITE
+	_env.ambient_light_color = Palette.STORM_SKY if storm else Color(1.0, 0.88, 0.78)
+	_dome.visible = State.storm_active() and State.storm_shielded
+	mike.visible = not State.mike_inside()
+
+
+func _build_dome() -> void:
+	_dome = MeshInstance3D.new()
+	var sph := SphereMesh.new()
+	sph.is_hemisphere = true
+	sph.radius = 9.5
+	sph.height = 6.0
+	_dome.mesh = sph
+	var m := StandardMaterial3D.new()
+	m.albedo_color = Palette.DOME
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.cull_mode = BaseMaterial3D.CULL_DISABLED
+	_dome.material_override = m
+	_dome.visible = false
+	add_child(_dome)
 
 
 func cell_center(c: Vector2i) -> Vector3:
@@ -52,11 +91,17 @@ func walk_to(c: Vector2i) -> void:
 	if _mike_tween:
 		_mike_tween.kill()
 	_mike_tween = create_tween()
+	_play_mike("run")
 	_mike_tween.tween_property(mike, "position", target, clampf(dir.length() / 5.0, 0.25, 1.4))
+	_mike_tween.tween_callback(_play_mike.bind("idle"))
 
 
 ## O Mike pula de alegria (quando colhe, por exemplo).
 func jump() -> void:
+	if _mike_anim and _mike_anim.has_animation("jump"):
+		_play_mike("jump")
+		_mike_anim.queue("idle")
+		return
 	var t := create_tween()
 	t.tween_property(mike, "position:y", 0.9, 0.18).set_ease(Tween.EASE_OUT)
 	t.tween_property(mike, "position:y", 0.0, 0.22).set_ease(Tween.EASE_IN)
@@ -80,6 +125,7 @@ func _cell_from_screen(p: Vector2) -> Vector2i:
 # ───────────── Montagem ─────────────
 func _build_world() -> void:
 	var env := Environment.new()
+	_env = env
 	env.background_mode = Environment.BG_COLOR
 	env.background_color = Palette.SKY
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
@@ -90,6 +136,7 @@ func _build_world() -> void:
 	add_child(world)
 
 	var sun := DirectionalLight3D.new()
+	_sun = sun
 	sun.rotation_degrees = Vector3(-55.0, -35.0, 0.0)
 	sun.light_energy = 1.1
 	sun.shadow_enabled = true
@@ -129,9 +176,84 @@ func _build_grid() -> void:
 			_tiles[State.key(c)] = m
 
 
-## Mike provisório (cápsula com o traje do design/01) até o modelo da Kenney entrar.
+## O Mike do design/01 (mike.glb). As animações idle/run/jump entram sozinhas quando os .fbx
+## chegarem em design/01-mike/ (o sincronizar.mjs copia). Sem elas, o Mike fica de braços abaixados.
 func _build_mike() -> void:
 	mike = Node3D.new()
+	add_child(mike)
+	mike.position = cell_center(Vector2i(2, 4)) + Vector3(0.0, 0.0, CELL * 0.62)
+	if not ResourceLoader.exists(MIKE_SCENE):
+		_build_mike_placeholder()
+		return
+	var model: Node3D = load(MIKE_SCENE).instantiate()
+	model.scale = Vector3.ONE * (MIKE_HEIGHT / MIKE_MODEL_HEIGHT)
+	mike.add_child(model)
+	var skel := _find_child_of_type(model, "Skeleton3D") as Skeleton3D
+	if skel == null:
+		return
+	_mike_anim = AnimationPlayer.new()
+	model.add_child(_mike_anim)
+	var lib := AnimationLibrary.new()
+	for anim_name in MIKE_ANIMS:
+		var path: String = MIKE_ANIMS[anim_name]
+		if not ResourceLoader.exists(path):
+			continue
+		var src: Node = load(path).instantiate()
+		var src_player := _find_child_of_type(src, "AnimationPlayer") as AnimationPlayer
+		if src_player and not src_player.get_animation_list().is_empty():
+			var a: Animation = src_player.get_animation(src_player.get_animation_list()[0]).duplicate()
+			# Aponta cada trilha para o esqueleto do Mike (os ossos têm o mesmo nome).
+			for t in range(a.get_track_count() - 1, -1, -1):
+				var bone := a.track_get_path(t).get_concatenated_subnames()
+				if bone == "" or skel.find_bone(bone) < 0:
+					a.remove_track(t)
+				else:
+					a.track_set_path(t, NodePath("%s:%s" % [model.get_path_to(skel), bone]))
+			a.loop_mode = Animation.LOOP_NONE if anim_name == "jump" else Animation.LOOP_LINEAR
+			lib.add_animation(anim_name, a)
+		src.free()
+	_mike_anim.add_animation_library("", lib)
+	if lib.has_animation("idle"):
+		_mike_anim.play("idle")
+	else:
+		_lower_arms(skel)
+
+
+func _play_mike(anim_name: String) -> void:
+	if _mike_anim and _mike_anim.has_animation(anim_name):
+		_mike_anim.play(anim_name, 0.15)
+
+
+## Tira o Mike da pose em T: gira cada braço em direção ao chão.
+func _lower_arms(skel: Skeleton3D) -> void:
+	for side in ["Left", "Right"]:
+		var arm := skel.find_bone(side + "Arm")
+		var fore := skel.find_bone(side + "ForeArm")
+		if arm < 0 or fore < 0:
+			continue
+		var g_arm := skel.get_bone_global_rest(arm)
+		var dir := (skel.get_bone_global_rest(fore).origin - g_arm.origin).normalized()
+		var axis := dir.cross(Vector3.DOWN)
+		if axis.length() < 0.001:
+			continue
+		var turn := Basis(axis.normalized(), dir.angle_to(Vector3.DOWN) * 0.88)
+		var parent := skel.get_bone_parent(arm)
+		var g_parent := skel.get_bone_global_rest(parent).basis if parent >= 0 else Basis()
+		var local := g_parent.inverse() * turn * g_arm.basis
+		skel.set_bone_pose_rotation(arm, local.get_rotation_quaternion())
+
+
+func _find_child_of_type(node: Node, type: String) -> Node:
+	if node.is_class(type):
+		return node
+	for c in node.get_children():
+		var found := _find_child_of_type(c, type)
+		if found:
+			return found
+	return null
+
+
+func _build_mike_placeholder() -> void:
 	var body := MeshInstance3D.new()
 	var cap := CapsuleMesh.new()
 	cap.radius = 0.32
@@ -148,8 +270,6 @@ func _build_mike() -> void:
 	visor.material_override = _mat(Palette.SUIT_STRIPE)
 	visor.position = Vector3(0.0, 0.92, 0.2)
 	mike.add_child(visor)
-	add_child(mike)
-	mike.position = cell_center(Vector2i(2, 4)) + Vector3(0.0, 0.0, CELL * 0.62)
 
 
 func _sync_items() -> void:

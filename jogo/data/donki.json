@@ -1,0 +1,27 @@
+{
+ "downloaded": "2026-11-14",
+ "note": "Dados arquivados de 2024, não ao vivo.",
+ "months_missing": [
+  "01 (erro 429)",
+  "02 (erro 429)",
+  "03 (erro 429)",
+  "04 (erro 429)",
+  "05 (erro 429)",
+  "06 (erro 429)",
+  "07 (erro 429)",
+  "08 (erro 429)",
+  "09 (erro 429)",
+  "10 (erro 429)",
+  "11 (erro 429)",
+  "12 (erro 429)"
+ ],
+ "events": [
+  {
+   "date": "2024-05-20",
+   "kind": "SEP",
+   "curiosity": true,
+   "source": "NASA",
+   "link": "https://www.nasa.gov/solar-system/planets/mars/nasa-watches-mars-light-up-during-epic-solar-storm"
+  }
+ ]
+}

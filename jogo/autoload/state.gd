@@ -3,6 +3,9 @@ extends Node
 ## (no navegador vira IndexedDB). Toda regra numérica mora no bloco BALANCEAMENTO.
 
 signal changed
+signal storm_started(event: Dictionary)
+signal storm_ended(shielded: bool)
+signal card_won(id: int, is_new: bool)
 
 # ───────────── BALANCEAMENTO (todos os números do jogo moram aqui) ─────────────
 const SOL_SECONDS := 2.5            # 1 sol (dia de Marte) = 2,5 s de jogo
@@ -27,6 +30,15 @@ const ITEMS := {
 }
 const BUILDABLE := ["greenhouse", "solar", "rtg", "moxie"]
 const PLANTS := {"lettuce": {"name": "P_LETTUCE", "sols": 33, "card": 1}}
+# Tempestade solar (dados reais do DONKI em res://data/donki.json)
+const FIRST_STORM_SOL := 20         # a 1ª chega cedo, para a criança (e o jurado) ver logo
+const STORM_EVERY := Vector2i(30, 50)
+const STORM_SOLS := 5               # quanto tempo dura
+const STORM_SHIELD_COST := 30.0     # levantar o escudo gasta energia
+const STORM_RADIATION := 30.0       # sem escudo, a radiação come a barra de escudo
+const AURORA_CHANCE := 0.10         # aguentou com escudo: chance da lendária "Aurora em Marte"
+const CARD_STORM := 23              # carta "Tempestade solar de 2024" (1ª tempestade)
+const CARD_AURORA := 25
 # ─────────────────────────────────────────────────────────────────────────────
 
 const SAVE_PATH := "user://save.json"
@@ -39,9 +51,17 @@ var sol := 1
 var items := {}     # "x,y" -> {"type", "level", "plant", "growth", "spent"}
 var cards := {}     # "id" -> quantas vezes ganhou
 var locale := ""
+var paused := false              # o jogo pausa quando a criança precisa escolher
+var next_storm_sol := FIRST_STORM_SOL
+var storms_seen := 0
+var storm_left := 0
+var storm_shielded := false
+var storm_event := {}
 
 var _sol_timer := 0.0
 var _save_timer := 0.0
+var _donki: Array = []
+var _cards_info := {}
 
 
 func _ready() -> void:
@@ -50,9 +70,21 @@ func _ready() -> void:
 	if locale == "":
 		locale = _device_locale()
 	TranslationServer.set_locale(locale)
+	_donki = _read_json("res://data/donki.json").get("events", [])
+	for c in _read_json("res://data/cartas.json", []):
+		_cards_info[int(c.id)] = c
+	# Atalho para testar e gravar o vídeo: abrir o link com ?tempestade traz a tempestade em 2 sóis.
+	if OS.has_feature("web") and str(JavaScriptBridge.eval("location.search", true)).contains("tempestade"):
+		next_storm_sol = sol + 2
+
+
+func card_info(id: int) -> Dictionary:
+	return _cards_info.get(id, {})
 
 
 func _process(delta: float) -> void:
+	if paused:
+		return
 	_sol_timer += delta
 	while _sol_timer >= SOL_SECONDS:
 		_sol_timer -= SOL_SECONDS
@@ -69,6 +101,12 @@ func new_game() -> void:
 	sol = 1
 	items.clear()
 	cards.clear()
+	paused = false
+	next_storm_sol = FIRST_STORM_SOL
+	storms_seen = 0
+	storm_left = 0
+	storm_shielded = false
+	storm_event = {}
 	for k in START_ITEMS:
 		items[k] = _new_item(START_ITEMS[k])
 	changed.emit()
@@ -184,7 +222,64 @@ func add_card(id: int) -> bool:
 	var k := str(id)
 	var is_new := not cards.has(k)
 	cards[k] = int(cards.get(k, 0)) + 1
+	card_won.emit(id, is_new)
 	return is_new
+
+
+# ───────────── Tempestade solar ─────────────
+func storm_active() -> bool:
+	return storm_left > 0
+
+
+## Sem escudo, o Mike fica em casa até a tempestade passar (não sai para explorar).
+func mike_inside() -> bool:
+	return storm_left > 0 and not storm_shielded
+
+
+func choose_storm(raise_shield: bool) -> bool:
+	if not paused or (raise_shield and not can_afford(STORM_SHIELD_COST)):
+		return false
+	storm_shielded = raise_shield
+	if raise_shield:
+		energy -= STORM_SHIELD_COST
+	else:
+		shield = maxf(0.0, shield - STORM_RADIATION)
+	storm_left = STORM_SOLS
+	paused = false
+	_after_action()
+	return true
+
+
+func _start_storm() -> void:
+	if _donki.is_empty():
+		next_storm_sol = sol + STORM_EVERY.x
+		return
+	# A 1ª tempestade é sempre a de 20/05/2024, que o Curiosity mediu aqui na Gale.
+	var event: Dictionary = {}
+	if storms_seen == 0:
+		for e in _donki:
+			if e.get("curiosity", false):
+				event = e
+	if event.is_empty():
+		event = _donki[storms_seen % _donki.size()]
+	storm_event = event
+	storms_seen += 1
+	paused = true
+	save_game()
+	storm_started.emit(event)
+
+
+func _end_storm() -> void:
+	var was_shielded := storm_shielded
+	next_storm_sol = sol + randi_range(STORM_EVERY.x, STORM_EVERY.y)
+	storm_shielded = false
+	storm_event = {}
+	storm_ended.emit(was_shielded)
+	if not cards.has(str(CARD_STORM)):
+		add_card(CARD_STORM)
+	if was_shielded and randf() < AURORA_CHANCE:
+		add_card(CARD_AURORA)
+	save_game()
 
 
 func set_locale(l: String) -> void:
@@ -215,6 +310,12 @@ func _tick() -> void:
 	if energy > LOW:
 		shield = minf(BAR_MAX, shield + SHIELD_RECHARGE)
 	sol += 1
+	if storm_left > 0:
+		storm_left -= 1
+		if storm_left == 0:
+			_end_storm()
+	elif sol >= next_storm_sol:
+		_start_storm()
 	changed.emit()
 
 
@@ -225,6 +326,8 @@ func save_game() -> void:
 		"version": SAVE_VERSION, "saved_at": int(Time.get_unix_time_from_system()),
 		"energy": energy, "oxygen": oxygen, "shield": shield, "sol": sol,
 		"items": items, "cards": cards, "locale": locale,
+		"paused": paused, "next_storm_sol": next_storm_sol, "storms_seen": storms_seen,
+		"storm_left": storm_left, "storm_shielded": storm_shielded, "storm_event": storm_event,
 	}
 	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if f:
@@ -243,12 +346,25 @@ func load_game() -> bool:
 	sol = int(data.sol)
 	locale = str(data.get("locale", ""))
 	cards = data.get("cards", {})
+	paused = bool(data.get("paused", false))
+	next_storm_sol = int(data.get("next_storm_sol", FIRST_STORM_SOL))
+	storms_seen = int(data.get("storms_seen", 0))
+	storm_left = int(data.get("storm_left", 0))
+	storm_shielded = bool(data.get("storm_shielded", false))
+	storm_event = data.get("storm_event", {})
 	items.clear()
 	for k in data.items:
 		var it: Dictionary = data.items[k]
 		it.level = int(it.level)
 		items[k] = it
 	return true
+
+
+func _read_json(path: String, fallback: Variant = {}) -> Variant:
+	if not FileAccess.file_exists(path):
+		return fallback
+	var data = JSON.parse_string(FileAccess.get_file_as_string(path))
+	return data if data != null else fallback
 
 
 func _new_item(type: String) -> Dictionary:
