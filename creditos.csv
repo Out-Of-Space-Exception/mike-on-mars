@@ -40,3 +40,4 @@ ia,Claude (Anthropic): adaptou a moldura das cartas (símbolo e cor da borda por
 ia,Claude (Anthropic): modelou o Kilopower no Blender (kilopower.py),design/03-itens-do-jogo,Anthropic,-,https://claude.ai,Design
 ia,Claude (Anthropic): procurou e conferiu nas páginas da NASA as fontes de 12 cartas e reescreveu os fatos que a fonte não dizia,conteudo/02-cartas,Anthropic,-,https://claude.ai,Conteúdo
 ia,Claude (Anthropic): escreveu com a dupla o texto dos 7 slides (slides.md) a partir do CONTEXTO.md e do cartas.csv,conteudo/04-slides,Anthropic,-,https://claude.ai,Conteúdo
+ia,Claude (Anthropic): traduziu para espanhol e francês os textos do jogo (textos.csv),conteudo/03-textos/textos.csv,Anthropic,-,https://claude.ai,Conteúdo
