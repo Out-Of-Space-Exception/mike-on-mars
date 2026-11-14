@@ -60,6 +60,7 @@ mike-on-mars/
 8. **Fato só com fonte.** Todo número, data ou missão precisa de link, de preferência da NASA. Não tem fonte? Não entra.
 9. **Não mexa no que é de outra dupla.** Quer mudar algo? Avise no grupo.
 10. **Simples primeiro.** Na dúvida entre duas opções, fique com a mais simples.
+11. **Precisa de algo de outra dupla?** Escreva em **Pedidos entre duplas**, no fim do [TAREFAS.md](TAREFAS.md). Quem entrega marca `[x]`.
 
 ---
 

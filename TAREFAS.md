@@ -3,6 +3,7 @@
 > - **Horário = limite.**
 > - **Terminou?** Troque `[ ]` por `[x]`: lápis ✏️ → **Commit changes**.
 > - **Clique no nome** do passo para ver como fazer.
+> - **Precisa de algo de outra dupla?** Escreva em **Pedidos entre duplas**, no fim desta página.
 > - **Faltou algo às 7h de domingo?** O time resolve no domingo, até 22h. O envio fecha domingo, às 23h59.
 
 ## 🎨 Design · Maria Fernanda e Thais · até 20h
@@ -41,3 +42,11 @@
 - [ ] 4h · [Bugs](dev/08-bugs/PASSO.md)
 - [ ] 6h · [Vídeo e página](dev/09-video-e-pagina/PASSO.md)
 - [ ] 7h · [Envio](dev/10-envio/PASSO.md)
+
+## 📮 Pedidos entre duplas
+
+> Precisa de algo de outra dupla? Escreva aqui, dizendo quem pede, para quem e onde entregar. Entregou? Marque `[x]`.
+
+- [ ] **Dev → Design:** subir as 3 animações do Mike em `design/01-mike/`: `idle.fbx`, `run.fbx` e `jump.fbx`, da pasta `Animations` do pacote Animated Characters Protagonists.
+- [ ] **Dev → Design:** subir em `design/03-itens-do-jogo/` os modelos da Kenney que não foram repintados: `cabbage.glb` (alface), `radish.glb` (rabanete), `flower_redA.glb` (zínia), `machine_barrel.glb` (RTG), `satelliteDish.glb` (antena) e `skybox-morning.png` (céu). Se o pacote tiver a pasta `Textures`, mande o `colormap.png` junto.
+- [ ] **Dev → Conteúdo:** faltam 6 sons do `sons.csv` em `conteudo/01-sons/sons/`: `revelar-epico`, `revelar-lendario` e `musica-base` (essenciais), e `passos`, `aurora` e `vento-poeira`.
