@@ -23,6 +23,9 @@ var _mike_anim: AnimationPlayer
 var _env: Environment
 var _sun: DirectionalLight3D
 var _dome: MeshInstance3D
+var _walking_out := false
+
+const EXPEDITION_CELL := Vector2i(-4, -4)   # fora da grade, no fundo da tela
 var _tiles := {}    # "x,y" -> MeshInstance3D
 var _nodes := {}    # "x,y" -> Node3D do item
 var _tile_mat: StandardMaterial3D
@@ -38,8 +41,36 @@ func _ready() -> void:
 	State.changed.connect(_sync_items)
 	State.changed.connect(_sync_storm)
 	State.storm_started.connect(func(_e: Dictionary) -> void: _sync_storm())
+	State.explore_started.connect(_walk_out)
+	State.explore_returned.connect(_walk_back)
 	_sync_items()
 	_sync_storm()
+
+
+## Expedição: o Mike sai andando para longe (lá para o fundo, rumo ao Monte Sharp) e some.
+func _walk_out() -> void:
+	_walking_out = true
+	var far := cell_center(EXPEDITION_CELL)
+	mike.rotation.y = atan2(far.x - mike.position.x, far.z - mike.position.z)
+	if _mike_tween:
+		_mike_tween.kill()
+	_play_mike("run")
+	_mike_tween = create_tween()
+	_mike_tween.tween_property(mike, "position", far, 1.8)
+	_mike_tween.tween_callback(func() -> void:
+		_walking_out = false
+		_play_mike("idle")
+		_sync_storm())
+
+
+## Volta da expedição: aparece lá no fundo e anda até a frente da casa, com o tubo.
+func _walk_back(_card_id: int) -> void:
+	mike.position = cell_center(EXPEDITION_CELL)
+	_sync_storm()
+	for k in State.items:
+		if State.items[k].type == "habitat":
+			walk_to(State.parse_key(k))
+			return
 
 
 ## Tempestade: céu e luz arroxeados; com escudo, uma cúpula protege a base; sem escudo, o Mike some dentro de casa.
@@ -48,7 +79,7 @@ func _sync_storm() -> void:
 	_sun.light_color = Palette.STORM_SKY.lightened(0.4) if storm else Color.WHITE
 	_env.ambient_light_color = Palette.STORM_SKY if storm else Color(1.0, 0.88, 0.78)
 	_dome.visible = State.storm_active() and State.storm_shielded
-	mike.visible = not State.mike_inside()
+	mike.visible = _walking_out or not (State.mike_inside() or State.exploring())
 
 
 func _build_dome() -> void:

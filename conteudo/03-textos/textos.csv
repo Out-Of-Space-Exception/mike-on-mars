@@ -81,3 +81,6 @@ EV_SOLAR_CURIOSITY,O robô Curiosity mediu esta aqui na Gale!,The Curiosity rove
 STORM_SHIELDED,Escudo ligado · {n} sóis,Shield on · {n} sols,,
 STORM_INSIDE,Mike em casa · {n} sóis,Mike stays inside · {n} sols,,
 STORM_OVER,A tempestade passou!,The storm is over!,,
+EXPLORING,Explorando · {n} sóis,Exploring · {n} sols,,
+TUBE_READY,Abrir o tubo!,Open the tube!,,
+LOCK_STORM,O Mike espera a tempestade passar.,Mike waits for the storm to pass.,,

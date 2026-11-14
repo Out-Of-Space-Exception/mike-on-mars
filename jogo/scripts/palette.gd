@@ -20,8 +20,8 @@ const TILE := Color("c46a3c")
 const TILE_HI := Color("f4d39b")
 const PLANT := Color("6cc04a")
 
-# Raridade: cores fixas que as crianças já conhecem (cinza, azul, roxo, dourado). Tom final: design/04.
-const RARITY := {"comum": Color("9aa3ad"), "raro": Color("3b82f6"), "épico": Color("9b5de5"), "lendário": GOLD}
+# Raridade (design/04, cores-das-coisas.csv): cinza, azul, roxo, dourado.
+const RARITY := {"comum": Color("9aa0a8"), "raro": Color("3b82d6"), "épico": Color("8e4fd8"), "lendário": Color("e8b23a")}
 const RARITY_KEY := {"comum": "RARITY_COMMON", "raro": "RARITY_RARE", "épico": "RARITY_EPIC", "lendário": "RARITY_LEGEND"}
 
 # Tempestade solar

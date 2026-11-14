@@ -81,6 +81,9 @@ EV_SOLAR_CURIOSITY,O robô Curiosity mediu esta aqui na Gale!,The Curiosity rove
 STORM_SHIELDED,Escudo ligado · {n} sóis,Shield on · {n} sols,Shield on · {n} sols,Shield on · {n} sols
 STORM_INSIDE,Mike em casa · {n} sóis,Mike stays inside · {n} sols,Mike stays inside · {n} sols,Mike stays inside · {n} sols
 STORM_OVER,A tempestade passou!,The storm is over!,The storm is over!,The storm is over!
+EXPLORING,Explorando · {n} sóis,Exploring · {n} sols,Exploring · {n} sols,Exploring · {n} sols
+TUBE_READY,Abrir o tubo!,Open the tube!,Open the tube!,Open the tube!
+LOCK_STORM,O Mike espera a tempestade passar.,Mike waits for the storm to pass.,Mike waits for the storm to pass.,Mike waits for the storm to pass.
 CARD_1_NAME,Alface,Lettuce,Lettuce,Lettuce
 CARD_1_FACT,"Os astronautas comeram alface plantada no espaço, em 10/08/2015.","Astronauts ate lettuce grown in space on August 10, 2015.","Astronauts ate lettuce grown in space on August 10, 2015.","Astronauts ate lettuce grown in space on August 10, 2015."
 CARD_2_NAME,Rabanete,Radish,Radish,Radish

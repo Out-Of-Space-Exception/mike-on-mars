@@ -1,27 +1,1126 @@
 {
  "downloaded": "2026-11-14",
  "note": "Dados arquivados de 2024, não ao vivo.",
- "months_missing": [
-  "01 (erro 429)",
-  "02 (erro 429)",
-  "03 (erro 429)",
-  "04 (erro 429)",
-  "05 (erro 429)",
-  "06 (erro 429)",
-  "07 (erro 429)",
-  "08 (erro 429)",
-  "09 (erro 429)",
-  "10 (erro 429)",
-  "11 (erro 429)",
-  "12 (erro 429)"
- ],
+ "months_missing": [],
  "events": [
+  {
+   "date": "2024-01-04",
+   "kind": "CME",
+   "speed_kms": 0,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/28426/-1"
+  },
+  {
+   "date": "2024-01-07",
+   "kind": "CME",
+   "speed_kms": 617,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/28439/-1"
+  },
+  {
+   "date": "2024-01-08",
+   "kind": "CME",
+   "speed_kms": 413,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/28457/-1"
+  },
+  {
+   "date": "2024-01-09",
+   "kind": "CME",
+   "speed_kms": 383,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/28474/-1"
+  },
+  {
+   "date": "2024-01-18",
+   "kind": "CME",
+   "speed_kms": 948,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/28613/-1"
+  },
+  {
+   "date": "2024-01-20",
+   "kind": "CME",
+   "speed_kms": 639,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/28633/-1"
+  },
+  {
+   "date": "2024-01-28",
+   "kind": "CME",
+   "speed_kms": 360,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/28704/-1"
+  },
+  {
+   "date": "2024-02-02",
+   "kind": "CME",
+   "speed_kms": 1278,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/28852/-1"
+  },
+  {
+   "date": "2024-02-07",
+   "kind": "CME",
+   "speed_kms": 818,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/28961/-1"
+  },
+  {
+   "date": "2024-02-11",
+   "kind": "CME",
+   "speed_kms": 0,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/29069/-1"
+  },
+  {
+   "date": "2024-02-12",
+   "kind": "CME",
+   "speed_kms": 656,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/29092/-1"
+  },
+  {
+   "date": "2024-02-13",
+   "kind": "CME",
+   "speed_kms": 0,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/29169/-1"
+  },
+  {
+   "date": "2024-02-14",
+   "kind": "CME",
+   "speed_kms": 3180,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/29170/-1"
+  },
+  {
+   "date": "2024-02-15",
+   "kind": "CME",
+   "speed_kms": 870,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/29163/-1"
+  },
+  {
+   "date": "2024-02-16",
+   "kind": "CME",
+   "speed_kms": 2544,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/29229/-1"
+  },
+  {
+   "date": "2024-02-17",
+   "kind": "CME",
+   "speed_kms": 2012,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/29225/-1"
+  },
+  {
+   "date": "2024-02-20",
+   "kind": "CME",
+   "speed_kms": 376,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/29252/-1"
+  },
+  {
+   "date": "2024-02-21",
+   "kind": "CME",
+   "speed_kms": 681,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/29260/-1"
+  },
+  {
+   "date": "2024-02-24",
+   "kind": "CME",
+   "speed_kms": 761,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/29313/-1"
+  },
+  {
+   "date": "2024-03-02",
+   "kind": "CME",
+   "speed_kms": 580,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/29377/-1"
+  },
+  {
+   "date": "2024-03-12",
+   "kind": "CME",
+   "speed_kms": 0,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/29510/-1"
+  },
+  {
+   "date": "2024-03-13",
+   "kind": "CME",
+   "speed_kms": 0,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/29502/-1"
+  },
+  {
+   "date": "2024-03-16",
+   "kind": "CME",
+   "speed_kms": 0,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/29554/-1"
+  },
+  {
+   "date": "2024-03-17",
+   "kind": "CME",
+   "speed_kms": 1201,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/29598/-1"
+  },
+  {
+   "date": "2024-03-18",
+   "kind": "CME",
+   "speed_kms": 1121,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/29602/-1"
+  },
+  {
+   "date": "2024-03-28",
+   "kind": "CME",
+   "speed_kms": 413,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/29793/-1"
+  },
+  {
+   "date": "2024-03-29",
+   "kind": "CME",
+   "speed_kms": 413,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/29794/-1"
+  },
+  {
+   "date": "2024-03-31",
+   "kind": "CME",
+   "speed_kms": 518,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/29821/-1"
+  },
+  {
+   "date": "2024-04-08",
+   "kind": "CME",
+   "speed_kms": 465,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/29893/-1"
+  },
+  {
+   "date": "2024-04-09",
+   "kind": "CME",
+   "speed_kms": 539,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/29924/-1"
+  },
+  {
+   "date": "2024-04-10",
+   "kind": "CME",
+   "speed_kms": 777,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/29942/-1"
+  },
+  {
+   "date": "2024-04-16",
+   "kind": "CME",
+   "speed_kms": 537,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/30025/-1"
+  },
+  {
+   "date": "2024-04-17",
+   "kind": "CME",
+   "speed_kms": 687,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/30054/-1"
+  },
+  {
+   "date": "2024-04-18",
+   "kind": "CME",
+   "speed_kms": 687,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/30053/-1"
+  },
+  {
+   "date": "2024-04-23",
+   "kind": "CME",
+   "speed_kms": 365,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/30146/-1"
+  },
+  {
+   "date": "2024-04-28",
+   "kind": "CME",
+   "speed_kms": 312,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/30236/-1"
+  },
+  {
+   "date": "2024-04-29",
+   "kind": "CME",
+   "speed_kms": 349,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/30275/-1"
+  },
+  {
+   "date": "2024-05-04",
+   "kind": "CME",
+   "speed_kms": 341,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/30336/-1"
+  },
+  {
+   "date": "2024-05-05",
+   "kind": "CME",
+   "speed_kms": 255,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/30339/-1"
+  },
+  {
+   "date": "2024-05-07",
+   "kind": "CME",
+   "speed_kms": 474,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/30396/-1"
+  },
+  {
+   "date": "2024-05-13",
+   "kind": "CME",
+   "speed_kms": 1263,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/30726/-1"
+  },
+  {
+   "date": "2024-05-14",
+   "kind": "CME",
+   "speed_kms": 717,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/30801/-1"
+  },
+  {
+   "date": "2024-05-15",
+   "kind": "CME",
+   "speed_kms": 602,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/30757/-1"
+  },
+  {
+   "date": "2024-05-16",
+   "kind": "CME",
+   "speed_kms": 1456,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/30822/-1"
+  },
+  {
+   "date": "2024-05-17",
+   "kind": "CME",
+   "speed_kms": 1199,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/30872/-1"
+  },
+  {
+   "date": "2024-05-18",
+   "kind": "CME",
+   "speed_kms": 676,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/30843/-1"
+  },
+  {
+   "date": "2024-05-19",
+   "kind": "CME",
+   "speed_kms": 1103,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/30961/-1"
+  },
   {
    "date": "2024-05-20",
    "kind": "SEP",
    "curiosity": true,
    "source": "NASA",
    "link": "https://www.nasa.gov/solar-system/planets/mars/nasa-watches-mars-light-up-during-epic-solar-storm"
+  },
+  {
+   "date": "2024-05-21",
+   "kind": "CME",
+   "speed_kms": 942,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31014/-1"
+  },
+  {
+   "date": "2024-05-28",
+   "kind": "CME",
+   "speed_kms": 507,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31103/-1"
+  },
+  {
+   "date": "2024-05-29",
+   "kind": "CME",
+   "speed_kms": 521,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31138/-1"
+  },
+  {
+   "date": "2024-06-08",
+   "kind": "CME",
+   "speed_kms": 412,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31281/-1"
+  },
+  {
+   "date": "2024-06-11",
+   "kind": "CME",
+   "speed_kms": 0,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31353/-1"
+  },
+  {
+   "date": "2024-06-12",
+   "kind": "CME",
+   "speed_kms": 1376,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31361/-1"
+  },
+  {
+   "date": "2024-06-14",
+   "kind": "CME",
+   "speed_kms": 0,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31405/-1"
+  },
+  {
+   "date": "2024-06-15",
+   "kind": "CME",
+   "speed_kms": 1019,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31443/-1"
+  },
+  {
+   "date": "2024-06-16",
+   "kind": "CME",
+   "speed_kms": 798,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31494/-1"
+  },
+  {
+   "date": "2024-06-17",
+   "kind": "CME",
+   "speed_kms": 384,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31469/-1"
+  },
+  {
+   "date": "2024-06-18",
+   "kind": "CME",
+   "speed_kms": 716,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31511/-1"
+  },
+  {
+   "date": "2024-06-23",
+   "kind": "CME",
+   "speed_kms": 542,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31589/-1"
+  },
+  {
+   "date": "2024-06-26",
+   "kind": "CME",
+   "speed_kms": 370,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31668/-1"
+  },
+  {
+   "date": "2024-06-27",
+   "kind": "CME",
+   "speed_kms": 370,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31667/-1"
+  },
+  {
+   "date": "2024-06-28",
+   "kind": "CME",
+   "speed_kms": 640,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31680/-1"
+  },
+  {
+   "date": "2024-06-29",
+   "kind": "CME",
+   "speed_kms": 520,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31694/-1"
+  },
+  {
+   "date": "2024-07-03",
+   "kind": "CME",
+   "speed_kms": 885,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31783/-1"
+  },
+  {
+   "date": "2024-07-04",
+   "kind": "CME",
+   "speed_kms": 809,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31757/-1"
+  },
+  {
+   "date": "2024-07-05",
+   "kind": "CME",
+   "speed_kms": 440,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31778/-1"
+  },
+  {
+   "date": "2024-07-07",
+   "kind": "CME",
+   "speed_kms": 519,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31812/-1"
+  },
+  {
+   "date": "2024-07-09",
+   "kind": "CME",
+   "speed_kms": 385,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31826/-1"
+  },
+  {
+   "date": "2024-07-11",
+   "kind": "CME",
+   "speed_kms": 476,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31842/-1"
+  },
+  {
+   "date": "2024-07-13",
+   "kind": "CME",
+   "speed_kms": 488,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31884/-1"
+  },
+  {
+   "date": "2024-07-16",
+   "kind": "CME",
+   "speed_kms": 642,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31917/-1"
+  },
+  {
+   "date": "2024-07-17",
+   "kind": "CME",
+   "speed_kms": 414,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31922/-1"
+  },
+  {
+   "date": "2024-07-19",
+   "kind": "CME",
+   "speed_kms": 826,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31982/-1"
+  },
+  {
+   "date": "2024-07-20",
+   "kind": "CME",
+   "speed_kms": 642,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31995/-1"
+  },
+  {
+   "date": "2024-07-25",
+   "kind": "CME",
+   "speed_kms": 598,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/32081/-1"
+  },
+  {
+   "date": "2024-07-26",
+   "kind": "CME",
+   "speed_kms": 592,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/32100/-1"
+  },
+  {
+   "date": "2024-07-27",
+   "kind": "CME",
+   "speed_kms": 441,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/32136/-1"
+  },
+  {
+   "date": "2024-07-28",
+   "kind": "CME",
+   "speed_kms": 552,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/32156/-1"
+  },
+  {
+   "date": "2024-07-30",
+   "kind": "CME",
+   "speed_kms": 456,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/32202/-1"
+  },
+  {
+   "date": "2024-07-31",
+   "kind": "CME",
+   "speed_kms": 445,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/32215/-1"
+  },
+  {
+   "date": "2024-08-01",
+   "kind": "CME",
+   "speed_kms": 803,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/32248/-1"
+  },
+  {
+   "date": "2024-08-02",
+   "kind": "CME",
+   "speed_kms": 920,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/32274/-1"
+  },
+  {
+   "date": "2024-08-03",
+   "kind": "CME",
+   "speed_kms": 1310,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/32377/-1"
+  },
+  {
+   "date": "2024-08-04",
+   "kind": "CME",
+   "speed_kms": 434,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/32386/-1"
+  },
+  {
+   "date": "2024-08-05",
+   "kind": "CME",
+   "speed_kms": 300,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/32338/-1"
+  },
+  {
+   "date": "2024-08-08",
+   "kind": "CME",
+   "speed_kms": 1095,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/32572/-1"
+  },
+  {
+   "date": "2024-08-11",
+   "kind": "CME",
+   "speed_kms": 925,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/32603/-1"
+  },
+  {
+   "date": "2024-08-13",
+   "kind": "CME",
+   "speed_kms": 677,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/32674/-1"
+  },
+  {
+   "date": "2024-08-18",
+   "kind": "CME",
+   "speed_kms": 574,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/32790/-1"
+  },
+  {
+   "date": "2024-08-20",
+   "kind": "CME",
+   "speed_kms": 328,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/32782/-1"
+  },
+  {
+   "date": "2024-08-21",
+   "kind": "CME",
+   "speed_kms": 349,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/32833/-1"
+  },
+  {
+   "date": "2024-08-22",
+   "kind": "CME",
+   "speed_kms": 545,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/32847/-1"
+  },
+  {
+   "date": "2024-08-23",
+   "kind": "CME",
+   "speed_kms": 504,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/32881/-1"
+  },
+  {
+   "date": "2024-08-24",
+   "kind": "CME",
+   "speed_kms": 522,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/32892/-1"
+  },
+  {
+   "date": "2024-08-25",
+   "kind": "CME",
+   "speed_kms": 722,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/32918/-1"
+  },
+  {
+   "date": "2024-08-28",
+   "kind": "CME",
+   "speed_kms": 461,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/32989/-1"
+  },
+  {
+   "date": "2024-09-04",
+   "kind": "CME",
+   "speed_kms": 584,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33085/-1"
+  },
+  {
+   "date": "2024-09-08",
+   "kind": "CME",
+   "speed_kms": 419,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33160/-1"
+  },
+  {
+   "date": "2024-09-09",
+   "kind": "CME",
+   "speed_kms": 0,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33214/-1"
+  },
+  {
+   "date": "2024-09-11",
+   "kind": "CME",
+   "speed_kms": 957,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33270/-1"
+  },
+  {
+   "date": "2024-09-12",
+   "kind": "CME",
+   "speed_kms": 626,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33245/-1"
+  },
+  {
+   "date": "2024-09-14",
+   "kind": "CME",
+   "speed_kms": 755,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33300/-1"
+  },
+  {
+   "date": "2024-09-16",
+   "kind": "CME",
+   "speed_kms": 423,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33319/-1"
+  },
+  {
+   "date": "2024-09-17",
+   "kind": "CME",
+   "speed_kms": 719,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33387/-1"
+  },
+  {
+   "date": "2024-09-18",
+   "kind": "CME",
+   "speed_kms": 768,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33394/-1"
+  },
+  {
+   "date": "2024-09-19",
+   "kind": "CME",
+   "speed_kms": 638,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33417/-1"
+  },
+  {
+   "date": "2024-09-20",
+   "kind": "CME",
+   "speed_kms": 447,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33426/-1"
+  },
+  {
+   "date": "2024-09-22",
+   "kind": "CME",
+   "speed_kms": 452,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33509/-1"
+  },
+  {
+   "date": "2024-09-24",
+   "kind": "CME",
+   "speed_kms": 323,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33515/-1"
+  },
+  {
+   "date": "2024-09-30",
+   "kind": "CME",
+   "speed_kms": 338,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33559/-1"
+  },
+  {
+   "date": "2024-10-02",
+   "kind": "CME",
+   "speed_kms": 1148,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33610/-1"
+  },
+  {
+   "date": "2024-10-03",
+   "kind": "CME",
+   "speed_kms": 433,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33631/-1"
+  },
+  {
+   "date": "2024-10-05",
+   "kind": "CME",
+   "speed_kms": 0,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33682/-1"
+  },
+  {
+   "date": "2024-10-06",
+   "kind": "CME",
+   "speed_kms": 1077,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33742/-1"
+  },
+  {
+   "date": "2024-10-07",
+   "kind": "CME",
+   "speed_kms": 822,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33705/-1"
+  },
+  {
+   "date": "2024-10-08",
+   "kind": "CME",
+   "speed_kms": 371,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33726/-1"
+  },
+  {
+   "date": "2024-10-10",
+   "kind": "CME",
+   "speed_kms": 0,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33837/-1"
+  },
+  {
+   "date": "2024-10-11",
+   "kind": "CME",
+   "speed_kms": 0,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33884/-1"
+  },
+  {
+   "date": "2024-10-12",
+   "kind": "CME",
+   "speed_kms": 529,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33816/-1"
+  },
+  {
+   "date": "2024-10-13",
+   "kind": "CME",
+   "speed_kms": 638,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33854/-1"
+  },
+  {
+   "date": "2024-10-18",
+   "kind": "CME",
+   "speed_kms": 829,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33989/-1"
+  },
+  {
+   "date": "2024-10-19",
+   "kind": "CME",
+   "speed_kms": 340,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/33994/-1"
+  },
+  {
+   "date": "2024-10-28",
+   "kind": "CME",
+   "speed_kms": 482,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/34126/-1"
+  },
+  {
+   "date": "2024-11-01",
+   "kind": "CME",
+   "speed_kms": 0,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/34300/-1"
+  },
+  {
+   "date": "2024-11-10",
+   "kind": "CME",
+   "speed_kms": 377,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/34416/-1"
+  },
+  {
+   "date": "2024-11-19",
+   "kind": "CME",
+   "speed_kms": 692,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/34625/-1"
+  },
+  {
+   "date": "2024-11-23",
+   "kind": "CME",
+   "speed_kms": 445,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/34709/-1"
+  },
+  {
+   "date": "2024-11-29",
+   "kind": "CME",
+   "speed_kms": 935,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/35322/-1"
+  },
+  {
+   "date": "2024-12-08",
+   "kind": "CME",
+   "speed_kms": 467,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/35412/-1"
+  },
+  {
+   "date": "2024-12-13",
+   "kind": "CME",
+   "speed_kms": 677,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/35515/-1"
+  },
+  {
+   "date": "2024-12-19",
+   "kind": "CME",
+   "speed_kms": 443,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/35642/-1"
+  },
+  {
+   "date": "2024-12-20",
+   "kind": "CME",
+   "speed_kms": 536,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/35683/-1"
+  },
+  {
+   "date": "2024-12-21",
+   "kind": "CME",
+   "speed_kms": 410,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/35666/-1"
+  },
+  {
+   "date": "2024-12-25",
+   "kind": "CME",
+   "speed_kms": 484,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/35807/-1"
+  },
+  {
+   "date": "2024-12-27",
+   "kind": "CME",
+   "speed_kms": 823,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/35883/-1"
+  },
+  {
+   "date": "2024-12-29",
+   "kind": "CME",
+   "speed_kms": 268,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/35923/-1"
+  },
+  {
+   "date": "2025-01-01",
+   "kind": "CME",
+   "speed_kms": 325,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/35948/-1"
+  },
+  {
+   "date": "2025-01-02",
+   "kind": "CME",
+   "speed_kms": 860,
+   "glancing": false,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/36055/-1"
+  },
+  {
+   "date": "2025-01-03",
+   "kind": "CME",
+   "speed_kms": 881,
+   "glancing": true,
+   "source": "NASA DONKI (WSA-ENLIL)",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/36079/-1"
   }
  ]
 }

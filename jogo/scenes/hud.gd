@@ -39,6 +39,12 @@ var _card_name: Label
 var _card_fact: Label
 var _card_photo: TextureRect
 var _card_queue: Array[int] = []
+var _explore_btn: Button
+var _tube: PanelContainer
+var _tube_shape: Panel
+var _tube_style: StyleBoxFlat
+var _tube_label: Label
+var _tube_tween: Tween
 
 const REVEAL_SOUND := {"comum": "revelar-comum", "raro": "revelar-raro", "épico": "revelar-epico", "lendário": "revelar-lendario"}
 
@@ -57,9 +63,54 @@ func _ready() -> void:
 	State.storm_started.connect(_show_storm)
 	State.storm_ended.connect(func(_shielded: bool) -> void: _show_toast(tr("STORM_OVER")))
 	State.card_won.connect(_queue_card)
+	State.explore_returned.connect(func(_id: int) -> void: get_tree().create_timer(1.6).timeout.connect(_show_tube))
 	_refresh()
+	if State.tube_card != 0:
+		_show_tube.call_deferred()
 	if State.paused and not State.storm_event.is_empty():
 		_show_storm.call_deferred(State.storm_event)
+
+
+# ───────────── Expedição e tubo de amostra ─────────────
+func _on_explore() -> void:
+	if State.tube_card != 0:
+		_show_tube()
+		return
+	var reason := State.explore_block_reason()
+	if reason != "":
+		_show_toast(tr(reason))
+		Sfx.play("travado")
+		return
+	if State.start_explore():
+		Sfx.play("toque-botao")
+		_set_mode(Mode.NONE)
+		_close_panel()
+
+
+func _show_tube() -> void:
+	if State.tube_card == 0 or _tube.visible:
+		return
+	_tube_style.bg_color = Palette.RARITY.get(State.tube_rarity(), Palette.TEXT)
+	_tube_label.text = tr("TUBE_TAP")
+	_tube.visible = true
+	_dim.visible = true
+	Sfx.play("tubo-abrir")
+	# O tubo treme e pulsa antes de abrir.
+	_tube_shape.pivot_offset = _tube_shape.size / 2.0
+	if _tube_tween:
+		_tube_tween.kill()
+	_tube_tween = create_tween().set_loops()
+	_tube_tween.tween_property(_tube_shape, "rotation_degrees", 7.0, 0.08)
+	_tube_tween.tween_property(_tube_shape, "rotation_degrees", -7.0, 0.16)
+	_tube_tween.tween_property(_tube_shape, "rotation_degrees", 0.0, 0.08)
+	_tube_tween.tween_interval(0.35)
+
+
+func _on_tube_tap() -> void:
+	if _tube_tween:
+		_tube_tween.kill()
+	_tube.visible = false
+	State.open_tube()
 
 
 # ───────────── Tempestade solar ─────────────
@@ -97,7 +148,7 @@ func _queue_card(id: int, _is_new: bool) -> void:
 func _show_next_card() -> void:
 	if _card_queue.is_empty():
 		_card.visible = false
-		_dim.visible = _storm.visible
+		_dim.visible = _storm.visible or _tube.visible
 		return
 	var id: int = _card_queue.pop_front()
 	var info := State.card_info(id)
@@ -264,6 +315,14 @@ func _refresh() -> void:
 		_bar_fill[bar].bg_color = Palette.ALERT if value < State.LOW else Palette.BAR[bar]
 	_sol_label.text = "%s  ·  %s" % [tr("HUD_SOL").format({"n": State.sol}), tr("HUD_PLACE")]
 	_lang_btn.text = LANG_NAMES.get(State.locale, "EN")
+	if State.exploring():
+		_explore_btn.text = tr("EXPLORING").format({"n": State.explore_left})
+	elif State.tube_card != 0:
+		_explore_btn.text = tr("TUBE_READY")
+	else:
+		_explore_btn.text = "%s  -%d" % [tr("BTN_EXPLORE"), int(State.EXPLORE_OXYGEN)]
+	_explore_btn.disabled = State.exploring()
+	_explore_btn.modulate = Color(1, 1, 1, 0.55) if State.explore_block_reason() != "" and State.tube_card == 0 else Color.WHITE
 	for type in _build_btns:
 		var def: Dictionary = State.ITEMS[type]
 		var b: Button = _build_btns[type]
@@ -364,6 +423,19 @@ func _build_bottom(root: Control) -> void:
 	_panel_buttons.add_theme_constant_override("separation", 10)
 	pbox.add_child(_panel_buttons)
 
+	_explore_btn = Button.new()
+	_explore_btn.custom_minimum_size = Vector2(0, 100)
+	_explore_btn.add_theme_font_size_override("font_size", 34)
+	var gold := Palette._box(Palette.GOLD, 22)
+	_explore_btn.add_theme_stylebox_override("normal", gold)
+	_explore_btn.add_theme_stylebox_override("hover", gold)
+	_explore_btn.add_theme_stylebox_override("pressed", Palette._box(Palette.GOLD.darkened(0.2), 22))
+	_explore_btn.add_theme_stylebox_override("disabled", Palette._box(Palette.GOLD.darkened(0.45), 22))
+	for c in ["font_color", "font_hover_color", "font_pressed_color", "font_disabled_color"]:
+		_explore_btn.add_theme_color_override(c, Palette.BG)
+	_explore_btn.pressed.connect(_on_explore)
+	bottom.add_child(_explore_btn)
+
 	var menu := PanelContainer.new()
 	bottom.add_child(menu)
 	var row := HBoxContainer.new()
@@ -428,6 +500,26 @@ func _build_popups(root: Control) -> void:
 	cbox.add_child(_card_fact)
 	var ok := _popup_button(cbox, _show_next_card)
 	ok.text = "OK"
+
+	# O tubo de amostra: uma cápsula na cor da raridade, que treme até a criança tocar.
+	_tube = _popup(root)
+	_tube.custom_minimum_size = Vector2(420, 0)
+	var tbox: VBoxContainer = _tube.get_child(0)
+	tbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	_tube_shape = Panel.new()
+	_tube_shape.custom_minimum_size = Vector2(130, 300)
+	_tube_shape.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_tube_style = Palette._box(Palette.TEXT, 65)
+	_tube_style.set_border_width_all(8)
+	_tube_style.border_color = Palette.TEXT
+	_tube_shape.add_theme_stylebox_override("panel", _tube_style)
+	tbox.add_child(_tube_shape)
+	_tube_label = Label.new()
+	_tube_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_tube_label.add_theme_font_size_override("font_size", 36)
+	tbox.add_child(_tube_label)
+	var open_btn := _popup_button(tbox, _on_tube_tap)
+	open_btn.text = "OK"
 
 
 func _popup(root: Control) -> PanelContainer:

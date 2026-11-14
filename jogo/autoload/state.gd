@@ -6,6 +6,8 @@ signal changed
 signal storm_started(event: Dictionary)
 signal storm_ended(shielded: bool)
 signal card_won(id: int, is_new: bool)
+signal explore_started
+signal explore_returned(card_id: int)
 
 # ───────────── BALANCEAMENTO (todos os números do jogo moram aqui) ─────────────
 const SOL_SECONDS := 2.5            # 1 sol (dia de Marte) = 2,5 s de jogo
@@ -39,6 +41,11 @@ const STORM_RADIATION := 30.0       # sem escudo, a radiação come a barra de e
 const AURORA_CHANCE := 0.10         # aguentou com escudo: chance da lendária "Aurora em Marte"
 const CARD_STORM := 23              # carta "Tempestade solar de 2024" (1ª tempestade)
 const CARD_AURORA := 25
+# Expedição: o Mike sai da base e volta com um tubo de amostra
+const EXPLORE_SOLS := 4             # fica fora 4 sóis (~10 s)
+const EXPLORE_OXYGEN := 20.0        # o traje gasta oxigênio
+const EXPLORE_RADIATION := 5.0      # lá fora a radiação come um pouco do escudo
+const TUBE_ODDS := {"comum": 60, "raro": 27, "épico": 10, "lendário": 3}   # em %
 # ─────────────────────────────────────────────────────────────────────────────
 
 const SAVE_PATH := "user://save.json"
@@ -57,6 +64,8 @@ var storms_seen := 0
 var storm_left := 0
 var storm_shielded := false
 var storm_event := {}
+var explore_left := 0            # sóis que faltam para o Mike voltar
+var tube_card := 0               # carta dentro do tubo que ainda não foi aberto (0 = nenhum)
 
 var _sol_timer := 0.0
 var _save_timer := 0.0
@@ -107,6 +116,8 @@ func new_game() -> void:
 	storm_left = 0
 	storm_shielded = false
 	storm_event = {}
+	explore_left = 0
+	tube_card = 0
 	for k in START_ITEMS:
 		items[k] = _new_item(START_ITEMS[k])
 	changed.emit()
@@ -226,6 +237,70 @@ func add_card(id: int) -> bool:
 	return is_new
 
 
+# ───────────── Expedição e tubo de amostra ─────────────
+func exploring() -> bool:
+	return explore_left > 0
+
+
+## Por que o Mike não pode sair agora ("" = pode). Devolve a chave do texto para a tela.
+func explore_block_reason() -> String:
+	if mike_inside():
+		return "LOCK_STORM"
+	if oxygen < EXPLORE_OXYGEN:
+		return "LOCK_OXYGEN"
+	return ""
+
+
+func start_explore() -> bool:
+	if paused or exploring() or tube_card != 0 or explore_block_reason() != "":
+		return false
+	oxygen -= EXPLORE_OXYGEN
+	shield = maxf(0.0, shield - EXPLORE_RADIATION)
+	explore_left = EXPLORE_SOLS
+	explore_started.emit()
+	_after_action()
+	return true
+
+
+## Abre o tubo que o Mike trouxe: a carta vai para o álbum (e aparece na tela).
+func open_tube() -> int:
+	var id := tube_card
+	if id == 0:
+		return 0
+	tube_card = 0
+	add_card(id)
+	_after_action()
+	return id
+
+
+func tube_rarity() -> String:
+	return card_info(tube_card).get("rarity", "comum")
+
+
+## Sorteia a raridade pelo TUBE_ODDS e depois uma carta dessa raridade que dá para achar na Gale.
+func _draw_tube() -> int:
+	var pool := {}
+	for id in _cards_info:
+		var c: Dictionary = _cards_info[id]
+		if c.locked or c.place != "Gale" or not (c.how in ["tubo de amostra", "explorar"]):
+			continue
+		if not pool.has(c.rarity):
+			pool[c.rarity] = []
+		pool[c.rarity].append(id)
+	if pool.is_empty():
+		return 0
+	var roll := randi_range(1, 100)
+	var rarity := "comum"
+	for r in TUBE_ODDS:
+		roll -= TUBE_ODDS[r]
+		if roll <= 0:
+			rarity = r
+			break
+	if not pool.has(rarity):
+		rarity = pool.keys()[0]
+	return pool[rarity].pick_random()
+
+
 # ───────────── Tempestade solar ─────────────
 func storm_active() -> bool:
 	return storm_left > 0
@@ -310,6 +385,11 @@ func _tick() -> void:
 	if energy > LOW:
 		shield = minf(BAR_MAX, shield + SHIELD_RECHARGE)
 	sol += 1
+	if explore_left > 0:
+		explore_left -= 1
+		if explore_left == 0:
+			tube_card = _draw_tube()
+			explore_returned.emit(tube_card)
 	if storm_left > 0:
 		storm_left -= 1
 		if storm_left == 0:
@@ -328,6 +408,7 @@ func save_game() -> void:
 		"items": items, "cards": cards, "locale": locale,
 		"paused": paused, "next_storm_sol": next_storm_sol, "storms_seen": storms_seen,
 		"storm_left": storm_left, "storm_shielded": storm_shielded, "storm_event": storm_event,
+		"explore_left": explore_left, "tube_card": tube_card,
 	}
 	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if f:
@@ -352,6 +433,8 @@ func load_game() -> bool:
 	storm_left = int(data.get("storm_left", 0))
 	storm_shielded = bool(data.get("storm_shielded", false))
 	storm_event = data.get("storm_event", {})
+	explore_left = int(data.get("explore_left", 0))
+	tube_card = int(data.get("tube_card", 0))
 	items.clear()
 	for k in data.items:
 		var it: Dictionary = data.items[k]
