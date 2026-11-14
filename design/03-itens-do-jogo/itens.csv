@@ -8,7 +8,7 @@ zinia,Nature Kit,flower_redA.glb,flor vermelha (combina com a paleta); arquivo: 
 hematita,Space Kit,rocks_smallA.glb,pintada de cinza-escuro: design/04-cores-das-coisas/hematita.glb
 enxofre,Space Kit,rock_crystals.glb,cristais amarelos: design/04-cores-das-coisas/enxofre.glb
 leopardo,Space Kit,rock_largeA.glb,com textura de jaspe-leopardo: design/04-cores-das-coisas/leopardo.glb
-painel-solar,feito pelo time (Blender),painel-solar.glb,não existe no Space Kit; moldura dourada #E8B23A; arquivo nesta pasta
+painel-solar,feito pelo time (Blender),niveis/painel-solar-n1.glb,3 níveis de upgrade: niveis/painel-solar-n1.glb / n2.glb / n3.glb (1 painel → 2 com escovinha → 6 com bateria)
 moxie,Space Kit,machine_generator.glb,pintado de dourado: design/04-cores-das-coisas/moxie.glb
 rtg,Space Kit,machine_barrel.glb,arquivo: design/03-itens-do-jogo/kenney/machine-barrel.glb
 ceu,Skyboxes,skybox-morning.png,céu pêssego/caramelo; arquivo: design/03-itens-do-jogo/kenney/skybox-morning.png
@@ -16,3 +16,6 @@ decoracao-bandeira,feito pelo time (Blender),decoracao-bandeira.glb,mastro doura
 decoracao-luzinhas,feito pelo time (Blender),decoracao-luzinhas.glb,postes dourados e lâmpadas que brilham; arquivo nesta pasta
 decoracao-vaso,Nature Kit,pot_small.glb,creme para não sumir no chão de Marte: design/04-cores-das-coisas/decoracao-vaso.glb
 decoracao-antena,Space Kit,satelliteDish.glb,arquivo: design/03-itens-do-jogo/kenney/satellite-dish.glb
+casa-do-mike,feito pelo time (Blender),niveis/casa-do-mike-n1.glb,3 níveis de upgrade: niveis/casa-do-mike-n1.glb / n2.glb / n3.glb (o casa-do-mike.glb antigo = nível 2)
+cenario-paredes,Modular Dungeon Kit,colormap-marte.png,paredes creme com base dourada e pilares vinho; chão de terra do kit; troque o Textures/colormap.png do kit por design/03-itens-do-jogo/kenney/modular-dungeon-kit/colormap-marte.png
+estufa,feito pelo time (Blender),niveis/estufa-n1.glb,3 níveis de upgrade: niveis/estufa-n1.glb / n2.glb / n3.glb (cúpula → túnel → túnel com cúpula e caixa d’água)

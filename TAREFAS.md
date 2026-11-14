@@ -49,5 +49,5 @@
 
 - [x] **Dev → Design:** subir as 3 animações do Mike em `design/01-mike/`: `idle.fbx`, `run.fbx` e `jump.fbx`, da pasta `Animations` do pacote Animated Characters Protagonists.
 - [x] **Dev → Design:** subir em `design/03-itens-do-jogo/` os modelos da Kenney que não foram repintados: `cabbage.glb` (alface), `radish.glb` (rabanete), `flower_redA.glb` (zínia), `machine_barrel.glb` (RTG), `satelliteDish.glb` (antena) e `skybox-morning.png` (céu). Se o pacote tiver a pasta `Textures`, mande o `colormap.png` junto.
-- [ ] **Dev → Design:** escolher e subir 2 modelos que faltam, em `design/03-itens-do-jogo/kenney/`: a **Casa do Mike** (um módulo de base) e a **Estufa**. Podem ser do Space Kit, Space Station Kit ou Modular Space Kit. Anotar no `itens.csv` (linhas `casa-do-mike` e `estufa`).
+- [x] **Dev → Design:** escolher e subir 2 modelos que faltam, em `design/03-itens-do-jogo/kenney/`: a **Casa do Mike** (um módulo de base) e a **Estufa**. Podem ser do Space Kit, Space Station Kit ou Modular Space Kit. Anotar no `itens.csv` (linhas `casa-do-mike` e `estufa`).
 - [ ] **Dev → Conteúdo:** faltam 6 sons do `sons.csv` em `conteudo/01-sons/sons/`: `revelar-epico`, `revelar-lendario` e `musica-base` (essenciais), e `passos`, `aurora` e `vento-poeira`.
