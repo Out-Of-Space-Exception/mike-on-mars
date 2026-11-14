@@ -31,8 +31,9 @@
    - As hélices `rotors_01` e `rotors_02` giram em sentidos opostos, por código.
    - Decola e pousa com tween e segue o Mike.
 10. **Idiomas:** o botão Idioma troca entre EN, PT, ES e FR (`TranslationServer`). O jogo começa no idioma do aparelho; se não for nenhum dos 4, começa em EN.
-11. **Reações do Mike:** usar as animações do `animacoes.md` (passo 03). Se faltar alguma, fazer com tween (pulo, tremida).
-12. Publicar e avisar no grupo.
+11. **Tela "NASA data" dentro do jogo:** um botão abre a lista dos dados reais que o jogo usa (DONKI com as datas, fontes das cartas, Ingenuity), com os links. O desafio pede que o jogador veja que é ciência de verdade.
+12. **Reações do Mike:** usar as animações do `animacoes.md` (passo 03). Se faltar alguma, fazer com tween (pulo, tremida).
+13. Publicar e avisar no grupo.
 
 ## O que entregar (nesta pasta)
 | Arquivo | O que tem | Formato |

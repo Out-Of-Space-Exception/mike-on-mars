@@ -42,6 +42,7 @@ O tubo é o momento "uau" do jogo: a revelação da raridade prende a criança. 
 
 ## Não pode
 - Inventar tempestade: toda tempestade solar do jogo vem do `donki.json`.
+- Fingir que o dado é ao vivo: ele é arquivado (2024), e o jogo mostra a data real. O desafio pede essa honestidade.
 - Punir: nada de perder itens ou cartas.
 - Deixar chave de API no repositório ou no jogo.
 - Sortear carta trancada ("em breve").

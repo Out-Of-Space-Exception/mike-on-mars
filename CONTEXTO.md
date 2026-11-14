@@ -116,7 +116,9 @@ Você está ajudando o time **Out of Space Exception** (Brasil) no NASA Space Ap
 - **Listar todos os recursos** usados (modelos, sons, fontes, imagens, código), mesmo os gratuitos.
 - IA é permitida, mas precisa ser **declarada**. Imagem e vídeo de IA levam **marca d'água**.
 - **Nenhuma** foto, vídeo ou voz de menores de 18 anos.
-- O envio fecha **domingo, 15/11, às 23h59**.
+- Dentro do jogo, mostrar de onde vêm os dados da NASA e deixar claro que são **arquivados**, não ao vivo (o desafio pede isso).
+- O envio fecha **domingo, 15/11, às 23h59**. Antes, clicar em **Submit for Judging**: projeto só salvo não é julgado.
+- Regras completas e campos do formulário, em português: [Space Apps 2026 Kit](https://github.com/angelinopires/space-apps-2026-kit/blob/main/docs/pt-br/regras-e-julgamento.md).
 
 ---
 
