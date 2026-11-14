@@ -1,0 +1,6 @@
+# Godot
+.godot/
+*.tmp
+# versão web gerada (vai para a branch gh-pages)
+/build/
+node_modules/
