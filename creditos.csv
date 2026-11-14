@@ -41,3 +41,4 @@ ia,Claude (Anthropic): criou o Mike astronauta no Blender (capacete + gola + moc
 ia,Claude (Anthropic): procurou e conferiu nas páginas da NASA as fontes de 12 cartas e reescreveu os fatos que a fonte não dizia,conteudo/02-cartas,Anthropic,-,https://claude.ai,Conteúdo
 ia,Claude (Anthropic): escreveu com a dupla o texto dos 7 slides (slides.md) a partir do CONTEXTO.md e do cartas.csv,conteudo/04-slides,Anthropic,-,https://claude.ai,Conteúdo
 ia,Claude (Anthropic): traduziu para espanhol e francês os textos do jogo (textos.csv),conteudo/03-textos/textos.csv,Anthropic,-,https://claude.ai,Conteúdo
+ia,Claude (Anthropic): escreveu com a dupla o texto da página do projeto (pagina.md) a partir do CONTEXTO.md + cartas.csv + creditos.csv,conteudo/06-pagina-do-projeto,Anthropic,-,https://claude.ai,Conteúdo
