@@ -1,5 +1,7 @@
 # Moldura das cartas
 
+Feita pelo time do zero, por código: [moldura-carta.gd](moldura-carta.gd) (Godot). Não usa nenhum modelo de fora.
+
 4 molduras, uma por raridade. Mudam o símbolo do medalhão no topo e a cor da borda e dos enfeites, com as cores de raridade do [cores-das-coisas.csv](../04-cores-das-coisas/cores-das-coisas.csv):
 
 | Raridade (`cartas.csv`) | Arquivo | Símbolo | Cor da borda |
