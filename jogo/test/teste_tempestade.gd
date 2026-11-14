@@ -18,6 +18,7 @@ func _ready() -> void:
 	_eventos()
 	_jogo_fechado()
 	_ingenuity(main.get_node("Base"))
+	_niveis_e_album()
 	print("RESULTADO: ", "TUDO OK" if falhas == 0 else "%d FALHA(S)" % falhas)
 	get_tree().quit(falhas)
 
@@ -153,3 +154,37 @@ func _ingenuity(base: Node3D) -> void:
 	ok(absf(eixo.dot(Vector3.UP)) > 0.9, "as hélices do Ingenuity giram em pé (eixo para cima)")
 	var tam: Vector3 = base._merged_aabb(base._pet).size
 	ok(tam.x > 0.8 and tam.x < 4.0, "o Ingenuity tem tamanho visível (%.1f m)" % tam.x)
+
+
+func _niveis_e_album() -> void:
+	State.new_game()
+	State.energy = 100.0
+	var casa := Vector2i(2, 3)
+	ok(State.upgrade_block_reason(casa) == "", "a casa pode ir para o nível 2 (tem espaço ao lado)")
+	State.upgrade(casa)
+	ok(State.cells_of(casa, "habitat", 2).size() == 2 and State.anchor_of(Vector2i(3, 3)) == casa, "casa no nível 2 ocupa 2 casas")
+	State.energy = 100.0
+	State.build("solar", Vector2i(4, 3))
+	ok(State.upgrade_block_reason(casa) == "NEED_SPACE", "sem espaço ao lado, a casa não sobe para o nível 3")
+	ok(not State.build("moxie", Vector2i(3, 3)), "não dá para construir em cima da casa grande")
+	State.remove(Vector2i(4, 3))
+	State.energy = 100.0
+	ok(State.upgrade(casa) and State.cells_of(casa, "habitat", 3).size() == 3, "com espaço, a casa vai para o nível 3 (3 casas)")
+	State.energy = 100.0
+	State.build("rtg", Vector2i(0, 0))
+	State.energy = 100.0
+	State.upgrade(Vector2i(0, 0))
+	State.energy = 100.0
+	State.upgrade(Vector2i(0, 0))
+	ok(State.item_name(State.item_at(Vector2i(0, 0))) == "B_KILOPOWER" and State.cards.has("14"), "RTG no nível 3 vira Kilopower e dá a carta")
+	var sem_dica := 0
+	for id in range(1, State.cards_total() + 1):
+		if State.card_hint(id).strip_edges() == "":
+			sem_dica += 1
+	ok(sem_dica == 0, "todas as 40 cartas dizem como ganhar")
+	State.energy = 100.0
+	State.build("greenhouse", Vector2i(0, 6))
+	State.plant(Vector2i(0, 6), "radish")
+	_ticks(30)
+	State.harvest(Vector2i(0, 6))
+	ok(int(State.inventory.get("radish", 0)) == 1, "colher conta no inventário (rabanete × 1)")

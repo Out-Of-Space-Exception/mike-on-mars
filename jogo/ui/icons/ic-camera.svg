@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Ícone de câmera do botão Foto (provisório do Dev até o design/07; mesmo estilo chapado dos outros) -->
+  <path fill="#ffffff" fill-rule="evenodd" d="M44 22h40l8 14h20a8 8 0 0 1 8 8v58a8 8 0 0 1-8 8H16a8 8 0 0 1-8-8V44a8 8 0 0 1 8-8h20zM64 52a22 22 0 1 0 0 44a22 22 0 1 0 0-44zm0 10a12 12 0 1 1 0 24a12 12 0 1 1 0-24z"/>
+</svg>

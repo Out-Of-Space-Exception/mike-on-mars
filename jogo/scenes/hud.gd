@@ -9,7 +9,7 @@ const LANGS := ["en", "pt_BR", "es", "fr"]
 const LANG_NAMES := {"en": "EN", "pt_BR": "PT", "es": "ES", "fr": "FR"}
 const BAR_KEYS := {"energy": "BAR_ENERGY", "oxygen": "BAR_OXYGEN", "shield": "BAR_SHIELD"}
 const REVEAL_SOUND := {"comum": "revelar-comum", "raro": "revelar-raro", "épico": "revelar-epico", "lendário": "revelar-lendario"}
-const ICONS := {"build": "res://ui/icons/ic-wrench.png", "explore": "res://ui/icons/ic-target.png", "album": "res://ui/icons/ic-menugrid.png"}
+const ICONS := {"build": "res://ui/icons/ic-wrench.png", "explore": "res://ui/icons/ic-target.png", "album": "res://ui/icons/ic-menugrid.png", "photo": "res://ui/icons/ic-camera.svg"}
 const DONKI_URL := "https://kauai.ccmc.gsfc.nasa.gov/DONKI/"
 
 var base: Node3D
@@ -69,6 +69,9 @@ var _start_nasa: Button
 var _postcard: Control
 var _postcard_label: Label
 var _flash: ColorRect
+var _inventory: HFlowContainer
+var _inv_labels := {}         # planta -> Label "× n"
+var _icons := {}              # planta -> textura desenhada do modelo 3D
 
 
 func _ready() -> void:
@@ -135,12 +138,12 @@ func on_cell_tapped(c: Vector2i) -> void:
 	var free: bool = c != base.OUTSIDE and State.item_at(c).is_empty()
 	match mode:
 		Mode.BUILD:
-			if free and State.build(build_type, c):
+			if c != base.OUTSIDE and State.build(build_type, c):
 				Sfx.play("construir")
 				base.walk_to(c)
 			_set_mode(Mode.NONE)
 		Mode.MOVE:
-			if free and State.move(selected, c):
+			if c != base.OUTSIDE and State.move(selected, c):
 				Sfx.play("construir")
 				base.walk_to(c)
 			_set_mode(Mode.NONE)
@@ -150,13 +153,19 @@ func on_cell_tapped(c: Vector2i) -> void:
 				_close_panel()
 			else:
 				Sfx.play("toque-botao")
-				_open_panel(c)
+				_open_panel(State.anchor_of(c))
 				base.walk_to(c)
 
 
 func _set_mode(m: Mode) -> void:
 	mode = m
-	base.highlight([] if m == Mode.NONE else State.free_cells())
+	match m:
+		Mode.BUILD:
+			base.highlight(State.free_cells())
+		Mode.MOVE:
+			base.highlight(State.move_targets(selected))
+		_:
+			base.highlight([])
 	_refresh()
 
 
@@ -249,7 +258,7 @@ func _refresh_panel() -> void:
 		_close_panel()
 		return
 	var def: Dictionary = State.ITEMS[it.type]
-	var title := tr(def.name)
+	var title := tr(State.item_name(it))
 	if State.upgrade_cost(selected) >= 0 or int(it.level) > 1:
 		title += " · " + tr("LEVEL").format({"n": int(it.level)})
 	_panel_title.text = title
@@ -275,7 +284,7 @@ func _refresh_panel() -> void:
 	var cost := State.upgrade_cost(selected)
 	if cost >= 0:
 		var up := _add_panel_button("%s -%d" % [tr("BTN_UPGRADE"), cost], _on_upgrade)
-		up.disabled = not State.can_afford(cost)
+		up.modulate = Color.WHITE if State.upgrade_block_reason(selected) == "" else Color(1, 1, 1, 0.55)
 	if def.get("removable", true):
 		_add_panel_button(tr("BTN_REMOVE"), _on_remove)
 
@@ -297,10 +306,11 @@ func _on_move() -> void:
 
 
 func _on_upgrade() -> void:
-	if State.upgrade(selected):
+	var reason := State.upgrade_block_reason(selected)
+	if reason == "" and State.upgrade(selected):
 		Sfx.play("melhorar")
 	else:
-		_show_toast(tr("NEED_ENERGY"))
+		_show_toast(tr(reason))
 		Sfx.play("travado")
 
 
@@ -463,6 +473,8 @@ func _show_next_card() -> void:
 	_card.visible = true
 	_update_dim()
 	Sfx.play(REVEAL_SOUND.get(rarity, "revelar-comum"))
+	if id == State.CARD_AURORA:
+		Sfx.play("aurora")
 
 
 func _on_card_source() -> void:
@@ -492,13 +504,12 @@ func _refresh_album() -> void:
 		if owned:
 			b.text = tr("CARD_%d_NAME" % id)
 			b.pressed.connect(_queue_card.bind(id, false))
-		elif info.get("locked", false):
-			b.text = tr("CARD_LOCKED")
-			b.disabled = true
 		else:
-			b.text = "?"
-			b.add_theme_font_size_override("font_size", 48)
-			b.disabled = true
+			b.text = tr("CARD_LOCKED") if info.get("locked", false) else "?"
+			if b.text == "?":
+				b.add_theme_font_size_override("font_size", 48)
+			# Carta que falta: o toque diz como ganhar.
+			b.pressed.connect(func() -> void: _show_info(tr("HOW_TITLE"), State.card_hint(id), Callable()))
 		_album_grid.add_child(b)
 
 
@@ -533,6 +544,7 @@ func _refresh() -> void:
 	_buttons.explore.modulate = Color(1, 1, 1, 0.55) if State.explore_block_reason() != "" and State.tube_card == 0 and not State.exploring() else Color.WHITE
 	_buttons.build.modulate = Color(1, 1, 1, 0.55) if State.base_locked_reason() != "" else Color.WHITE
 	_hint.text = _status_text()
+	_refresh_inventory()
 	if _panel.visible:
 		_refresh_panel()
 	if _build_menu.visible:
@@ -557,6 +569,70 @@ func _status_text() -> String:
 	if State.cards.size() <= 3 and not State.exploring() and State.tube_card == 0:
 		return tr("TUT_EXPLORE")
 	return ""
+
+
+## Quantas de cada planta a criança já colheu, com o próprio modelo 3D como ícone.
+func _refresh_inventory() -> void:
+	if base == null:
+		return
+	for p in State.inventory:
+		if int(State.inventory[p]) <= 0:
+			continue
+		if not _inv_labels.has(p):
+			var chip := PanelContainer.new()
+			var style := Palette._box(Palette.BG.darkened(0.35), 20)
+			style.content_margin_left = 8
+			style.content_margin_right = 14
+			style.content_margin_top = 2
+			style.content_margin_bottom = 2
+			chip.add_theme_stylebox_override("panel", style)
+			var row := HBoxContainer.new()
+			chip.add_child(row)
+			var icon := TextureRect.new()
+			icon.custom_minimum_size = Vector2(48, 48)
+			icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			icon.texture = _plant_icon(p)
+			row.add_child(icon)
+			var label := Label.new()
+			label.add_theme_font_size_override("font_size", 26)
+			row.add_child(label)
+			_inventory.add_child(chip)
+			_inv_labels[p] = label
+		_inv_labels[p].text = "× %d" % int(State.inventory[p])
+
+
+## Desenha o modelo da planta uma vez numa telinha separada e usa a imagem como ícone.
+func _plant_icon(p: String) -> Texture2D:
+	if _icons.has(p):
+		return _icons[p]
+	var file := State.model_file(State.PLANTS[p].model)
+	var vp := SubViewport.new()
+	vp.size = Vector2i(96, 96)
+	vp.transparent_bg = true
+	vp.own_world_3d = true
+	vp.render_target_update_mode = SubViewport.UPDATE_ONCE
+	add_child(vp)
+	var model: Node3D = base._load_model(file, 1.0, 1.0)
+	if model:
+		vp.add_child(model)
+	var env := WorldEnvironment.new()
+	env.environment = Environment.new()
+	env.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.environment.ambient_light_color = Color.WHITE
+	env.environment.ambient_light_energy = 0.7
+	vp.add_child(env)
+	var light := DirectionalLight3D.new()
+	light.rotation_degrees = Vector3(-50.0, 30.0, 0.0)
+	vp.add_child(light)
+	var cam := Camera3D.new()
+	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
+	cam.size = 1.4
+	vp.add_child(cam)
+	cam.position = Vector3(1.5, 1.6, 1.5)
+	cam.look_at(Vector3(0.0, 0.45, 0.0))
+	_icons[p] = vp.get_texture()
+	return _icons[p]
 
 
 func _refresh_build_menu() -> void:
@@ -648,6 +724,12 @@ func _build_top() -> void:
 	_sol_label = Label.new()
 	_sol_label.add_theme_font_size_override("font_size", 28)
 	pill.add_child(_sol_label)
+
+	_inventory = HFlowContainer.new()
+	_inventory.alignment = FlowContainer.ALIGNMENT_CENTER
+	_inventory.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_inventory.add_theme_constant_override("h_separation", 10)
+	top.add_child(_inventory)
 
 	_hint = Label.new()
 	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

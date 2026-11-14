@@ -93,7 +93,17 @@ if (existsSync(itensCsv)) {
     itens[it.item_do_jogo] = nome;
   }
 }
-writeFileSync(join(RAIZ, 'jogo/data/itens.json'), JSON.stringify(itens, null, 1) + '\n');
+// Os 3 níveis (niveis/<item>-n1.glb, -n2, -n3) e a altura de cada item (tamanhos.csv, com o Mike = 2,2)
+const niveis = join(RAIZ, 'design/03-itens-do-jogo/niveis');
+if (existsSync(niveis)) for (const f of readdirSync(niveis)) if (f.endsWith('.glb')) copyFileSync(join(niveis, f), join(RAIZ, 'jogo/models/items', f));
+const alturas = {};
+const tamanhosCsv = join(RAIZ, 'design/03-itens-do-jogo/tamanhos.csv');
+if (existsSync(tamanhosCsv)) {
+  for (const t of objetos(parse(readFileSync(tamanhosCsv, 'utf8')))) {
+    if (t.chave_no_jogo && t.chave_no_jogo !== '-') alturas[t.chave_no_jogo] = Number(t.altura);
+  }
+}
+writeFileSync(join(RAIZ, 'jogo/data/itens.json'), JSON.stringify({files: itens, heights: alturas}, null, 1) + '\n');
 
 // 8. Ícones do design/05
 const icones = join(RAIZ, 'design/05-telas/telas-godot');

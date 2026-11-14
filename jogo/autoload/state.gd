@@ -28,7 +28,7 @@ const SLOW_GROWTH := 0.5            # com energia baixa, a planta cresce pela me
 # "model" = nome do item no design/03-itens-do-jogo/itens.csv · "card" = carta ganha ao construir o 1º
 # "decor" = quantas cartas no álbum destravam a decoração · "max" = quantos dá para ter
 const ITEMS := {
-	"habitat": {"name": "B_HABITAT", "cost": 0, "height": 1.6, "removable": false, "model": "casa-do-mike"},
+	"habitat": {"name": "B_HABITAT", "cost": 0, "height": 1.6, "removable": false, "model": "casa-do-mike", "shield": 1.0},
 	"greenhouse": {"name": "B_GREENHOUSE", "cost": 15, "height": 1.2, "energy_when_planted": -1.0, "model": "estufa"},
 	"solar": {"name": "B_SOLAR", "cost": 10, "height": 0.4, "energy": 3.0, "model": "painel-solar", "card": 11},
 	"rtg": {"name": "B_RTG", "cost": 30, "height": 1.0, "energy": 1.0, "model": "rtg", "card": 12},
@@ -41,6 +41,10 @@ const ITEMS := {
 }
 const BUILDABLE := ["greenhouse", "solar", "rtg", "moxie", "antenna", "pad", "flag", "lights", "pot"]
 const CARD_KILOPOWER := 14          # RTG no nível 3 vira uma mini usina (carta Kilopower)
+const KILOPOWER_ENERGY := 4.0       # o Kilopower (RTG nível 3) dá 4 de energia por sol, dia e noite
+# Quantas casas da grade cada nível ocupa (os modelos do design/03 crescem para o lado: nível 3 = 3 casas)
+const FOOTPRINT := {"habitat": [1, 2, 3], "greenhouse": [1, 2, 3], "solar": [1, 2, 3]}
+const GREENHOUSE_LEVEL_SPEED := 0.5 # estufa maior: +50% de velocidade por nível acima do 1
 # Plantas: tempo real proporcional (1 sol ≈ 1 dia). "unlock" = colheitas para destravar a semente.
 const PLANTS := {
 	"lettuce": {"name": "P_LETTUCE", "sols": 33, "card": 1, "model": "alface", "unlock": 0},
@@ -99,6 +103,7 @@ var sol := 1
 var items := {}     # "x,y" -> {"type", "level", "plant", "growth", "spent"}
 var cards := {}     # "id" -> quantas vezes ganhou
 var harvests := 0
+var inventory := {}  # planta -> quantas a criança já colheu
 var locale := ""
 var paused := false              # o jogo pausa quando a criança precisa escolher
 var pending_event := ""          # evento esperando a escolha ou o "OK" da criança
@@ -157,8 +162,57 @@ func donki_count() -> int:
 
 
 ## Arquivo .glb do item no jogo (vem do itens.csv do Design), ou "" se ainda não tem.
-func model_file(model_name: String) -> String:
-	return _models.get(model_name, "")
+## Com nível, procura a versão do nível (ex.: casa-do-mike-n2.glb).
+func model_file(model_name: String, level := 1) -> String:
+	var file: String = _models.get("files", {}).get(model_name, "")
+	if level > 1 and file.contains("-n1."):
+		var leveled := file.replace("-n1.", "-n%d." % level)
+		if ResourceLoader.exists("res://models/items/" + leveled):
+			return leveled
+	return file
+
+
+## Altura do item no jogo, pelo tamanhos.csv do Design (que mede com o Mike = 2,2). 0 = não tem.
+func model_height(game_key: String) -> float:
+	return float(_models.get("heights", {}).get(game_key, 0.0))
+
+
+## Como ganhar a carta (texto para a criança, no álbum).
+func card_hint(id: int) -> String:
+	for p in PLANTS:
+		if int(PLANTS[p].card) == id:
+			var txt := tr("HOW_HARVEST").format({"name": tr(PLANTS[p].name)})
+			if int(PLANTS[p].unlock) > 0:
+				txt += " " + tr("HOW_SEED").format({"n": PLANTS[p].unlock})
+			return txt
+	for t in ITEMS:
+		if int(ITEMS[t].get("card", 0)) == id:
+			return tr("HOW_BUILD").format({"name": tr(ITEMS[t].name)})
+	match id:
+		CARD_KILOPOWER:
+			return tr("HOW_KILOPOWER")
+		CARD_STORM:
+			return tr("HOW_STORM")
+		CARD_AURORA:
+			return tr("HOW_AURORA")
+		CARD_DUST:
+			return tr("HOW_DUST")
+		CARD_DEVIL:
+			return tr("HOW_DEVIL")
+		CARD_FROST:
+			return tr("HOW_FROST")
+		CARD_BLUE_SUNSET:
+			return tr("HOW_SUNSET")
+		CARD_EARTH_SEEN:
+			return tr("HOW_EARTH")
+	if id in PACKAGE_CARDS:
+		return tr("HOW_PACKAGE")
+	if SOL_CARDS.values().has(id):
+		return tr("HOW_TIME")
+	var info := card_info(id)
+	if info.get("locked", false):
+		return tr("HOW_LOCKED")
+	return tr("HOW_TUBE")
 
 
 func start() -> void:
@@ -185,6 +239,7 @@ func new_game() -> void:
 	items.clear()
 	cards.clear()
 	harvests = 0
+	inventory.clear()
 	paused = false
 	pending_event = ""
 	next_storm_sol = FIRST_STORM_SOL
@@ -219,8 +274,46 @@ static func in_grid(c: Vector2i) -> bool:
 	return c.x >= 0 and c.y >= 0 and c.x < GRID_W and c.y < GRID_H
 
 
+## Quantas casas o item ocupa (para a direita da casa âncora), conforme o nível.
+static func width_of(type: String, level: int) -> int:
+	var sizes: Array = FOOTPRINT.get(type, [1])
+	return int(sizes[clampi(level - 1, 0, sizes.size() - 1)])
+
+
+static func cells_of(anchor: Vector2i, type: String, level: int) -> Array[Vector2i]:
+	var out: Array[Vector2i] = []
+	for i in width_of(type, level):
+		out.append(anchor + Vector2i(i, 0))
+	return out
+
+
+## Mapa "casa ocupada" -> "casa âncora do item que está nela".
+func _occupancy() -> Dictionary:
+	var occ := {}
+	for k in items:
+		for c in cells_of(parse_key(k), items[k].type, int(items[k].level)):
+			occ[key(c)] = k
+	return occ
+
+
+## A casa âncora do item que ocupa a casa c (ou (-1, -1) se está livre).
+func anchor_of(c: Vector2i) -> Vector2i:
+	var occ := _occupancy()
+	return parse_key(occ[key(c)]) if occ.has(key(c)) else Vector2i(-1, -1)
+
+
 func item_at(c: Vector2i) -> Dictionary:
-	return items.get(key(c), {})
+	var occ := _occupancy()
+	return items.get(occ.get(key(c), ""), {})
+
+
+## Dá para pôr este item (neste nível) com a âncora em c? (ignore = o próprio item, ao mover ou melhorar)
+func can_place(type: String, level: int, c: Vector2i, ignore := "") -> bool:
+	var occ := _occupancy()
+	for cell in cells_of(c, type, level):
+		if not in_grid(cell) or (occ.has(key(cell)) and occ[key(cell)] != ignore):
+			return false
+	return true
 
 
 func count_items(type: String) -> int:
@@ -231,11 +324,32 @@ func count_items(type: String) -> int:
 	return n
 
 
+## Nome do item na tela (o RTG no nível 3 vira Kilopower).
+func item_name(it: Dictionary) -> String:
+	if it.get("type") == "rtg" and int(it.get("level", 1)) >= MAX_LEVEL:
+		return "B_KILOPOWER"
+	return ITEMS[it.type].name
+
+
 func free_cells() -> Array[Vector2i]:
+	var occ := _occupancy()
 	var out: Array[Vector2i] = []
 	for x in GRID_W:
 		for y in GRID_H:
-			if not items.has(key(Vector2i(x, y))):
+			if not occ.has(key(Vector2i(x, y))):
+				out.append(Vector2i(x, y))
+	return out
+
+
+## Onde o item da âncora "from" cabe se for movido.
+func move_targets(from: Vector2i) -> Array[Vector2i]:
+	var it: Dictionary = items.get(key(from), {})
+	var out: Array[Vector2i] = []
+	if it.is_empty():
+		return out
+	for x in GRID_W:
+		for y in GRID_H:
+			if Vector2i(x, y) != from and can_place(it.type, int(it.level), Vector2i(x, y), key(from)):
 				out.append(Vector2i(x, y))
 	return out
 
@@ -269,7 +383,7 @@ func build_block_reason(type: String) -> String:
 
 func build(type: String, c: Vector2i) -> bool:
 	var def: Dictionary = ITEMS[type]
-	if not in_grid(c) or items.has(key(c)) or build_block_reason(type) != "":
+	if not can_place(type, 1, c) or build_block_reason(type) != "":
 		return false
 	energy -= def.cost
 	items[key(c)] = _new_item(type)
@@ -281,7 +395,10 @@ func build(type: String, c: Vector2i) -> bool:
 
 
 func move(from: Vector2i, to: Vector2i) -> bool:
-	if base_locked_reason() != "" or not items.has(key(from)) or items.has(key(to)) or not in_grid(to):
+	if base_locked_reason() != "" or not items.has(key(from)) or from == to:
+		return false
+	var it: Dictionary = items[key(from)]
+	if not can_place(it.type, int(it.level), to, key(from)):
 		return false
 	items[key(to)] = items[key(from)]
 	items.erase(key(from))
@@ -296,9 +413,24 @@ func upgrade_cost(c: Vector2i) -> int:
 	return UPGRADE_COST.get(int(it.level), -1)
 
 
+## Por que não dá para melhorar ("" = dá): falta energia ou falta espaço ao lado para o nível maior.
+func upgrade_block_reason(c: Vector2i) -> String:
+	var it: Dictionary = items.get(key(c), {})
+	var cost := upgrade_cost(c)
+	if it.is_empty() or cost < 0:
+		return "MAX_LEVEL"
+	if base_locked_reason() != "":
+		return base_locked_reason()
+	if not can_place(it.type, int(it.level) + 1, c, key(c)):
+		return "NEED_SPACE"
+	if not can_afford(cost):
+		return "NEED_ENERGY"
+	return ""
+
+
 func upgrade(c: Vector2i) -> bool:
 	var cost := upgrade_cost(c)
-	if base_locked_reason() != "" or cost < 0 or not can_afford(cost):
+	if upgrade_block_reason(c) != "":
 		return false
 	energy -= cost
 	items[key(c)].level += 1
@@ -315,7 +447,7 @@ func remove(c: Vector2i) -> bool:
 	if base_locked_reason() != "" or it.is_empty() or not ITEMS[it.type].get("removable", true):
 		return false
 	energy = minf(BAR_MAX, energy + float(it.spent))
-	items.erase(key(c))
+	items.erase(key(anchor_of(c)))
 	_after_action()
 	return true
 
@@ -352,6 +484,7 @@ func harvest(c: Vector2i) -> String:
 	it.plant = ""
 	it.growth = 0.0
 	harvests += 1
+	inventory[p] = int(inventory.get(p, 0)) + 1
 	add_card(PLANTS[p].card)
 	if unlocked_plants().size() > before:
 		var nova: String = unlocked_plants()[-1]
@@ -604,6 +737,11 @@ func _tick() -> void:
 		var e: float = def.get("energy", 0.0)
 		if it.type == "solar" and dust_left > 0:
 			e *= DUST_FACTOR
+		if it.type == "rtg" and int(it.level) >= MAX_LEVEL:
+			e = KILOPOWER_ENERGY
+			bonus = 1.0
+		if def.has("shield") and energy > LOW:
+			shield = minf(BAR_MAX, shield + def.shield * (int(it.level) - 1))
 		if it.type == "greenhouse":
 			e = def.energy_when_planted if it.plant != "" and not greenhouse_off else 0.0
 		d_energy += e * bonus if e > 0.0 else e
@@ -614,7 +752,7 @@ func _tick() -> void:
 			var speed := 1.0 if energy >= LOW else SLOW_GROWTH
 			if cold_left > 0 and not cold_heated:
 				speed = COLD_GROWTH
-			it.growth += speed
+			it.growth += speed * (1.0 + GREENHOUSE_LEVEL_SPEED * (int(it.level) - 1))
 	energy = clampf(energy + d_energy, 0.0, BAR_MAX)
 	oxygen = clampf(oxygen + d_oxygen, 0.0, BAR_MAX)
 	if energy > LOW:
@@ -685,7 +823,7 @@ func _ready_plants() -> int:
 
 
 # ───────────── Salvar e carregar ─────────────
-const _SAVED := ["energy", "oxygen", "shield", "sol", "items", "cards", "harvests", "locale", "paused",
+const _SAVED := ["energy", "oxygen", "shield", "sol", "items", "cards", "harvests", "inventory", "locale", "paused",
 	"pending_event", "next_storm_sol", "storms_seen", "storm_left", "storm_shielded", "storm_event",
 	"next_event_sol", "dust_left", "cold_left", "cold_heated", "nosignal_left", "nosignal_plan",
 	"explore_left", "tube_card"]

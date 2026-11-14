@@ -9,9 +9,12 @@ const OUTSIDE := Vector2i(-1, -1)
 const ITEMS_DIR := "res://models/items/"
 const MIKE_SCENE := "res://models/mike/mike.glb"
 const MIKE_MODEL_HEIGHT := 4.0   # altura do mike.glb em unidades do arquivo
-const MIKE_HEIGHT := 2.2         # altura do Mike no jogo (grande de propósito, para a criança ver)
+const MIKE_HEIGHT := 1.5         # altura do Mike no jogo (a câmera chega perto no começo)
+const DESIGN_MIKE := 2.2         # o tamanhos.csv do Design mede tudo com o Mike = 2,2
 const INGENUITY := "res://models/nasa/ingenuity.glb"
-const INGENUITY_WIDTH := 1.9
+const INGENUITY_WIDTH := 1.3
+const CAM_MIN := 10.0            # câmera mais perto (base pequena)
+const CAM_MAX := 19.5            # câmera mais longe (a grade inteira)
 const EXPEDITION_CELL := Vector2i(-4, -4)   # fora da grade, no fundo da tela
 # Cores do Ingenuity (design/04): corpo branco, faixas azul e vermelha, detalhes dourados
 const INGENUITY_COLORS := {
@@ -37,6 +40,10 @@ var _pet: Node3D
 var _rotors: Array[Node3D] = []
 var _rotor_axes: Array[Vector3] = []
 var _time := 0.0
+var _type_scale := {}       # escala de cada construção com níveis (a mesma em todos os níveis)
+var whole_grid := false     # o HUD liga ao construir ou mover: a câmera mostra a grade inteira
+var _cam_goal := Vector3(INF, INF, INF)
+var _cam_tween: Tween
 
 
 func _ready() -> void:
@@ -76,6 +83,38 @@ func highlight(cells: Array) -> void:
 		_tiles[k].material_override = _tile_mat
 	for c in cells:
 		_tiles[State.key(c)].material_override = _tile_hi_mat
+	whole_grid = not cells.is_empty()
+	_frame_camera()
+
+
+## A câmera enquadra a base: perto quando ela é pequena, a grade inteira ao construir ou mover.
+func _frame_camera() -> void:
+	var lo := Vector2i(0, 0)
+	var hi := Vector2i(State.GRID_W - 1, State.GRID_H - 1)
+	if not whole_grid:
+		lo = Vector2i(State.GRID_W, State.GRID_H)
+		hi = Vector2i(-1, -1)
+		for k in State.items:
+			for c in State.cells_of(State.parse_key(k), State.items[k].type, int(State.items[k].level)):
+				lo = lo.min(c)
+				hi = hi.max(c)
+		lo = (lo - Vector2i(1, 1)).clamp(Vector2i.ZERO, Vector2i(State.GRID_W - 1, State.GRID_H - 1))
+		hi = (hi + Vector2i(1, 1)).clamp(Vector2i.ZERO, Vector2i(State.GRID_W - 1, State.GRID_H - 1))
+	var a := cell_center(lo) - Vector3(CELL / 2.0, 0.0, CELL / 2.0)
+	var b := cell_center(hi) + Vector3(CELL / 2.0, 0.0, CELL / 2.0)
+	var center := (a + b) / 2.0
+	var size := clampf(((b.x - a.x) + (b.z - a.z)) / sqrt(2.0) * 1.08, CAM_MIN, CAM_MAX)
+	var goal := Vector3(center.x, center.z, size)
+	if goal.is_equal_approx(_cam_goal):
+		return
+	_cam_goal = goal
+	# A barra de cima é maior que a de baixo: sobe um pouco a câmera para a base ficar no meio do que sobra.
+	var pos := center + camera.transform.basis.z * 40.0 + camera.transform.basis.y * size * 0.08
+	if _cam_tween:
+		_cam_tween.kill()
+	_cam_tween = create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_cam_tween.tween_property(camera, "position", pos, 0.6)
+	_cam_tween.tween_property(camera, "size", size, 0.6)
 
 
 ## O Mike anda até a frente da casa tocada.
@@ -273,35 +312,58 @@ func _play_mike(anim_name: String) -> void:
 # ───────────── Itens da base ─────────────
 func _sync_items() -> void:
 	for k in _nodes.keys():
-		if not State.items.has(k) or _nodes[k].get_meta("type") != State.items[k].type:
+		var gone: bool = not State.items.has(k)
+		if not gone and (_nodes[k].get_meta("type") != State.items[k].type or _nodes[k].get_meta("level") != int(State.items[k].level)):
+			gone = true
+		if gone:
 			_nodes[k].queue_free()
 			_nodes.erase(k)
 	for k in State.items:
 		var it: Dictionary = State.items[k]
+		var level := int(it.level)
 		if not _nodes.has(k):
-			var n := _make_item(it.type)
+			var n := _make_item(it.type, level)
 			add_child(n)
 			_nodes[k] = n
 		var node: Node3D = _nodes[k]
-		node.position = cell_center(State.parse_key(k))
-		var s := 1.0 + 0.15 * (int(it.level) - 1)
+		var w := State.width_of(it.type, level)
+		node.position = cell_center(State.parse_key(k)) + Vector3((w - 1) * CELL / 2.0, 0.0, 0.0)
+		# Quem tem modelo por nível já cresce no modelo; os outros crescem um pouco a cada nível.
+		var s := 1.0 if State.FOOTPRINT.has(it.type) else 1.0 + 0.15 * (level - 1)
 		node.scale = Vector3(s, s, s)
 		var label: Label3D = node.get_node("Label")
-		label.text = tr(State.ITEMS[it.type].name)
+		label.text = tr(State.item_name(it))
 		_update_plant(node, it)
 	_sync_pet()
+	_frame_camera()
 
 
-func _make_item(type: String) -> Node3D:
+func _make_item(type: String, level: int) -> Node3D:
 	var root := Node3D.new()
 	root.set_meta("type", type)
+	root.set_meta("level", level)
 	var h: float = State.ITEMS[type].height
-	var model := _load_model(State.model_file(State.ITEMS[type].get("model", "")), CELL * 0.9, CELL * 1.3)
+	var model_name: String = State.ITEMS[type].get("model", "")
+	var model := _load_model(State.model_file(model_name, level), CELL * 0.9, CELL * 1.3)
 	if model:
+		if State.FOOTPRINT.has(type):
+			# Mesma escala em todos os níveis: o nível 1 cabe numa casa; os outros crescem para o lado.
+			if not _type_scale.has(type):
+				var first := _load_model(State.model_file(model_name, 1), 1.0, 1.0)
+				first.scale = Vector3.ONE
+				var size1 := _merged_aabb(first).size
+				_type_scale[type] = CELL * 0.95 / maxf(size1.x, 0.001)
+				first.free()
+			_scale_model(model, _type_scale[type])
+		elif State.model_height(type) > 0.0:
+			_fit(model, CELL * 0.95, State.model_height(type) * MIKE_HEIGHT / DESIGN_MIKE)
 		root.add_child(model)
 		h = _merged_aabb(model).end.y * model.scale.y + model.position.y
 	else:
 		root.add_child(_placeholder(type, h))
+	if type == "rtg" and level >= State.MAX_LEVEL:
+		root.add_child(_kilopower_radiator(h))
+		h += 0.5
 	var label := Label3D.new()
 	label.name = "Label"
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
@@ -423,7 +485,8 @@ func _update_plant(node: Node3D, it: Dictionary) -> void:
 			c.queue_free()
 		holder.set_meta("plant", it.plant)
 		if it.plant != "":
-			var model := _load_model(State.model_file(State.PLANTS[it.plant].model), CELL * 0.6, 0.9)
+			var plant_h := State.model_height(it.plant) * MIKE_HEIGHT / DESIGN_MIKE
+			var model := _load_model(State.model_file(State.PLANTS[it.plant].model), CELL * 0.5, plant_h if plant_h > 0.0 else 0.6)
 			if model:
 				holder.add_child(model)
 	var p := 0.0
@@ -444,6 +507,39 @@ func _load_model(file: String, max_width: float, max_height: float) -> Node3D:
 	var holder := Node3D.new()
 	holder.add_child(inst)
 	_fit(holder, max_width, max_height)
+	return holder
+
+
+## Aplica uma escala fixa e deixa o modelo em pé no chão, centralizado.
+func _scale_model(holder: Node3D, s: float) -> void:
+	holder.scale = Vector3.ONE
+	holder.position = Vector3.ZERO
+	var box := _merged_aabb(holder)
+	holder.scale = Vector3.ONE * s
+	holder.position = Vector3(-box.get_center().x * s, -box.position.y * s, -box.get_center().z * s)
+
+
+## Kilopower (RTG no nível 3): um radiador dourado em forma de guarda-chuva, como o reator de verdade.
+func _kilopower_radiator(top: float) -> Node3D:
+	var holder := Node3D.new()
+	var mast := MeshInstance3D.new()
+	var cyl := CylinderMesh.new()
+	cyl.top_radius = 0.06
+	cyl.bottom_radius = 0.06
+	cyl.height = 0.4
+	mast.mesh = cyl
+	mast.material_override = _mat(Palette.SUIT)
+	mast.position.y = top + 0.2
+	holder.add_child(mast)
+	var umbrella := MeshInstance3D.new()
+	var cone := CylinderMesh.new()
+	cone.top_radius = 0.75
+	cone.bottom_radius = 0.08
+	cone.height = 0.35
+	umbrella.mesh = cone
+	umbrella.material_override = _mat(Palette.GOLD)
+	umbrella.position.y = top + 0.5
+	holder.add_child(umbrella)
 	return holder
 
 
