@@ -49,7 +49,7 @@ const GREENHOUSE_LEVEL_SPEED := 0.5 # estufa maior: +50% de velocidade por níve
 const PLANTS := {
 	"lettuce": {"name": "P_LETTUCE", "sols": 33, "card": 1, "model": "alface", "unlock": 0},
 	"radish": {"name": "P_RADISH", "sols": 27, "card": 2, "model": "rabanete", "unlock": 0},
-	"kale": {"name": "P_KALE", "sols": 28, "card": 3, "model": "alface", "unlock": 1},
+	"kale": {"name": "P_KALE", "sols": 28, "card": 3, "model": "couve", "unlock": 1},
 	"zinnia": {"name": "P_ZINNIA", "sols": 60, "card": 5, "model": "zinia", "unlock": 3},
 	"chile": {"name": "P_CHILE", "sols": 120, "card": 6, "model": "pimenta", "unlock": 5},
 }
