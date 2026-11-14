@@ -35,7 +35,7 @@
 - [x] 10h30 · [Destravar o time](dev/01-destravar-o-time/PASSO.md)
 - [x] 11h30 · [Teste do caminho](dev/02-teste-do-caminho/PASSO.md)
 - [x] 14h30 · [Esqueleto](dev/03-esqueleto/PASSO.md)
-- [ ] 16h30 · [Tubo de amostra e tempestades](dev/04-tubo-e-tempestades/PASSO.md)
+- [x] 16h30 · [Tubo de amostra e tempestades](dev/04-tubo-e-tempestades/PASSO.md)
 - [ ] 19h · [Jogo completo](dev/05-jogo-completo/PASSO.md)
 - [ ] 20h · [Receber as entregas](dev/06-receber-entregas/PASSO.md)
 - [ ] 1h · [Acabamento e congelamento](dev/07-acabamento-e-congelamento/PASSO.md)
