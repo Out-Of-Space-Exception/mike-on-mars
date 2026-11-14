@@ -11,3 +11,4 @@ modelo,Nature Kit (pacote 3D),itens do jogo (zínia + pedra + vaso),Kenney,CC0,h
 modelo,Space Kit (pacote 3D),itens do jogo (máquinas + pedras + antena),Kenney,CC0,https://kenney.nl/assets/space-kit,Design
 imagem,Skyboxes,céu da base (skybox-morning),Kenney,CC0,https://kenney.nl/assets/skyboxes,Design
 ia,Claude (Anthropic): escolheu os itens com a dupla e modelou no Blender o painel solar + a bandeira + as luzinhas (modelos-novos.py),design/03-itens-do-jogo,Anthropic,-,https://claude.ai,Design
+ia,Claude (Anthropic): repintou hematita + enxofre + MOXIE + vaso e fez no Blender a textura do leopardo e o pé de pimenta,design/04-cores-das-coisas e design/03-itens-do-jogo,Anthropic,-,https://claude.ai,Design
