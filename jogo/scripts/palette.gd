@@ -9,6 +9,8 @@ const TEXT := Color("f2d091")     # creme: texto
 const GOLD := Color("e8b23a")     # ouro: destaque e raro
 const ALERT := Color("bf2a2a")    # vermelho: alerta
 
+const FONT := "res://ui/fonts/rubik.ttf"   # design/02 (Rubik, OFL)
+
 # design/01 (mike.md)
 const SUIT := Color("f4f4f8")
 const SUIT_STRIPE := Color("3fa7c9")
@@ -35,6 +37,8 @@ const BAR := {"energy": GOLD, "oxygen": Color("7cc6e0"), "shield": SUIT_STRIPE}
 static func make_theme() -> Theme:
 	var t := Theme.new()
 	t.default_font_size = 28
+	if ResourceLoader.exists(FONT):
+		t.default_font = load(FONT)
 	t.set_color("font_color", "Label", TEXT)
 	t.set_color("font_color", "Button", TEXT)
 	t.set_color("font_hover_color", "Button", TEXT)

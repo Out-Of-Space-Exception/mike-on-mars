@@ -15,7 +15,6 @@ const ITEM_COLORS := {
 const MIKE_SCENE := "res://models/mike/mike.glb"
 const MIKE_MODEL_HEIGHT := 4.0   # altura do mike.glb em unidades do arquivo
 const MIKE_HEIGHT := 2.2         # altura do Mike no jogo (grande de propósito, para a criança ver)
-const MIKE_ANIMS := {"idle": "res://models/mike/idle.fbx", "run": "res://models/mike/run.fbx", "jump": "res://models/mike/jump.fbx"}
 
 var camera: Camera3D
 var mike: Node3D
@@ -219,34 +218,17 @@ func _build_mike() -> void:
 	var model: Node3D = load(MIKE_SCENE).instantiate()
 	model.scale = Vector3.ONE * (MIKE_HEIGHT / MIKE_MODEL_HEIGHT)
 	mike.add_child(model)
-	var skel := _find_child_of_type(model, "Skeleton3D") as Skeleton3D
-	if skel == null:
+	# As animações idle, run e jump já vêm dentro do mike.glb (design/01).
+	var player := _find_child_of_type(model, "AnimationPlayer") as AnimationPlayer
+	if player and player.has_animation("idle"):
+		_mike_anim = player
+		for loop_anim in ["idle", "run"]:
+			if player.has_animation(loop_anim):
+				player.get_animation(loop_anim).loop_mode = Animation.LOOP_LINEAR
+		player.play("idle")
 		return
-	_mike_anim = AnimationPlayer.new()
-	model.add_child(_mike_anim)
-	var lib := AnimationLibrary.new()
-	for anim_name in MIKE_ANIMS:
-		var path: String = MIKE_ANIMS[anim_name]
-		if not ResourceLoader.exists(path):
-			continue
-		var src: Node = load(path).instantiate()
-		var src_player := _find_child_of_type(src, "AnimationPlayer") as AnimationPlayer
-		if src_player and not src_player.get_animation_list().is_empty():
-			var a: Animation = src_player.get_animation(src_player.get_animation_list()[0]).duplicate()
-			# Aponta cada trilha para o esqueleto do Mike (os ossos têm o mesmo nome).
-			for t in range(a.get_track_count() - 1, -1, -1):
-				var bone := a.track_get_path(t).get_concatenated_subnames()
-				if bone == "" or skel.find_bone(bone) < 0:
-					a.remove_track(t)
-				else:
-					a.track_set_path(t, NodePath("%s:%s" % [model.get_path_to(skel), bone]))
-			a.loop_mode = Animation.LOOP_NONE if anim_name == "jump" else Animation.LOOP_LINEAR
-			lib.add_animation(anim_name, a)
-		src.free()
-	_mike_anim.add_animation_library("", lib)
-	if lib.has_animation("idle"):
-		_mike_anim.play("idle")
-	else:
+	var skel := _find_child_of_type(model, "Skeleton3D") as Skeleton3D
+	if skel:
 		_lower_arms(skel)
 
 

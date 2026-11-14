@@ -56,10 +56,10 @@ const copiar = (de, para) => {
 const sons = copiar('conteudo/01-sons/sons', 'jogo/sounds');
 const fotos = copiar('conteudo/02-cartas/fotos', 'jogo/ui/cards');
 
-// 4. O Mike do design/01 (modelo + animações idle/run/jump, quando chegarem)
+// 4. O Mike do design/01 (o mike.glb já traz as animações idle, run e jump)
 mkdirSync(join(RAIZ, 'jogo/models/mike'), {recursive: true});
 let mike = 0;
-for (const f of ['mike.glb', 'idle.fbx', 'run.fbx', 'jump.fbx']) {
+for (const f of ['mike.glb']) {
   const de = join(RAIZ, 'design/01-mike', f);
   if (existsSync(de)) { copyFileSync(de, join(RAIZ, 'jogo/models/mike', f)); mike++; }
 }
@@ -69,3 +69,10 @@ const fotosNoJogo = existsSync(join(RAIZ, 'jogo/ui/cards')) ? readdirSync(join(R
 for (const d of dados) d.photo_file = fotosNoJogo.find(f => f.startsWith(String(d.id).padStart(2, '0') + '-')) || '';
 writeFileSync(join(RAIZ, 'jogo/data/cartas.json'), JSON.stringify(dados, null, 1) + '\n');
 console.log(`textos: ${textos.length} + ${cartas.length * 2} das cartas · cartas: ${dados.length} · sons: ${sons} · fotos: ${fotos} · mike: ${mike} arquivo(s)`);
+
+// 6. Tela de carregamento e fonte do design/05 (a página web usa a nave e a fonte; o jogo usa a fonte)
+const carregamento = join(RAIZ, 'design/05-telas/carregamento');
+mkdirSync(join(RAIZ, 'jogo/web'), {recursive: true});
+mkdirSync(join(RAIZ, 'jogo/ui/fonts'), {recursive: true});
+for (const f of ['nave.png', 'rubik.ttf']) if (existsSync(join(carregamento, f))) copyFileSync(join(carregamento, f), join(RAIZ, 'jogo/web', f));
+if (existsSync(join(carregamento, 'rubik.ttf'))) copyFileSync(join(carregamento, 'rubik.ttf'), join(RAIZ, 'jogo/ui/fonts/rubik.ttf'));
