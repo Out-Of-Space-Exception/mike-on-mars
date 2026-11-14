@@ -22,3 +22,4 @@ estufa,feito pelo time (Blender),niveis/estufa-n1.glb,3 níveis de upgrade: nive
 chao,feito pelo time (Godot + Blender),cenario/terreno-marte.glb,terreno com centro plano (base) + morros + dunas + 3 crateras + planaltos; textura sem emenda cenario/chao-marte.png (1024x1024); receitas: cenario/terreno.py e cenario/chao.gd
 efeito-poeira,feito pelo time (Godot),cenario/poeira_flutuando.gd,poeirinha dourada flutuando no ar da base (CPUParticles3D); é só adicionar na cena da base
 plataforma-pouso,feito pelo time (Blender),niveis/plataforma-pouso-n1.glb,3 níveis: niveis/plataforma-pouso-n1.glb / n2 / n3 (no jogo: pad)
+kilopower,feito pelo time (Blender),kilopower.glb,RTG no nível 3: núcleo do reator + anel de 8 conversores + mastro + radiador em guarda-chuva dourado; arquivo nesta pasta (receita: kilopower.py)
