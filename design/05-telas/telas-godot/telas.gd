@@ -120,7 +120,7 @@ func _botao(r: Rect2, icone: String, texto: String, fundo := TERRACOTA, cor_txt 
 		var t := _imagem(icone, Rect2(Vector2(r.size.x / 2 - tam / 2, r.size.y * 0.12), Vector2(tam, tam)), p); t.modulate = cor_txt
 	elif icone != "":
 		_icone(icone, Vector2(r.size.x / 2, r.size.y * 0.12 + tam / 2), tam, cor_txt, p)
-	_texto(texto, int(clampf(r.size.y * 0.2, 22, 34)), cor_txt, Vector2(0, r.size.y * 0.6), r.size.x, HORIZONTAL_ALIGNMENT_CENTER, 700, p)
+	_texto(texto, int(clampf(minf(r.size.y * 0.2, r.size.x / (0.62 * maxf(texto.length(), 4.0))), 20, 34)), cor_txt, Vector2(0, r.size.y * 0.6), r.size.x, HORIZONTAL_ALIGNMENT_CENTER, 700, p)
 	return p
 
 
@@ -151,15 +151,25 @@ func _desenhar_horizonte(mars: Control) -> void:
 func _hud() -> void:
 	_imagem("res://base.png", Rect2(Vector2.ZERO, Vector2(720, 1280)))
 	_rastro(func(t): return Vector2(395 - fmod(t * 120.0, 260.0), 760 + sin(t * 6.0) * 6.0), 1.2)
-	var topo := _caixa(Rect2(Vector2(24, 48), Vector2(672, 236)), Color(VINHO, .92), OURO, 28, 3)
-	_barra(70 - 48, "raio", "Energy", .72, OURO, topo)
-	_barra(130 - 48, "oxigenio", "Oxygen", .55, CREME, topo)
-	_barra(190 - 48, "escudo", "Shield", .86, TERRACOTA, topo)
-	var chip := _caixa(Rect2(Vector2(150, 300), Vector2(420, 54)), Color(VINHO_ESCURO, .85), Color(OURO, .7), 27, 2)
-	_texto("Sol 12 · Gale Crater", 26, CREME, Vector2(0, 10), 420, HORIZONTAL_ALIGNMENT_CENTER, 600, chip)
-	var b := [["res://ic-wrench.png", "Build"], ["res://ic-target.png", "Explore"], ["res://ic-menugrid.png", "Album"], ["camera", "Photo"]]
+	# EM CIMA: lugar e dia + as 4 ações (Explore, Build, Album, Photo)
+	var chip := _caixa(Rect2(Vector2(170, 44), Vector2(380, 50)), Color(VINHO_ESCURO, .85), Color(OURO, .7), 25, 2)
+	_texto("Sol 12 · Gale Crater", 24, CREME, Vector2(0, 9), 380, HORIZONTAL_ALIGNMENT_CENTER, 600, chip)
+	var b := [["res://ic2-gi-zoom.png", "Explore"], ["res://ic2-gi-wrench.png", "Build"], ["res://ic2-bg-cards-collection.png", "Album"], ["res://ic2-gi-share1.png", "Photo"]]
 	for i in 4:
-		_botao(Rect2(Vector2(24 + i * 172, 1080), Vector2(156, 150)), b[i][0], b[i][1])
+		_botao(Rect2(Vector2(24 + i * 172, 108), Vector2(156, 130)), b[i][0], b[i][1])
+	# EMBAIXO: as 3 barras + o botão da estufa
+	var baixo := _caixa(Rect2(Vector2(24, 1030), Vector2(470, 210)), Color(VINHO, .92), OURO, 28, 3)
+	_barra_ic(26, "res://ic2-gi-power.png", "Energy", .72, OURO, baixo)
+	_barra_ic(88, "res://ic2-ge-cloud.png", "Oxygen", .55, CREME, baixo)
+	_barra_ic(150, "res://ic2-bg-shield.png", "Shield", .86, TERRACOTA, baixo)
+	_botao(Rect2(Vector2(510, 1030), Vector2(186, 210)), "res://ic2-bg-resource-wheat.png", "Greenhouse")
+
+
+func _barra_ic(y: float, icone: String, nome: String, valor: float, cor: Color, pai: Node) -> void:
+	var t := _imagem(icone, Rect2(Vector2(22, y), Vector2(40, 40)), pai); t.modulate = cor
+	_texto(nome, 24, CREME, Vector2(72, y + 4), 140, HORIZONTAL_ALIGNMENT_LEFT, 600, pai)
+	_caixa(Rect2(Vector2(200, y + 8), Vector2(250, 26)), VINHO_ESCURO, Color(cor, .6), 13, 2, pai)
+	_caixa(Rect2(Vector2(204, y + 12), Vector2(242 * valor, 18)), cor, Color(0, 0, 0, 0), 9, 0, pai)
 
 
 func _album() -> void:

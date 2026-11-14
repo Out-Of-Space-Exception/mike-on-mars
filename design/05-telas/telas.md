@@ -2,7 +2,7 @@
 - Link: sem Figma; as telas são feitas direto no Godot (arquivos nesta pasta)
 - tela-carregamento.png (extra): Marte 3D girando, a nave branca e dourada é a barra de progresso e deixa um rastro de constelação dourado
 - tela-inicial.png: título, o Mike correndo com o rastro de constelação, o horizonte de Marte e o botão Play
-- hud-barras.png: a base 3D, as 3 barras (Energy dourada, Oxygen creme, Shield terracota), "Sol 12 · Gale Crater" e 4 botões (Build, Explore, Album, Photo); o Mike deixa o rastro ao correr
+- hud-barras.png: a base 3D no meio; EM CIMA o "Sol 12 · Gale Crater" e as 4 ações (Explore, Build, Album, Photo); EMBAIXO as 3 barras (Energy dourada, Oxygen creme, Shield terracota) e o botão Greenhouse. Separado assim para a criança não ver tudo junto. Ícones do passo 07.
 - album.png: "8/40 cards" e a grade de cartas com borda na cor da raridade; as que faltam ficam apagadas com "?"; o resto rola para baixo
 - carta.png: "New card!", foto da NASA, etiqueta Rare, MOXIE, "This is real:" e o fato, com o rastro em volta da carta
 - aviso-tempestade.png: sol, "Solar storm coming!", a data real do DONKI (20/05/2024) e 2 botões grandes: escudo ou ficar dentro
