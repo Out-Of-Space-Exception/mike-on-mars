@@ -112,6 +112,7 @@ func _on_play() -> void:
 	Sfx.play("toque-botao")
 	Sfx.play_music("musica-base")
 	_start.visible = false
+	_root.visible = true
 	base.orbit = false
 	State.start()
 	var away: Dictionary = State.away
@@ -1165,6 +1166,7 @@ func _build_start() -> void:
 	_start_play.custom_minimum_size = Vector2(360, 170)
 	_start_play.size_flags_horizontal = Control.SIZE_SHRINK_END
 	_start_play.add_theme_font_size_override("font_size", 52)
+	_start_play.autowrap_mode = TextServer.AUTOWRAP_OFF
 	col.add_child(_start_play)
 	var corner := HBoxContainer.new()
 	corner.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
@@ -1176,13 +1178,18 @@ func _build_start() -> void:
 	_start_nasa = _key_button(_on_nasa, true)
 	_start_nasa.custom_minimum_size = Vector2(0, 96)
 	_start_nasa.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	_start_nasa.autowrap_mode = TextServer.AUTOWRAP_OFF
 	corner.add_child(_start_nasa)
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	corner.add_child(spacer)
 	_start_lang = _key_button(_on_lang, true)
 	_start_lang.custom_minimum_size = Vector2(120, 96)
+	_start_lang.size_flags_horizontal = Control.SIZE_SHRINK_END
+	_start_lang.autowrap_mode = TextServer.AUTOWRAP_OFF
 	corner.add_child(_start_lang)
+	# A interface do jogo só aparece depois do Jogar.
+	_root.visible = false
 	# A janela de dados da NASA também abre na tela inicial: fica por cima de tudo.
 	_nasa.reparent(self)
 	_nasa.theme = _root.theme

@@ -18,7 +18,7 @@
   "how": "colher na estufa",
   "place": "Gale",
   "number": "27 dias",
-  "source": "https://space.com/nasa-astronaut-harvests-radishes-space-station",
+  "source": "https://www.nasa.gov/missions/station/astronauts-harvest-radish-crop-on-international-space-station/",
   "photo": "",
   "locked": false,
   "photo_file": ""
@@ -29,8 +29,8 @@
   "rarity": "comum",
   "how": "colher na estufa",
   "place": "Gale",
-  "number": "28 dias",
-  "source": "https://www.nasa.gov/blogs/stationreport/2018/10/25/iss-daily-summary-report-10-25-2018/",
+  "number": "",
+  "source": "https://www.nasa.gov/exploration-research-and-technology/growing-plants-in-space/",
   "photo": "",
   "locked": false,
   "photo_file": ""
@@ -41,8 +41,8 @@
   "rarity": "comum",
   "how": "colher na estufa",
   "place": "Gale",
-  "number": "",
-  "source": "https://blogs.nasa.gov/kennedy/2016/08/18/growing-potatoes-in-martian-gardens/",
+  "number": "o dobro",
+  "source": "https://www.nasa.gov/science-research/nasa-plant-researchers-explore-question-of-deep-space-food-crops/",
   "photo": "",
   "locked": false,
   "photo_file": ""
@@ -102,7 +102,7 @@
   "how": "tubo de amostra",
   "place": "Gale",
   "number": "30/05/2024",
-  "source": "https://www.space.com/nasa-mars-curiosity-sulfur-rocks",
+  "source": "https://www.nasa.gov/missions/mars-science-laboratory/curiosity-rover/nasas-curiosity-rover-discovers-a-surprise-in-a-martian-rock/",
   "photo": "",
   "locked": false,
   "photo_file": ""
@@ -138,7 +138,7 @@
   "how": "construir",
   "place": "Gale",
   "number": "",
-  "source": "",
+  "source": "https://science.nasa.gov/planetary-science/programs/radioisotope-power-systems/faq/",
   "photo": "",
   "locked": false,
   "photo_file": ""
@@ -161,8 +161,8 @@
   "rarity": "raro",
   "how": "construir",
   "place": "Gale",
-  "number": "1 a 10 kW",
-  "source": "https://www.nasa.gov/directorates/spacetech/kilopower",
+  "number": "até 10 kW",
+  "source": "https://www.nasa.gov/news-release/demonstration-proves-nuclear-fission-system-can-provide-space-exploration-power/",
   "photo": "",
   "locked": false,
   "photo_file": ""
@@ -174,7 +174,7 @@
   "how": "construir",
   "place": "Gale",
   "number": "72 voos",
-  "source": "https://www.nbcnews.com/science/space/nasas-little-helicopter-mars-logged-last-flight-rcna135757",
+  "source": "https://www.nasa.gov/news-release/after-three-years-on-mars-nasas-ingenuity-helicopter-mission-ends/",
   "photo": "",
   "locked": false,
   "photo_file": ""
@@ -258,7 +258,7 @@
   "how": "aguentar o evento",
   "place": "Gale",
   "number": "",
-  "source": "",
+  "source": "https://www.jpl.nasa.gov/news/spirit-gets-energy-boost-from-cleaner-solar-panels/",
   "photo": "",
   "locked": false,
   "photo_file": ""
@@ -282,7 +282,7 @@
   "how": "de manhã após a noite congelante",
   "place": "Gale",
   "number": "",
-  "source": "",
+  "source": "https://www.jpl.nasa.gov/images/pia00530-frost-on-utopia-planitia/",
   "photo": "",
   "locked": false,
   "photo_file": ""
@@ -294,7 +294,7 @@
   "how": "chance após tempestade solar com escudo",
   "place": "Gale",
   "number": "",
-  "source": "",
+  "source": "https://science.nasa.gov/solar-system/planets/mars/nasa-observes-first-visible-light-auroras-at-mars/",
   "photo": "",
   "locked": false,
   "photo_file": ""
