@@ -1,13 +1,12 @@
 # Mike
-- Modelo: characterMedium.fbx (Kenney Animated Characters Protagonists)
+- Modelo: mike.glb (Kenney Animated Characters Protagonists, characterMedium + cabelo 3D nosso)
 - Cor do traje: #F4F4F8
-- Acessório ou detalhe: broche de Marte no peito, vermelho #C1440E com borda dourada #D4A84B (só cor, pintado na textura)
+- Acessório ou detalhe: cabelo loiro #E9BE62 com franja de lado e rabinho curto preso por elástico azul #3FA7C9; broche de Marte no peito (#C1440E com borda #D4A84B)
 - Personalidade: Curioso e animado, o Mike pula de alegria a cada descoberta e nunca desiste da base.
 
 ## Para o Dev
-- **Mudança de pacote:** a dupla de Design escolheu o [Animated Characters Protagonists](https://kenney.nl/assets/animated-characters-protagonists) (CC0) em vez do Mini Characters. O pacote só tem `.fbx`; a Godot 4.7 importa direto (ou exporte para `.glb`).
-- **Textura:** [mike-skin.png](mike-skin.png) (1024×1024) no lugar das skins do pacote. Base: `Skins/criminalMaleA.png`, repintada.
-- **Editar a pintura:** [mike-skin.svg](mike-skin.svg) (Figma ou Inkscape).
-- **Animações do pacote:** `Animations/idle.fbx`, `run.fbx`, `jump.fbx` (o Mike pula quando colhe).
-- **Cores:** cabelo loiro `#E9BE62`; faixas, gola e sapatos azuis `#3FA7C9`; faixa escura `#1B6F91`.
-- [mike.png](mike.png): o Mike de frente, de lado e de costas no céu caramelo.
+- **Use o [mike.glb](mike.glb):** já tem o corpo, o esqueleto, a textura [mike-skin.png](mike-skin.png) e o cabelo 3D (`MikeHair`), preso ao osso `Head` (mexe junto com a cabeça).
+- **Mudança de pacote:** a dupla de Design escolheu o [Animated Characters Protagonists](https://kenney.nl/assets/animated-characters-protagonists) (CC0) em vez do Mini Characters.
+- **Animações:** `Animations/idle.fbx`, `run.fbx` e `jump.fbx` do pacote (o Mike pula quando colhe). O esqueleto do `mike.glb` é o mesmo do pacote.
+- **Editar:** a pintura em [mike-skin.svg](mike-skin.svg); o cabelo é gerado pelo script [mike-cabelo3d.py](mike-cabelo3d.py) no Blender 5.3 (`blender --background --python mike-cabelo3d.py -- <characterMedium.fbx> <mike-skin.png> <prefixo-das-fotos> <saida.glb>`).
+- [mike.png](mike.png): o Mike de frente, 3/4, lado e costas no céu caramelo.

@@ -80,4 +80,4 @@
     <path stroke="none" fill="#3FA7C9" d="M483 531.55 L384.8 510 483 510 483 531.55 M160 531.75 L160 510 259.2 510 160 531.75"/>
     
     
-  <circle cx="322" cy="895" r="26" fill="#D4A84B"/><circle cx="322" cy="895" r="19" fill="#C1440E"/><circle cx="314" cy="888" r="5" fill="#E2683C"/><circle cx="329" cy="901" r="3.5" fill="#9C3409"/><path fill="#E9BE62" d="M0 240 L215 240 Q222 330 205 420 Q120 445 0 430 Z"/><path fill="#E9BE62" d="M639 240 L424 240 Q417 330 434 420 Q519 445 639 430 Z"/><path fill="none" stroke="#C99A3E" stroke-width="5" stroke-linecap="round" d="M60 300 Q70 360 55 410 M130 290 Q140 350 128 415 M509 300 Q499 360 514 410 M579 290 Q569 350 581 415"/></g></svg>
+  <circle cx="322" cy="895" r="26" fill="#D4A84B"/><circle cx="322" cy="895" r="19" fill="#C1440E"/><circle cx="314" cy="888" r="5" fill="#E2683C"/><circle cx="329" cy="901" r="3.5" fill="#9C3409"/></g></svg>
