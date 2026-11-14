@@ -1,8 +1,8 @@
 item_do_jogo,pacote,arquivo_do_modelo,observacao
-alface,Food Kit,cabbage.glb,o pacote não tem alface solta; o repolho parece um pé de alface; arquivo: design/03-itens-do-jogo/kenney/cabbage.glb (textura embutida)
+alface,feito pelo time (Blender),alface.glb,alface romana vermelha inspirada na Outredgeous (a que cresceu na Estação Espacial); arquivo nesta pasta (receita: plantas.py); substitui o cabbage.glb
 pimenta,feito pelo time (Blender),pimenta.glb,pé de pimenta com 12 pimentas vermelhas num vaso creme e dourado; arquivo nesta pasta (o pepper.glb do Food Kit parecia cenoura)
 rabanete,Food Kit,radish.glb,arquivo: design/03-itens-do-jogo/kenney/radish.glb (textura embutida)
-couve,Food Kit,NAO-TEM,não achei no Food Kit nem no Nature Kit
+couve,feito pelo time (Blender),couve.glb,couve crespa verde-escura com talo; arquivo nesta pasta (receita: plantas.py); antes o jogo usava o modelo da alface
 batata,Food Kit,NAO-TEM,não achei no Food Kit nem no Nature Kit
 zinia,Nature Kit,flower_redA.glb,flor vermelha (combina com a paleta); arquivo: design/03-itens-do-jogo/kenney/flower-red-a.glb
 hematita,Space Kit,rocks_smallA.glb,pintada de cinza-escuro: design/04-cores-das-coisas/hematita.glb
