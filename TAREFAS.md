@@ -7,7 +7,7 @@
 
 ## 🎨 Design · Maria Fernanda e Thais · até 20h
 
-- [ ] 11h · [O Mike](design/01-mike/PASSO.md)
+- [x] 11h · [O Mike](design/01-mike/PASSO.md)
 - [x] 11h30 · [Cores e fonte](design/02-cores-e-fonte/PASSO.md)
 - [ ] 12h30 · [Os itens do jogo](design/03-itens-do-jogo/PASSO.md)
 - [ ] 14h30 · [As cores das coisas](design/04-cores-das-coisas/PASSO.md)

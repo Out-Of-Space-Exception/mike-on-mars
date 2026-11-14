@@ -3,3 +3,5 @@ ferramenta,Godot Engine 4.7.2,motor do jogo,Godot Engine contributors,MIT,https:
 dado,DONKI (tempestades solares reais),eventos de tempestade solar,NASA,dado público da NASA,https://kauai.ccmc.gsfc.nasa.gov/DONKI/,Dev
 fonte,Rubik,interface do jogo,"Hubert and Fischer, Meir Sadan, Cyreal, Daniel Grumer, Omaima Dajani",OFL,https://fonts.google.com/specimen/Rubik,Design
 ia,Claude (Anthropic): sugeriu a paleta de 5 cores e a fonte e conferiu o contraste,design/02-cores-e-fonte,Anthropic,-,https://claude.ai,Design
+modelo,Mini Characters (pacote 3D),Mike (character-male-e.glb),Kenney,CC0,https://kenney.nl/assets/mini-characters,Design
+ia,Claude (Anthropic): escolheu o boneco com a dupla, recoloriu a textura do Mike e montou o mike.png,design/01-mike,Anthropic,-,https://claude.ai,Design
