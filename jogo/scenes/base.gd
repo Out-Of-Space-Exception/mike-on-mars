@@ -3,6 +3,7 @@ extends Node3D
 ## Só desenha o que está no State. Quem decide o que um toque faz é o HUD (recebe cell_tapped).
 
 signal cell_tapped(cell: Vector2i)
+signal mike_tapped
 
 const CELL := 2.0
 const OUTSIDE := Vector2i(-1, -1)
@@ -45,6 +46,8 @@ var whole_grid := false     # o HUD liga ao construir ou mover: a câmera mostra
 var _cam_goal := Vector3(INF, INF, INF)
 var _cam_tween: Tween
 var _rig: Node3D
+var orbit := true            # o HUD desliga quando a criança toca em Jogar
+var _built_once := false    # depois da 1ª montagem, construção nova "pula" para o lugar
 var _manual_cam := false
 var _touches := {}          # dedo -> posição na tela
 var _press_pos := Vector2.ZERO
@@ -72,6 +75,9 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_time += delta
+	# Na tela inicial, a câmera dá uma volta devagar pela base.
+	if orbit and not _manual_cam:
+		_rig.rotate_y(delta * 0.08)
 	if _pet == null:
 		return
 	# O Ingenuity voa atrás do Mike, balançando, com as hélices girando em sentidos opostos.
@@ -155,7 +161,7 @@ func _on_touch(event: InputEventScreenTouch) -> void:
 	var was_single := _touches.size() == 1
 	_touches.erase(event.index)
 	if was_single and not _dragging:
-		cell_tapped.emit(_cell_from_screen(event.position))
+		_tap(event.position)
 	if _touches.is_empty():
 		_dragging = false
 
@@ -193,7 +199,15 @@ func _on_mouse_button(event: InputEventMouseButton) -> void:
 				_press_pos = event.position
 				_dragging = false
 			elif not _dragging:
-				cell_tapped.emit(_cell_from_screen(event.position))
+				_tap(event.position)
+
+
+## Toque rápido: no Mike, ele reage; em outro lugar, escolhe a casa da grade.
+func _tap(p: Vector2) -> void:
+	if mike.visible and camera.unproject_position(mike.global_position + Vector3(0.0, MIKE_HEIGHT * 0.5, 0.0)).distance_to(p) < 70.0:
+		mike_tapped.emit()
+		return
+	cell_tapped.emit(_cell_from_screen(p))
 
 
 ## Arrastar: o chão "gruda" no dedo.
@@ -480,6 +494,9 @@ func _sync_items() -> void:
 			var n := _make_item(it.type, level)
 			add_child(n)
 			_nodes[k] = n
+			if _built_once:
+				n.scale = Vector3.ONE * 0.3
+				create_tween().tween_property(n, "scale", Vector3.ONE, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		var node: Node3D = _nodes[k]
 		var w := State.width_of(it.type, level)
 		var rot := int(it.get("rot", 0))
@@ -492,6 +509,7 @@ func _sync_items() -> void:
 		var label: Label3D = node.get_node("Label")
 		label.text = tr(State.item_name(it))
 		_update_plant(node, it)
+	_built_once = true
 	_sync_pet()
 	_frame_camera()
 
@@ -516,7 +534,10 @@ func _make_item(type: String, level: int) -> Node3D:
 				var first := _load_model(State.model_file(model_name, 1), 1.0, 1.0)
 				first.scale = Vector3.ONE
 				var size1 := _merged_aabb(first).size
-				if State.FOOTPRINT.has(type) or target_h <= 0.0:
+				if State.FOOTPRINT.has(type):
+					# Mede pela largura (o lado em que os níveis crescem); a escadinha da porta pode passar um pouco.
+					_type_scale[type] = CELL * 0.95 / maxf(size1.x, 0.001)
+				elif target_h <= 0.0:
 					_type_scale[type] = CELL * 0.95 / maxf(maxf(size1.x, size1.z), 0.001)
 				else:
 					_type_scale[type] = minf(target_h / maxf(size1.y, 0.001), CELL * 0.95 / maxf(maxf(size1.x, size1.z), 0.001))

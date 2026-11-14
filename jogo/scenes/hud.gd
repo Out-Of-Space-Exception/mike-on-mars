@@ -9,6 +9,7 @@ const LANGS := ["en", "pt_BR", "es", "fr"]
 const LANG_NAMES := {"en": "EN", "pt_BR": "PT", "es": "ES", "fr": "FR"}
 const BAR_KEYS := {"energy": "BAR_ENERGY", "oxygen": "BAR_OXYGEN", "shield": "BAR_SHIELD"}
 const REVEAL_SOUND := {"comum": "revelar-comum", "raro": "revelar-raro", "épico": "revelar-epico", "lendário": "revelar-lendario"}
+const BAR_ICONS := {"energy": "res://ui/icons/ic-energia.svg", "oxygen": "res://ui/icons/ic-oxigenio.svg", "shield": "res://ui/icons/ic-escudo.svg"}
 const ICONS := {"build": "res://ui/icons/ic-wrench.png", "explore": "res://ui/icons/ic-target.png", "album": "res://ui/icons/ic-menugrid.png", "photo": "res://ui/icons/ic-camera.svg"}
 const DONKI_URL := "https://kauai.ccmc.gsfc.nasa.gov/DONKI/"
 
@@ -23,7 +24,8 @@ var _bar_labels := {}
 var _bar_fill := {}
 var _sol_label: Label
 var _hint: Label
-var _toast: Label
+var _toast: PanelContainer
+var _toast_label: Label
 var _toast_tween: Tween
 var _buttons := {}            # "build", "explore", "album", "photo" -> Button
 var _build_menu: PanelContainer
@@ -53,8 +55,10 @@ var _card_photo: TextureRect
 var _card_source := ""
 var _card_queue: Array[int] = []
 var _tube: PanelContainer
-var _tube_shape: Panel
-var _tube_style: StyleBoxFlat
+var _tube_node: Node3D
+var _tube_glass: StandardMaterial3D
+var _tube_light: OmniLight3D
+var _bold: FontVariation
 var _tube_label: Label
 var _tube_tween: Tween
 var _album: PanelContainer
@@ -108,6 +112,7 @@ func _on_play() -> void:
 	Sfx.play("toque-botao")
 	Sfx.play_music("musica-base")
 	_start.visible = false
+	base.orbit = false
 	State.start()
 	var away: Dictionary = State.away
 	if int(away.get("sols", 0)) >= 4:
@@ -129,6 +134,13 @@ func _resume_pending() -> void:
 			_show_storm(State.storm_event)
 		"dust", "devil", "cold", "nosignal":
 			_show_event(State.pending_event)
+
+
+## O Mike reage quando a criança toca nele (pesquisa, item 17).
+func on_mike_tapped() -> void:
+	base.jump()
+	Sfx.play("bem-vindo")
+	_show_toast(tr("MIKE_%d" % randi_range(1, 4)))
 
 
 func _on_lang() -> void:
@@ -188,7 +200,7 @@ func _on_build() -> void:
 func _on_build_item(type: String) -> void:
 	var reason := State.build_block_reason(type)
 	if reason != "":
-		_show_toast(tr(reason))
+		_show_toast(tr(reason), true)
 		Sfx.play("travado")
 		return
 	Sfx.play("toque-botao")
@@ -204,7 +216,7 @@ func _on_explore() -> void:
 		return
 	var reason := State.explore_block_reason()
 	if reason != "":
-		_show_toast(tr(reason))
+		_show_toast(tr(reason), true)
 		Sfx.play("travado")
 		return
 	if State.start_explore():
@@ -317,7 +329,7 @@ func _on_rotate() -> void:
 	if reason == "" and State.rotate(selected):
 		Sfx.play("construir")
 	else:
-		_show_toast(tr(reason))
+		_show_toast(tr(reason), true)
 		Sfx.play("travado")
 
 
@@ -326,7 +338,7 @@ func _on_upgrade() -> void:
 	if reason == "" and State.upgrade(selected):
 		Sfx.play("melhorar")
 	else:
-		_show_toast(tr(reason))
+		_show_toast(tr(reason), true)
 		Sfx.play("travado")
 
 
@@ -355,7 +367,7 @@ func _show_storm(event: Dictionary) -> void:
 		lines.append(tr("EV_SOLAR_CURIOSITY"))
 	lines.append(tr("EV_SOLAR_Q"))
 	_show_choice(tr("EV_SOLAR_TITLE"), lines,
-		"%s  -%d" % [tr("EV_SOLAR_A"), int(State.STORM_SHIELD_COST)], State.can_afford(State.STORM_SHIELD_COST),
+		"%s  ·  -%d %s" % [tr("EV_SOLAR_A"), int(State.STORM_SHIELD_COST), tr("BAR_ENERGY").to_lower()], State.can_afford(State.STORM_SHIELD_COST),
 		_storm_shield, tr("EV_SOLAR_B"), _storm_inside)
 	Sfx.play("alerta")
 
@@ -379,7 +391,7 @@ func _show_event(type: String) -> void:
 			Sfx.play("energia-volta")
 		"cold":
 			_show_choice(tr("EV_COLD_TITLE"), [tr("EV_COLD_TEXT"), tr("EV_COLD_Q")],
-				"%s  -%d" % [tr("EV_COLD_A"), int(State.COLD_HEAT_COST)], State.can_afford(State.COLD_HEAT_COST),
+				"%s  ·  -%d %s" % [tr("EV_COLD_A"), int(State.COLD_HEAT_COST), tr("BAR_ENERGY").to_lower()], State.can_afford(State.COLD_HEAT_COST),
 				func() -> void: State.choose_cold(true),
 				tr("EV_COLD_B"), func() -> void: State.choose_cold(false))
 			Sfx.play("alerta")
@@ -433,19 +445,24 @@ func _on_info_ok() -> void:
 func _show_tube() -> void:
 	if State.tube_card == 0 or _tube.visible or _start.visible:
 		return
-	_tube_style.bg_color = Palette.RARITY.get(State.tube_rarity(), Palette.TEXT)
+	var color: Color = Palette.RARITY.get(State.tube_rarity(), Palette.TEXT)
+	_tube_glass.albedo_color = Color(color, 0.6)
+	_tube_glass.emission = color
+	_tube_light.light_color = color
 	_tube_label.text = tr("TUBE_TAP")
 	_tube.visible = true
 	_update_dim()
 	Sfx.play("tubo-abrir")
-	_tube_shape.pivot_offset = _tube_shape.size / 2.0
+	# O tubo gira devagar e dá tremidinhas, como se a amostra quisesse sair.
 	if _tube_tween:
 		_tube_tween.kill()
+	_tube_node.rotation = Vector3.ZERO
 	_tube_tween = create_tween().set_loops()
-	_tube_tween.tween_property(_tube_shape, "rotation_degrees", 7.0, 0.08)
-	_tube_tween.tween_property(_tube_shape, "rotation_degrees", -7.0, 0.16)
-	_tube_tween.tween_property(_tube_shape, "rotation_degrees", 0.0, 0.08)
-	_tube_tween.tween_interval(0.35)
+	_tube_tween.tween_property(_tube_node, "rotation:z", 0.2, 0.08)
+	_tube_tween.tween_property(_tube_node, "rotation:z", -0.2, 0.16)
+	_tube_tween.tween_property(_tube_node, "rotation:z", 0.0, 0.08)
+	_tube_tween.parallel().tween_property(_tube_node, "rotation:y", TAU, 1.2).as_relative()
+	_tube_tween.tween_interval(0.3)
 
 
 func _on_tube_tap() -> void:
@@ -475,7 +492,7 @@ func _show_next_card() -> void:
 	_card_style.border_color = color
 	_card_title.text = tr("CARD_NEW") if State.cards.get(str(id), 0) == 1 else ""
 	_card_rarity.text = tr(Palette.RARITY_KEY.get(rarity, "RARITY_COMMON"))
-	_card_rarity.add_theme_color_override("font_color", color)
+	_card_rarity.add_theme_color_override("font_color", color.darkened(0.3))
 	_card_name.text = tr("CARD_%d_NAME" % id)
 	_card_fact.text = "%s %s" % [tr("CARD_REAL"), tr("CARD_%d_FACT" % id)]
 	_card_source = str(info.get("source", ""))
@@ -512,11 +529,15 @@ func _refresh_album() -> void:
 		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		b.add_theme_font_size_override("font_size", 20)
 		var color: Color = Palette.RARITY.get(info.get("rarity", "comum"), Palette.TEXT)
-		var box := Palette._box(Palette.BG.darkened(0.25) if owned else Palette.BG.darkened(0.5), 16)
-		box.set_border_width_all(5 if owned else 2)
-		box.border_color = color if owned else Palette.BG.lightened(0.15)
+		# Carta que a criança tem = papel com a borda da raridade; carta que falta = chapa escura.
+		var box: StyleBoxFlat = Palette.paper(color) if owned else Palette.plate()
+		box.content_margin_left = 10
+		box.content_margin_right = 10
+		box.shadow_offset = Vector2(4, 5)
 		for s in ["normal", "hover", "pressed", "disabled"]:
 			b.add_theme_stylebox_override(s, box)
+		b.add_theme_color_override("font_color", Palette.INK if owned else Palette.TEXT.darkened(0.3))
+		b.add_theme_color_override("font_disabled_color", Palette.TEXT.darkened(0.3))
 		if owned:
 			b.text = tr("CARD_%d_NAME" % id)
 			b.pressed.connect(_queue_card.bind(id, false))
@@ -677,14 +698,32 @@ func _update_dim() -> void:
 	_dim.visible = _choice.visible or _info.visible or _card.visible or _tube.visible or _nasa.visible
 
 
-func _show_toast(text: String) -> void:
-	_toast.text = text
+## Aviso curto num "bilhetinho" de papel inclinado. Quando é bloqueio (falta algo), ele treme de leve.
+func _show_toast(text: String, shake := false) -> void:
+	_toast_label.text = text
 	_toast.modulate.a = 1.0
+	_toast.reset_size()
+	_toast.pivot_offset = _toast.size / 2.0
+	_toast.position = (get_viewport().get_visible_rect().size - _toast.size) / 2.0
 	if _toast_tween:
 		_toast_tween.kill()
 	_toast_tween = create_tween()
+	_toast.scale = Vector2(0.85, 0.85)
+	_toast_tween.tween_property(_toast, "scale", Vector2.ONE, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	if shake:
+		var x := _toast.position.x
+		for d in [14.0, -12.0, 8.0, -4.0, 0.0]:
+			_toast_tween.tween_property(_toast, "position:x", x + d, 0.05)
 	_toast_tween.tween_interval(1.6)
-	_toast_tween.tween_property(_toast, "modulate:a", 0.0, 0.5)
+	_toast_tween.tween_property(_toast, "modulate:a", 0.0, 0.4)
+
+
+## Todo botão responde na hora: afunda quando aperta e quica quando solta (pesquisa, item 16).
+func _juice(b: Button) -> void:
+	b.resized.connect(func() -> void: b.pivot_offset = b.size / 2.0)
+	b.button_down.connect(func() -> void: create_tween().tween_property(b, "scale", Vector2(0.93, 0.93), 0.06))
+	b.button_up.connect(func() -> void:
+		create_tween().tween_property(b, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT))
 
 
 # ───────────── Montagem da tela ─────────────
@@ -698,26 +737,26 @@ func _build_top() -> void:
 	top.add_theme_constant_override("separation", 14)
 	_root.add_child(top)
 
-	var panel := PanelContainer.new()
-	var style := Palette._box(Palette.BG, 28)
-	style.set_border_width_all(3)
-	style.border_color = Palette.GOLD
-	style.content_margin_left = 28
-	style.content_margin_right = 28
-	style.content_margin_top = 18
-	style.content_margin_bottom = 18
-	panel.add_theme_stylebox_override("panel", style)
+	var panel := Plate.new()
 	top.add_child(panel)
 	var rows := VBoxContainer.new()
-	rows.add_theme_constant_override("separation", 12)
+	rows.add_theme_constant_override("separation", 10)
 	panel.add_child(rows)
 	for bar in BAR_KEYS:
 		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 16)
+		row.add_theme_constant_override("separation", 14)
 		rows.add_child(row)
+		var icon := TextureRect.new()
+		icon.custom_minimum_size = Vector2(44, 44)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		if ResourceLoader.exists(BAR_ICONS[bar]):
+			icon.texture = load(BAR_ICONS[bar])
+		icon.modulate = Palette.BAR[bar]
+		row.add_child(icon)
 		var label := Label.new()
 		label.custom_minimum_size = Vector2(150, 0)
-		label.add_theme_font_size_override("font_size", 26)
+		label.add_theme_font_size_override("font_size", 28)
 		row.add_child(label)
 		var pb := ProgressBar.new()
 		pb.max_value = State.BAR_MAX
@@ -732,17 +771,15 @@ func _build_top() -> void:
 		_bar_labels[bar] = label
 		_bar_fill[bar] = fill
 
+	# O "Sol N · Cratera Gale" é uma placa no canto, um pouco torta (nada de tudo centralizado).
 	var pill := PanelContainer.new()
-	pill.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	var pill_style := Palette._box(Palette.BG.darkened(0.35), 30)
-	pill_style.set_border_width_all(2)
-	pill_style.border_color = Palette.GOLD.darkened(0.3)
-	pill_style.content_margin_left = 36
-	pill_style.content_margin_right = 36
-	pill.add_theme_stylebox_override("panel", pill_style)
+	pill.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	pill.add_theme_stylebox_override("panel", Palette.paper(Palette.GOLD.darkened(0.25)))
+	pill.rotation_degrees = -2.0
 	top.add_child(pill)
 	_sol_label = Label.new()
 	_sol_label.add_theme_font_size_override("font_size", 28)
+	_sol_label.add_theme_color_override("font_color", Palette.INK)
 	pill.add_child(_sol_label)
 
 	_inventory = HFlowContainer.new()
@@ -770,7 +807,7 @@ func _build_bottom() -> void:
 	bottom.add_theme_constant_override("separation", 14)
 	_root.add_child(bottom)
 
-	_build_menu = PanelContainer.new()
+	_build_menu = Plate.new()
 	_build_menu.visible = false
 	bottom.add_child(_build_menu)
 	_build_grid = GridContainer.new()
@@ -779,7 +816,7 @@ func _build_bottom() -> void:
 	_build_grid.add_theme_constant_override("v_separation", 10)
 	_build_menu.add_child(_build_grid)
 
-	_panel = PanelContainer.new()
+	_panel = Plate.new()
 	_panel.visible = false
 	bottom.add_child(_panel)
 	var pbox := VBoxContainer.new()
@@ -795,28 +832,32 @@ func _build_bottom() -> void:
 	_panel_buttons.add_theme_constant_override("v_separation", 10)
 	pbox.add_child(_panel_buttons)
 
+	# Embaixo, no alcance do polegar. Explorar é a ação principal: maior, dourada e mais alta que as outras.
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 14)
+	row.add_theme_constant_override("separation", 12)
+	row.alignment = BoxContainer.ALIGNMENT_END
 	bottom.add_child(row)
-	var big := Palette._box(Palette.BUTTON, 22)
-	big.set_border_width_all(3)
-	big.border_color = Palette.GOLD
 	for k in ["build", "explore", "album", "photo"]:
+		var main_action: bool = k == "explore"
 		var b := Button.new()
-		b.custom_minimum_size = Vector2(0, 150)
+		b.custom_minimum_size = Vector2(0, 176 if main_action else 140)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		b.add_theme_font_size_override("font_size", 26)
+		b.size_flags_vertical = Control.SIZE_SHRINK_END
+		b.size_flags_stretch_ratio = 1.5 if main_action else 1.0
+		b.add_theme_font_size_override("font_size", 32 if main_action else 26)
 		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		for s in ["normal", "hover", "pressed", "disabled"]:
-			b.add_theme_stylebox_override(s, big if s != "pressed" else Palette._box(Palette.BUTTON.darkened(0.2), 22))
-		for c in ["font_color", "font_hover_color", "font_pressed_color", "font_disabled_color"]:
-			b.add_theme_color_override(c, Palette.BG)
+		var color := Palette.GOLD if main_action else Palette.BUTTON
+		for s in ["normal", "hover", "disabled"]:
+			b.add_theme_stylebox_override(s, Palette.key(color))
+		b.add_theme_stylebox_override("pressed", Palette.key(color, true))
 		if ICONS.has(k) and ResourceLoader.exists(ICONS[k]):
 			b.icon = load(ICONS[k])
 			b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-			b.add_theme_constant_override("icon_max_width", 56)
-			b.add_theme_color_override("icon_normal_color", Palette.BG)
+			b.add_theme_constant_override("icon_max_width", 64 if main_action else 52)
+			for ic in ["icon_normal_color", "icon_hover_color", "icon_pressed_color", "icon_focus_color"]:
+				b.add_theme_color_override(ic, Palette.INK)
+		_juice(b)
 		row.add_child(b)
 		_buttons[k] = b
 	_buttons.build.pressed.connect(_on_build)
@@ -826,17 +867,20 @@ func _build_bottom() -> void:
 
 
 func _build_messages() -> void:
-	_toast = Label.new()
-	_toast.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	_toast.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	_toast.grow_vertical = Control.GROW_DIRECTION_BOTH
-	_toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_toast.add_theme_font_size_override("font_size", 40)
-	_toast.add_theme_color_override("font_outline_color", Palette.BG)
-	_toast.add_theme_constant_override("outline_size", 14)
+	_toast = PanelContainer.new()
+	_toast.add_theme_stylebox_override("panel", Palette.paper(Palette.GOLD))
+	_toast.rotation_degrees = -3.0
+	_toast.custom_minimum_size = Vector2(0, 0)
 	_toast.modulate.a = 0.0
 	_toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_toast)
+	_toast_label = Label.new()
+	_toast_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_toast_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_toast_label.custom_minimum_size = Vector2(460, 0)
+	_toast_label.add_theme_font_size_override("font_size", 34)
+	_toast_label.add_theme_color_override("font_color", Palette.INK)
+	_toast.add_child(_toast_label)
 
 
 func _build_album() -> void:
@@ -879,96 +923,163 @@ func _build_album() -> void:
 
 func _build_popups() -> void:
 	_dim = ColorRect.new()
-	_dim.color = Color(0, 0, 0, 0.55)
+	_dim.color = Color(0.08, 0.02, 0.03, 0.6)
 	_dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_dim.visible = false
 	_root.add_child(_dim)
 
-	# Escolha (tempestade, noite fria, sem sinal)
-	_choice = _popup(620)
+	# Escolha (tempestade, noite fria, sem sinal): chapa da base com a faixa de perigo listrada.
+	_choice = _popup(640, "alert")
 	var cbox: VBoxContainer = _choice.get_child(0)
-	_choice_title = _wrap_label("", 38)
-	_choice_title.add_theme_color_override("font_color", Palette.GOLD)
+	_choice_title = _title_label(40)
 	cbox.add_child(_choice_title)
 	_choice_lines = VBoxContainer.new()
 	_choice_lines.add_theme_constant_override("separation", 10)
 	cbox.add_child(_choice_lines)
 	_choice_a = _popup_button(cbox, _on_choice.bind(0))
-	_choice_b = _popup_button(cbox, _on_choice.bind(1))
+	_choice_b = _popup_button(cbox, _on_choice.bind(1), true)
 
-	# Aviso com OK (poeira, redemoinho, enquanto você estava fora)
+	# Aviso com OK (poeira, redemoinho, enquanto você estava fora): chapa da base.
 	_info = _popup(620)
 	var ibox: VBoxContainer = _info.get_child(0)
-	_info_title = _wrap_label("", 38)
-	_info_title.add_theme_color_override("font_color", Palette.GOLD)
+	_info_title = _title_label(40)
 	ibox.add_child(_info_title)
-	_info_text = _wrap_label("", 28)
+	_info_text = _wrap_label("", 30)
+	_info_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	ibox.add_child(_info_text)
 	_popup_button(ibox, _on_info_ok).text = "OK"
 
-	# Carta
-	_card = _popup(620)
-	_card_style = Palette._box(Palette.BG, 24)
-	_card_style.set_border_width_all(8)
+	# Carta: papel creme com a borda na cor da raridade, um pouco torta, como uma carta de verdade.
+	_card = _popup(600, "paper")
+	_card.rotation_degrees = -2.0
+	_card_style = Palette.paper()
 	_card.add_theme_stylebox_override("panel", _card_style)
 	var kbox: VBoxContainer = _card.get_child(0)
-	_card_title = _wrap_label("", 28)
+	_card_title = _wrap_label("", 26)
+	_card_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_card_title.add_theme_color_override("font_color", Palette.INK.lightened(0.25))
 	kbox.add_child(_card_title)
 	_card_photo = TextureRect.new()
 	_card_photo.custom_minimum_size = Vector2(0, 300)
 	_card_photo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_card_photo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	kbox.add_child(_card_photo)
-	_card_name = _wrap_label("", 44)
+	_card_name = _title_label(46)
+	_card_name.add_theme_color_override("font_color", Palette.INK)
 	kbox.add_child(_card_name)
 	_card_rarity = _wrap_label("", 28)
+	_card_rarity.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	kbox.add_child(_card_rarity)
-	_card_fact = _wrap_label("", 28)
+	_card_fact = _wrap_label("", 30)
+	_card_fact.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_card_fact.add_theme_color_override("font_color", Palette.INK)
 	kbox.add_child(_card_fact)
 	var crow := HBoxContainer.new()
 	crow.add_theme_constant_override("separation", 12)
 	kbox.add_child(crow)
-	var source := Button.new()
+	var source := _key_button(_on_card_source, true)
 	source.name = "Source"
-	source.custom_minimum_size = Vector2(0, 90)
-	source.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	source.pressed.connect(_on_card_source)
 	crow.add_child(source)
-	var ok := Button.new()
+	var ok := _key_button(_show_next_card)
 	ok.text = "OK"
-	ok.custom_minimum_size = Vector2(0, 90)
-	ok.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	ok.pressed.connect(_show_next_card)
 	crow.add_child(ok)
 
-	# Tubo de amostra: uma cápsula na cor da raridade, que treme até a criança tocar.
-	_tube = _popup(420)
+	# Tubo de amostra em 3D (o mesmo material do jogo): gira e treme na cor da raridade até a criança tocar.
+	_tube = _popup(460)
 	var tbox: VBoxContainer = _tube.get_child(0)
 	tbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	_tube_shape = Panel.new()
-	_tube_shape.custom_minimum_size = Vector2(130, 300)
-	_tube_shape.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	_tube_style = Palette._box(Palette.TEXT, 65)
-	_tube_style.set_border_width_all(8)
-	_tube_style.border_color = Palette.TEXT
-	_tube_shape.add_theme_stylebox_override("panel", _tube_style)
-	tbox.add_child(_tube_shape)
-	_tube_label = _wrap_label("", 36)
+	var view := SubViewportContainer.new()
+	view.stretch = true
+	view.custom_minimum_size = Vector2(320, 400)
+	view.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	tbox.add_child(view)
+	var vp := SubViewport.new()
+	vp.transparent_bg = true
+	vp.own_world_3d = true
+	view.add_child(vp)
+	_build_tube_scene(vp)
+	_tube_label = _title_label(36)
+	_tube_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	tbox.add_child(_tube_label)
 	_popup_button(tbox, _on_tube_tap).text = "OK"
 
 	# Dados da NASA
 	_nasa = _popup(640)
 	var nbox: VBoxContainer = _nasa.get_child(0)
-	var ntitle := _wrap_label("", 36)
-	ntitle.add_theme_color_override("font_color", Palette.GOLD)
+	var ntitle := _title_label(36)
 	nbox.add_child(ntitle)
-	_nasa_text = _wrap_label("", 26)
+	_nasa_text = _wrap_label("", 28)
 	_nasa_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	nbox.add_child(_nasa_text)
-	_popup_button(nbox, func() -> void: OS.shell_open(DONKI_URL)).text = "DONKI (NASA)"
+	_popup_button(nbox, func() -> void: OS.shell_open(DONKI_URL), true).text = "DONKI (NASA)"
 	_popup_button(nbox, _close_nasa).text = "OK"
 	_nasa.visibility_changed.connect(func() -> void: ntitle.text = tr("NASA_TITLE"))
+
+
+## O tubo de amostra: vidro na cor da raridade, tampas de metal, uma pedrinha dentro e uma luz da mesma cor.
+func _build_tube_scene(vp: SubViewport) -> void:
+	var env := WorldEnvironment.new()
+	env.environment = Environment.new()
+	env.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.environment.ambient_light_color = Color(1.0, 0.92, 0.85)
+	env.environment.ambient_light_energy = 0.6
+	vp.add_child(env)
+	var sun := DirectionalLight3D.new()
+	sun.rotation_degrees = Vector3(-40.0, 35.0, 0.0)
+	vp.add_child(sun)
+	_tube_node = Node3D.new()
+	vp.add_child(_tube_node)
+	var glass := MeshInstance3D.new()
+	var cyl := CylinderMesh.new()
+	cyl.top_radius = 0.42
+	cyl.bottom_radius = 0.42
+	cyl.height = 1.5
+	cyl.radial_segments = 12
+	glass.mesh = cyl
+	_tube_glass = StandardMaterial3D.new()
+	_tube_glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_tube_glass.roughness = 0.15
+	_tube_glass.emission_enabled = true
+	_tube_glass.emission_energy_multiplier = 0.6
+	glass.material_override = _tube_glass
+	_tube_node.add_child(glass)
+	for y in [0.82, -0.82]:
+		var cap := MeshInstance3D.new()
+		var c := CylinderMesh.new()
+		c.top_radius = 0.47
+		c.bottom_radius = 0.47
+		c.height = 0.2
+		c.radial_segments = 12
+		cap.mesh = c
+		var metal := StandardMaterial3D.new()
+		metal.albedo_color = Palette.SUIT.darkened(0.15)
+		metal.metallic = 0.6
+		metal.roughness = 0.35
+		cap.material_override = metal
+		cap.position.y = y
+		_tube_node.add_child(cap)
+	var rock := MeshInstance3D.new()
+	var r := SphereMesh.new()
+	r.radius = 0.22
+	r.height = 0.36
+	r.radial_segments = 6
+	r.rings = 3
+	rock.mesh = r
+	var rock_mat := StandardMaterial3D.new()
+	rock_mat.albedo_color = Palette.GROUND.darkened(0.2)
+	rock.material_override = rock_mat
+	rock.position.y = -0.45
+	_tube_node.add_child(rock)
+	_tube_light = OmniLight3D.new()
+	_tube_light.position = Vector3(0.0, 0.0, -0.9)
+	_tube_light.omni_range = 3.0
+	_tube_light.light_energy = 2.0
+	vp.add_child(_tube_light)
+	var cam := Camera3D.new()
+	cam.fov = 40.0
+	vp.add_child(cam)
+	cam.position = Vector3(0.0, 0.3, 3.4)
+	cam.look_at(Vector3(0.0, 0.0, 0.0))
 
 
 func _close_nasa() -> void:
@@ -988,20 +1099,24 @@ func _build_postcard() -> void:
 	_postcard.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_postcard.visible = false
 	add_child(_postcard)
+	# Cartão-postal: uma etiqueta de papel torta no canto, com o lugar e o sol.
 	var strip := PanelContainer.new()
-	strip.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	strip.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
+	strip.offset_left = 36
+	strip.offset_bottom = -60
 	strip.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	var style := Palette._box(Palette.BG, 0)
-	style.content_margin_top = 30
-	style.content_margin_bottom = 40
-	strip.add_theme_stylebox_override("panel", style)
+	strip.rotation_degrees = -4.0
+	strip.add_theme_stylebox_override("panel", Palette.paper(Palette.BUTTON))
 	_postcard.add_child(strip)
 	var col := VBoxContainer.new()
 	strip.add_child(col)
-	var title := _wrap_label("Mike on Mars", 52)
-	title.add_theme_color_override("font_color", Palette.GOLD)
+	var title := _title_label(50)
+	title.text = "Mike on Mars"
+	title.add_theme_color_override("font_color", Palette.BUTTON.darkened(0.2))
 	col.add_child(title)
-	_postcard_label = _wrap_label("", 34)
+	_postcard_label = _wrap_label("", 32)
+	_postcard_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_postcard_label.add_theme_color_override("font_color", Palette.INK)
 	col.add_child(_postcard_label)
 
 
@@ -1009,31 +1124,36 @@ func _build_start() -> void:
 	_start = Control.new()
 	_start.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(_start)
-	var bg := TextureRect.new()
-	var g := GradientTexture2D.new()
-	g.fill_from = Vector2(0.5, 0.0)
-	g.fill_to = Vector2(0.5, 1.0)
-	g.gradient = Gradient.new()
-	g.gradient.set_color(0, Color("3a1418"))
-	g.gradient.set_color(1, Palette.BG)
-	bg.texture = g
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bg.stretch_mode = TextureRect.STRETCH_SCALE
-	_start.add_child(bg)
+	# Fundo: a própria base (a câmera gira devagar atrás), só escurecida. Nada de degradê genérico.
+	var shade := ColorRect.new()
+	shade.color = Color(0.12, 0.03, 0.05, 0.42)
+	shade.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_start.add_child(shade)
 	var col := VBoxContainer.new()
 	col.set_anchors_preset(Control.PRESET_FULL_RECT)
-	col.offset_top = 120
+	col.offset_left = 48
+	col.offset_right = -48
+	col.offset_top = 140
 	col.offset_bottom = -90
-	col.add_theme_constant_override("separation", 24)
+	col.add_theme_constant_override("separation", 6)
 	col.theme = _root.theme
 	_start.add_child(col)
-	var title := _wrap_label("Mike on Mars", 92)
-	col.add_child(title)
-	var line := ColorRect.new()
-	line.color = Palette.GOLD
-	line.custom_minimum_size = Vector2(220, 5)
-	line.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	col.add_child(line)
+	# Título como letreiro: duas linhas, torto, alinhado à esquerda, "Mars" em terracota.
+	var sign := VBoxContainer.new()
+	sign.rotation_degrees = -4.0
+	sign.add_theme_constant_override("separation", -18)
+	col.add_child(sign)
+	var t1 := _title_label(120)
+	t1.text = "Mike"
+	sign.add_child(t1)
+	var t2 := _title_label(84)
+	t2.text = "on Mars"
+	t2.add_theme_color_override("font_color", Palette.BUTTON)
+	sign.add_child(t2)
+	for t in [t1, t2]:
+		t.add_theme_color_override("font_shadow_color", Color(0.1, 0.02, 0.03, 0.9))
+		t.add_theme_constant_override("shadow_offset_x", 5)
+		t.add_theme_constant_override("shadow_offset_y", 7)
 	var mike := TextureRect.new()
 	if ResourceLoader.exists("res://ui/icons/mike.png"):
 		mike.texture = load("res://ui/icons/mike.png")
@@ -1041,18 +1161,10 @@ func _build_start() -> void:
 	mike.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	mike.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	col.add_child(mike)
-	_start_play = Button.new()
-	_start_play.custom_minimum_size = Vector2(320, 140)
-	_start_play.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	_start_play.add_theme_font_size_override("font_size", 44)
-	var big := Palette._box(Palette.BUTTON, 26)
-	big.set_border_width_all(4)
-	big.border_color = Palette.GOLD
-	for s in ["normal", "hover", "pressed"]:
-		_start_play.add_theme_stylebox_override(s, big)
-	for c in ["font_color", "font_hover_color", "font_pressed_color"]:
-		_start_play.add_theme_color_override(c, Palette.BG)
-	_start_play.pressed.connect(_on_play)
+	_start_play = _key_button(_on_play)
+	_start_play.custom_minimum_size = Vector2(360, 170)
+	_start_play.size_flags_horizontal = Control.SIZE_SHRINK_END
+	_start_play.add_theme_font_size_override("font_size", 52)
 	col.add_child(_start_play)
 	var corner := HBoxContainer.new()
 	corner.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
@@ -1061,16 +1173,15 @@ func _build_start() -> void:
 	corner.offset_top = 24
 	corner.theme = _root.theme
 	_start.add_child(corner)
-	_start_nasa = Button.new()
-	_start_nasa.custom_minimum_size = Vector2(0, 72)
-	_start_nasa.pressed.connect(_on_nasa)
+	_start_nasa = _key_button(_on_nasa, true)
+	_start_nasa.custom_minimum_size = Vector2(0, 96)
+	_start_nasa.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	corner.add_child(_start_nasa)
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	corner.add_child(spacer)
-	_start_lang = Button.new()
-	_start_lang.custom_minimum_size = Vector2(100, 72)
-	_start_lang.pressed.connect(_on_lang)
+	_start_lang = _key_button(_on_lang, true)
+	_start_lang.custom_minimum_size = Vector2(120, 96)
 	corner.add_child(_start_lang)
 	# A janela de dados da NASA também abre na tela inicial: fica por cima de tudo.
 	_nasa.reparent(self)
@@ -1081,13 +1192,22 @@ func _build_start() -> void:
 	move_child(_toast, -1)
 
 
-func _popup(width: int) -> PanelContainer:
-	var p := PanelContainer.new()
+## Janela no meio da tela. "plate" = chapa da base; "alert" = chapa com faixa de perigo; "paper" = papel.
+func _popup(width: int, kind := "plate") -> PanelContainer:
+	var p: PanelContainer
+	if kind == "paper":
+		p = PanelContainer.new()
+		p.add_theme_stylebox_override("panel", Palette.paper())
+	else:
+		var plate := Plate.new()
+		plate.stripe = kind == "alert"
+		p = plate
 	p.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	p.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	p.grow_vertical = Control.GROW_DIRECTION_BOTH
 	p.custom_minimum_size = Vector2(width, 0)
 	p.visible = false
+	p.resized.connect(func() -> void: p.pivot_offset = p.size / 2.0)
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 16)
 	p.add_child(box)
@@ -1095,13 +1215,39 @@ func _popup(width: int) -> PanelContainer:
 	return p
 
 
-func _popup_button(box: VBoxContainer, action: Callable) -> Button:
+## Botão-tecla. O principal é dourado; o secundário, terracota.
+func _key_button(action: Callable, secondary := false) -> Button:
 	var b := Button.new()
-	b.custom_minimum_size = Vector2(0, 96)
+	b.custom_minimum_size = Vector2(0, 104)
+	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var color := Palette.BUTTON if secondary else Palette.GOLD
+	for s in ["normal", "hover", "disabled"]:
+		b.add_theme_stylebox_override(s, Palette.key(color))
+	b.add_theme_stylebox_override("pressed", Palette.key(color, true))
 	b.pressed.connect(action)
+	_juice(b)
+	return b
+
+
+func _popup_button(box: VBoxContainer, action: Callable, secondary := false) -> Button:
+	var b := _key_button(action, secondary)
 	box.add_child(b)
 	return b
+
+
+## Título com a Rubik bem grossa, alinhado à esquerda (nada de tudo centralizado).
+func _title_label(size: int) -> Label:
+	var l := _wrap_label("", size)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	l.add_theme_color_override("font_color", Palette.GOLD)
+	if _bold == null and ResourceLoader.exists(Palette.FONT):
+		_bold = FontVariation.new()
+		_bold.base_font = load(Palette.FONT)
+		_bold.variation_opentype = {TextServerManager.get_primary_interface().name_to_tag("wght"): 800}
+	if _bold:
+		l.add_theme_font_override("font", _bold)
+	return l
 
 
 func _wrap_label(text: String, size: int) -> Label:
