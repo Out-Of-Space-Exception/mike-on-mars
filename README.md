@@ -5,7 +5,8 @@ Jogo do time **Out of Space Exception** para o NASA Space Apps Challenge 2026 (d
 - 🎮 **Jogar a versão do momento:** https://out-of-space-exception.github.io/mike-on-mars/ (no celular, aponte a câmera para o QR abaixo)
 - 🧠 **Contexto do projeto** (cole em qualquer IA antes de pedir algo): [CONTEXTO.md](CONTEXTO.md)
 - 📋 **Tarefas do time:** link no grupo do zap
-n<img src="ferramentas/qr-code.png" width="180" alt="QR code do jogo">
+
+<img src="ferramentas/qr-code.png" width="180" alt="QR code do jogo">
 
 ## Onde fica cada coisa
 
