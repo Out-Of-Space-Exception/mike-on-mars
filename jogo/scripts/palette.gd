@@ -34,24 +34,72 @@ const DOME := Color(0.45, 0.75, 1.0, 0.18)
 const BAR := {"energy": GOLD, "oxygen": Color("7cc6e0"), "shield": SUIT_STRIPE}
 
 
+# Peças da interface (pesquisa/anti-ai-slop.md): cada tipo tem forma própria.
+#  - tecla: botão que "afunda" (borda grossa embaixo), é o que a criança toca;
+#  - chapa: painel de metal da base, com parafusos (scripts/plate.gd);
+#  - papel: a carta e o aviso curto, cor creme, como papel de verdade.
+const PLATE := Color("3b1a1e")
+const PLATE_EDGE := Color("5c2d31")
+const RIVET := Color("8a5a4e")
+const PAPER := Color("f2e3c2")
+const INK := Color("3b1a1e")
+const STRIPE_H := 22.0
+
+
 static func make_theme() -> Theme:
 	var t := Theme.new()
-	t.default_font_size = 28
+	t.default_font_size = 30
 	if ResourceLoader.exists(FONT):
 		t.default_font = load(FONT)
 	t.set_color("font_color", "Label", TEXT)
-	t.set_color("font_color", "Button", TEXT)
-	t.set_color("font_hover_color", "Button", TEXT)
-	t.set_color("font_pressed_color", "Button", TEXT)
-	t.set_color("font_disabled_color", "Button", Color(TEXT, 0.45))
-	t.set_stylebox("normal", "Button", _box(BUTTON, 18))
-	t.set_stylebox("hover", "Button", _box(BUTTON.lightened(0.1), 18))
-	t.set_stylebox("pressed", "Button", _box(BUTTON.darkened(0.2), 18))
-	t.set_stylebox("disabled", "Button", _box(BUTTON.darkened(0.45), 18))
+	for c in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
+		t.set_color(c, "Button", INK)
+	t.set_color("font_disabled_color", "Button", Color(INK, 0.45))
+	t.set_stylebox("normal", "Button", key(BUTTON))
+	t.set_stylebox("hover", "Button", key(BUTTON))
+	t.set_stylebox("pressed", "Button", key(BUTTON, true))
+	t.set_stylebox("disabled", "Button", key(BUTTON.darkened(0.35)))
 	t.set_stylebox("focus", "Button", StyleBoxEmpty.new())
-	t.set_stylebox("panel", "PanelContainer", _box(Color(BG, 0.9), 24))
-	t.set_stylebox("background", "ProgressBar", _box(Color(BG.lightened(0.15), 1.0), 10))
+	t.set_stylebox("panel", "PanelContainer", plate(false))
+	t.set_stylebox("background", "ProgressBar", _box(Color("2a1215"), 6))
 	return t
+
+
+## Tecla: cantos pouco arredondados e uma borda grossa e mais escura embaixo; apertada, ela "afunda".
+static func key(color: Color, pressed := false) -> StyleBoxFlat:
+	var b := _box(color, 14)
+	b.border_color = color.darkened(0.38)
+	b.border_width_bottom = 2 if pressed else 9
+	b.content_margin_top = 16 if pressed else 10
+	b.content_margin_bottom = 8
+	return b
+
+
+## Chapa de metal: cantos quase retos, borda fina mais clara (os parafusos vêm do plate.gd).
+static func plate(stripe := false) -> StyleBoxFlat:
+	var b := _box(PLATE, 8)
+	b.set_border_width_all(3)
+	b.border_color = PLATE_EDGE
+	b.content_margin_left = 34
+	b.content_margin_right = 34
+	b.content_margin_top = 26 + (STRIPE_H if stripe else 0.0)
+	b.content_margin_bottom = 26
+	return b
+
+
+## Papel: creme, canto pequeno e uma sombra dura deslocada (como um cartão apoiado na mesa).
+static func paper(edge: Color = INK) -> StyleBoxFlat:
+	var b := _box(PAPER, 6)
+	b.set_border_width_all(6)
+	b.border_color = edge
+	b.shadow_color = Color(0, 0, 0, 0.35)
+	b.shadow_size = 1
+	b.shadow_offset = Vector2(8, 10)
+	b.content_margin_left = 30
+	b.content_margin_right = 30
+	b.content_margin_top = 24
+	b.content_margin_bottom = 24
+	return b
 
 
 static func _box(color: Color, radius: int) -> StyleBoxFlat:

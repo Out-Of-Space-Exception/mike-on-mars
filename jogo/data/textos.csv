@@ -48,10 +48,10 @@ CARD_NEW,Carta nova!,New card!,New card!,New card!
 CARD_REAL,De verdade:,This is real:,This is real:,This is real:
 CARD_LOCKED,Em breve,Coming soon,Coming soon,Coming soon
 EV_SOLAR_TITLE,Tempestade solar chegando!,Solar storm coming!,Solar storm coming!,Solar storm coming!
-EV_SOLAR_REAL,De verdade: {date} · dados da NASA (DONKI),Real: {date} · NASA data (DONKI),Real: {date} · NASA data (DONKI),Real: {date} · NASA data (DONKI)
+EV_SOLAR_REAL,Aconteceu de verdade: {date}. Dado da NASA.,This really happened: {date}. NASA data.,This really happened: {date}. NASA data.,This really happened: {date}. NASA data.
 EV_SOLAR_Q,Levantar o escudo?,Raise the shield?,Raise the shield?,Raise the shield?
-EV_SOLAR_A,Escudo (gasta energia),Shield (uses energy),Shield (uses energy),Shield (uses energy)
-EV_SOLAR_B,Mike fica em casa,Mike stays inside,Mike stays inside,Mike stays inside
+EV_SOLAR_A,"Sim, levantar","Yes, shield up","Yes, shield up","Yes, shield up"
+EV_SOLAR_B,"Não, ficar em casa","No, stay inside","No, stay inside","No, stay inside"
 EV_DUST_TITLE,Tempestade de poeira!,Dust storm!,Dust storm!,Dust storm!
 EV_DUST_TEXT,Os painéis ficaram sujos.,The panels got dirty.,The panels got dirty.,The panels got dirty.
 EV_DEVIL_TITLE,Redemoinho de poeira!,Dust devil!,Dust devil!,Dust devil!
@@ -95,8 +95,8 @@ EV_NOSIGNAL_TEXT,O Sol ficou entre a Terra e Marte. Sem mensagens por um tempo.,
 PLAN_SAVE,Economizar energia,Save energy,Save energy,Save energy
 PLAN_PLANT,Continuar plantando,Keep planting,Keep planting,Keep planting
 EV_COLD_TEXT,"Na Gale, a noite chega perto de −70 °C.","In Gale, nights get close to −70 °C.","In Gale, nights get close to −70 °C.","In Gale, nights get close to −70 °C."
-EV_COLD_A,Aquecer a estufa,Heat the greenhouse,Heat the greenhouse,Heat the greenhouse
-EV_COLD_B,Deixar esfriar,Let it cool,Let it cool,Let it cool
+EV_COLD_A,"Sim, aquecer","Yes, heat it","Yes, heat it","Yes, heat it"
+EV_COLD_B,"Não, deixar esfriar","No, let it cool","No, let it cool","No, let it cool"
 COLD_LEFT,Noite fria · {n} sóis,Cold night · {n} sols,Cold night · {n} sols,Cold night · {n} sols
 DUST_LEFT,Painéis sujos · {n} sóis,Dirty panels · {n} sols,Dirty panels · {n} sols,Dirty panels · {n} sols
 BTN_NASA,Dados da NASA,NASA data,NASA data,NASA data
@@ -132,14 +132,18 @@ OUT_ENERGY,Apagão! Acabou a energia.,Blackout! The energy ran out.,Blackout! Th
 OUT_OXYGEN,Acabou o oxigênio! O Mike ficou em casa.,Out of oxygen! Mike stays inside.,Out of oxygen! Mike stays inside.,Out of oxygen! Mike stays inside.
 OUT_ENERGY_HINT,Sem energia: construa um painel solar ou um RTG.,No energy: build a solar panel or an RTG.,No energy: build a solar panel or an RTG.,No energy: build a solar panel or an RTG.
 OUT_OXYGEN_HINT,Sem oxigênio: construa o MOXIE ou plante na estufa.,No oxygen: build a MOXIE or plant in the greenhouse.,No oxygen: build a MOXIE or plant in the greenhouse.,No oxygen: build a MOXIE or plant in the greenhouse.
+MIKE_1,Oi! Bora explorar a cratera?,Hi! Want to explore the crater?,Hi! Want to explore the crater?,Hi! Want to explore the crater?
+MIKE_2,Planta faz oxigênio pra mim respirar!,Plants make oxygen so I can breathe!,Plants make oxygen so I can breathe!,Plants make oxygen so I can breathe!
+MIKE_3,"Se vier tempestade solar, eu me escondo!","If a solar storm comes, I hide!","If a solar storm comes, I hide!","If a solar storm comes, I hide!"
+MIKE_4,"Lá longe é o Monte Sharp, com 5 km de altura!","Far away is Mount Sharp, 5 km tall!","Far away is Mount Sharp, 5 km tall!","Far away is Mount Sharp, 5 km tall!"
 CARD_1_NAME,Alface,Lettuce,Lettuce,Lettuce
 CARD_1_FACT,"Os astronautas comeram alface plantada no espaço, em 10/08/2015.","Astronauts ate lettuce grown in space on August 10, 2015.","Astronauts ate lettuce grown in space on August 10, 2015.","Astronauts ate lettuce grown in space on August 10, 2015."
 CARD_2_NAME,Rabanete,Radish,Radish,Radish
 CARD_2_FACT,Cresceu em só 27 dias na Estação Espacial (2020).,It grew in just 27 days on the Space Station (2020).,It grew in just 27 days on the Space Station (2020).,It grew in just 27 days on the Space Station (2020).
 CARD_3_NAME,Couve,Kale,Kale,Kale
-CARD_3_FACT,Foi colhida no espaço para um feriado (Ação de Graças de 2018).,It was harvested in space for Thanksgiving (2018).,It was harvested in space for Thanksgiving (2018).,It was harvested in space for Thanksgiving (2018).
+CARD_3_FACT,Foi colhida no espaço bem a tempo do Dia de Ação de Graças (28/11/2018).,"It was harvested in space just in time for Thanksgiving (November 28, 2018).","It was harvested in space just in time for Thanksgiving (November 28, 2018).","It was harvested in space just in time for Thanksgiving (November 28, 2018)."
 CARD_4_NAME,Batata,Potato,Potato,Potato
-CARD_4_FACT,A NASA testou batata em um solo que imita o de Marte.,NASA tested potatoes in soil that copies Mars soil.,NASA tested potatoes in soil that copies Mars soil.,NASA tested potatoes in soil that copies Mars soil.
+CARD_4_FACT,"Um cientista da NASA diz que a batata pode dar o dobro de comida de alguns grãos, com a mesma luz.","A NASA scientist says potatoes could make twice as much food as some seed crops, with the same light.","A NASA scientist says potatoes could make twice as much food as some seed crops, with the same light.","A NASA scientist says potatoes could make twice as much food as some seed crops, with the same light."
 CARD_5_NAME,Zínia,Zinnia,Zinnia,Zinnia
 CARD_5_FACT,"Primeira flor a florescer no espaço (16/01/2016), salva de um fungo.","The first flower to bloom in space (January 16, 2016), saved from mold.","The first flower to bloom in space (January 16, 2016), saved from mold.","The first flower to bloom in space (January 16, 2016), saved from mold."
 CARD_6_NAME,Pimenta Hatch,Hatch chile,Hatch chile,Hatch chile
@@ -147,7 +151,7 @@ CARD_6_FACT,Cresceu uns 4 meses no espaço e virou noite do taco (2021).,It grew
 CARD_7_NAME,"Hematita (""blueberries"")","Hematite (""blueberries"")","Hematite (""blueberries"")","Hematite (""blueberries"")"
 CARD_7_FACT,Bolinhas que mostram que já teve água em Marte.,Tiny balls that show Mars once had water.,Tiny balls that show Mars once had water.,Tiny balls that show Mars once had water.
 CARD_8_NAME,Jarosita,Jarosite,Jarosite,Jarosite
-CARD_8_FACT,Um mineral que precisa de água para se formar.,A mineral that needs water to form.,A mineral that needs water to form.,A mineral that needs water to form.
+CARD_8_FACT,O Opportunity achou numa rocha. É uma pista de que ela já foi molhada.,Opportunity found it in a rock. It is a clue that the rock was once wet.,Opportunity found it in a rock. It is a clue that the rock was once wet.,Opportunity found it in a rock. It is a clue that the rock was once wet.
 CARD_9_NAME,Enxofre,Sulfur,Sulfur,Sulfur
 CARD_9_FACT,Cristais amarelos que o Curiosity achou ao quebrar uma pedra (2024).,Yellow crystals Curiosity found when it cracked a rock (2024).,Yellow crystals Curiosity found when it cracked a rock (2024).,Yellow crystals Curiosity found when it cracked a rock (2024).
 CARD_10_NAME,Manchas de leopardo,Leopard spots,Leopard spots,Leopard spots
@@ -155,19 +159,19 @@ CARD_10_FACT,Manchinhas na rocha Cheyava Falls: talvez um sinal de vida antiga.,
 CARD_11_NAME,Painel solar,Solar panel,Solar panel,Solar panel
 CARD_11_FACT,Marte recebe no máximo 45% da luz do Sol que chega na Terra.,Mars gets at most 45% of the sunlight that reaches Earth.,Mars gets at most 45% of the sunlight that reaches Earth.,Mars gets at most 45% of the sunlight that reaches Earth.
 CARD_12_NAME,Bateria nuclear (RTG),Nuclear battery (RTG),Nuclear battery (RTG),Nuclear battery (RTG)
-CARD_12_FACT,"Dá pouca energia, mas funciona dia e noite, com ou sem poeira. O Curiosity usa uma.","A little power, but it works day and night, dust or no dust. Curiosity uses one.","A little power, but it works day and night, dust or no dust. Curiosity uses one.","A little power, but it works day and night, dust or no dust. Curiosity uses one."
+CARD_12_FACT,O Curiosity tira a energia dela. Funciona até no escuro e na poeira.,Curiosity gets its power from one. It works even in the dark and the dust.,Curiosity gets its power from one. It works even in the dark and the dust.,Curiosity gets its power from one. It works even in the dark and the dust.
 CARD_13_NAME,MOXIE,MOXIE,MOXIE,MOXIE
 CARD_13_FACT,Fez 122 g de oxigênio com o ar de Marte: o que um cachorro pequeno respira em 10 h.,It made 122 g of oxygen from Mars air: what a small dog breathes in 10 hours.,It made 122 g of oxygen from Mars air: what a small dog breathes in 10 hours.,It made 122 g of oxygen from Mars air: what a small dog breathes in 10 hours.
 CARD_14_NAME,Kilopower,Kilopower,Kilopower,Kilopower
 CARD_14_FACT,Uma mini usina nuclear que a NASA testou para futuras bases.,A mini nuclear power plant NASA tested for future bases.,A mini nuclear power plant NASA tested for future bases.,A mini nuclear power plant NASA tested for future bases.
 CARD_15_NAME,Ingenuity,Ingenuity,Ingenuity,Ingenuity
-CARD_15_FACT,O primeiro helicóptero a voar em outro planeta: 72 voos.,The first helicopter to fly on another planet: 72 flights.,The first helicopter to fly on another planet: 72 flights.,The first helicopter to fly on another planet: 72 flights.
+CARD_15_FACT,A primeira aeronave a voar em outro planeta: 72 voos.,The first aircraft to fly on another planet: 72 flights.,The first aircraft to fly on another planet: 72 flights.,The first aircraft to fly on another planet: 72 flights.
 CARD_16_NAME,Curiosity,Curiosity,Curiosity,Curiosity
 CARD_16_FACT,O robô que trabalha aqui na cratera Gale. Ele mediu a tempestade solar de 2024.,The rover working right here in Gale Crater. It measured the 2024 solar storm.,The rover working right here in Gale Crater. It measured the 2024 solar storm.,The rover working right here in Gale Crater. It measured the 2024 solar storm.
 CARD_17_NAME,Opportunity,Opportunity,Opportunity,Opportunity
 CARD_17_FACT,Parou de responder durante uma tempestade de poeira gigante (2018).,It stopped answering during a giant dust storm (2018).,It stopped answering during a giant dust storm (2018).,It stopped answering during a giant dust storm (2018).
 CARD_18_NAME,Perseverance,Perseverance,Perseverance,Perseverance
-CARD_18_FACT,Achou a rocha com manchas de leopardo e guarda amostras em tubos.,It found the rock with leopard spots and keeps samples in tubes.,It found the rock with leopard spots and keeps samples in tubes.,It found the rock with leopard spots and keeps samples in tubes.
+CARD_18_FACT,Achou a rocha com manchas de leopardo e tirou uma amostra dela (2024).,It found the rock with leopard spots and took a sample from it (2024).,It found the rock with leopard spots and took a sample from it (2024).,It found the rock with leopard spots and took a sample from it (2024).
 CARD_19_NAME,Sol (o dia de Marte),Sol (a Mars day),Sol (a Mars day),Sol (a Mars day)
 CARD_19_FACT,Um dia em Marte se chama sol e dura 24 h 39 min.,A day on Mars is called a sol and lasts 24 h 39 min.,A day on Mars is called a sol and lasts 24 h 39 min.,A day on Mars is called a sol and lasts 24 h 39 min.
 CARD_20_NAME,Frio da Gale,Gale cold,Gale cold,Gale cold
@@ -175,7 +179,7 @@ CARD_20_FACT,"Na cratera Gale, o dia chega perto de 0 °C e a noite perto de −
 CARD_21_NAME,Tempestade de poeira,Dust storm,Dust storm,Dust storm
 CARD_21_FACT,A poeira derrubou a energia do robô InSight de 5.000 para 500.,"Dust cut the InSight lander's power from 5,000 to 500.","Dust cut the InSight lander's power from 5,000 to 500.","Dust cut the InSight lander's power from 5,000 to 500."
 CARD_22_NAME,Redemoinho de poeira,Dust devil,Dust devil,Dust devil
-CARD_22_FACT,Redemoinhos de vento já limparam os painéis solares de robôs em Marte.,Whirlwinds have cleaned the solar panels of rovers on Mars.,Whirlwinds have cleaned the solar panels of rovers on Mars.,Whirlwinds have cleaned the solar panels of rovers on Mars.
+CARD_22_FACT,O vento de Marte soprou a poeira dos painéis solares do robô Spirit (2009).,Mars wind blew dust off the solar panels of the Spirit rover (2009).,Mars wind blew dust off the solar panels of the Spirit rover (2009).,Mars wind blew dust off the solar panels of the Spirit rover (2009).
 CARD_23_NAME,Tempestade solar de 2024,2024 solar storm,2024 solar storm,2024 solar storm
 CARD_23_FACT,O Curiosity mediu o mesmo que 30 raios-X de uma vez (20/05/2024).,"Curiosity measured the same as 30 chest X-rays at once (May 20, 2024).","Curiosity measured the same as 30 chest X-rays at once (May 20, 2024).","Curiosity measured the same as 30 chest X-rays at once (May 20, 2024)."
 CARD_24_NAME,Geada em Marte,Frost on Mars,Frost on Mars,Frost on Mars

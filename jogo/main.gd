@@ -8,3 +8,4 @@ extends Node
 func _ready() -> void:
 	hud.base = base
 	base.cell_tapped.connect(hud.on_cell_tapped)
+	base.mike_tapped.connect(hud.on_mike_tapped)
