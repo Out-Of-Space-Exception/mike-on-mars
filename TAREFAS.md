@@ -15,7 +15,7 @@
 - [x] 17h · [As telas](design/05-telas/PASSO.md)
 - [ ] 18h · [Logo e ícone](design/06-logo-e-icone/PASSO.md)
 - [x] 19h · [Ícones dos botões](design/07-icones-dos-botoes/PASSO.md)
-- [ ] 19h30 · [Teste no celular](design/08-teste-no-celular/PASSO.md)
+- [x] 19h30 · [Teste no celular](design/08-teste-no-celular/PASSO.md)
 - [ ] 20h · [Entrega](design/09-entrega/PASSO.md)
 
 ## ✍️ Conteúdo e pitch · Carolina e Davi · até 20h
