@@ -19,6 +19,7 @@ func _ready() -> void:
 	_jogo_fechado()
 	_ingenuity(main.get_node("Base"))
 	_niveis_e_album()
+	_girar_energia_oxigenio()
 	print("RESULTADO: ", "TUDO OK" if falhas == 0 else "%d FALHA(S)" % falhas)
 	get_tree().quit(falhas)
 
@@ -188,3 +189,35 @@ func _niveis_e_album() -> void:
 	_ticks(30)
 	State.harvest(Vector2i(0, 6))
 	ok(int(State.inventory.get("radish", 0)) == 1, "colher conta no inventário (rabanete × 1)")
+
+
+func _girar_energia_oxigenio() -> void:
+	State.new_game()
+	State.energy = 100.0
+	var casa := Vector2i(2, 3)
+	State.upgrade(casa)
+	ok(State.anchor_of(Vector2i(3, 3)) == casa, "casa nível 2 deitada ocupa a casa ao lado")
+	ok(State.rotate(casa) and State.anchor_of(Vector2i(2, 4)) == casa and State.anchor_of(Vector2i(3, 3)) == Vector2i(-1, -1), "girar a casa: a fileira vai para a frente")
+	State.energy = 100.0
+	State.build("solar", Vector2i(3, 3))
+	State.rotate(casa)
+	State.build("moxie", Vector2i(2, 4))
+	ok(State.rotate_block_reason(casa) == "NEED_SPACE", "não gira se a fileira nova não couber")
+	# Sem energia: a bateria de emergência da casa ajuda devagar.
+	State.new_game()
+	State.energy = 0.0
+	State.oxygen = 50.0
+	State._tick()
+	ok(State.energy > 0.0, "sem energia, a bateria de emergência da casa dá um pouquinho")
+	# Sem oxigênio: o Mike fica em casa; a planta faz oxigênio.
+	State.oxygen = 0.4
+	State._tick()
+	ok(State.oxygen <= 0.0 and State.mike_inside() and State.explore_block_reason() == "LOCK_OXYGEN", "sem oxigênio, o Mike fica em casa e não explora")
+	State.energy = 100.0
+	State.build("greenhouse", Vector2i(0, 0))
+	State.plant(Vector2i(0, 0), "lettuce")
+	State.oxygen = 10.0
+	var antes: float = State.oxygen
+	State.energy = 100.0
+	State._tick()
+	ok(is_equal_approx(State.oxygen, antes - State.OXYGEN_BREATH + State.PLANT_OXYGEN), "o Mike respira e a planta faz oxigênio")

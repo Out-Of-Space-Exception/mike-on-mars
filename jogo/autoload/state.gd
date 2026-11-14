@@ -24,6 +24,9 @@ const MAX_LEVEL := 3
 const LEVEL_BONUS := 0.5            # +50% de produção por nível acima do 1
 const UPGRADE_COST := {1: 20, 2: 40}  # energia para subir do nível N para N+1
 const SHIELD_RECHARGE := 2.0        # por sol, se a energia estiver acima de LOW
+const OXYGEN_BREATH := 0.5          # o Mike respira: gasta oxigênio todo sol
+const PLANT_OXYGEN := 0.3           # cada planta crescendo na estufa faz um pouco de oxigênio
+const EMERGENCY_ENERGY := 0.5       # bateria de emergência da casa, quando a energia está baixa
 const SLOW_GROWTH := 0.5            # com energia baixa, a planta cresce pela metade
 # "model" = nome do item no design/03-itens-do-jogo/itens.csv · "card" = carta ganha ao construir o 1º
 # "decor" = quantas cartas no álbum destravam a decoração · "max" = quantos dá para ter
@@ -34,7 +37,7 @@ const ITEMS := {
 	"rtg": {"name": "B_RTG", "cost": 30, "height": 1.0, "energy": 1.0, "model": "rtg", "card": 12},
 	"moxie": {"name": "B_MOXIE", "cost": 20, "height": 0.9, "energy": -1.0, "oxygen": 2.0, "model": "moxie", "card": 13},
 	"antenna": {"name": "B_ANTENNA", "cost": 15, "height": 1.0, "model": "decoracao-antena", "max": 1},
-	"pad": {"name": "B_PAD", "cost": 40, "height": 0.15, "card": 15, "max": 1},
+	"pad": {"name": "B_PAD", "cost": 40, "height": 0.15, "card": 15, "max": 1, "model": "plataforma-pouso"},
 	"flag": {"name": "D_FLAG", "cost": 0, "height": 1.4, "model": "decoracao-bandeira", "decor": 5},
 	"lights": {"name": "D_LIGHTS", "cost": 0, "height": 1.2, "model": "decoracao-luzinhas", "decor": 10},
 	"pot": {"name": "D_POT", "cost": 0, "height": 0.6, "model": "decoracao-vaso", "decor": 15},
@@ -164,6 +167,8 @@ func donki_count() -> int:
 ## Arquivo .glb do item no jogo (vem do itens.csv do Design), ou "" se ainda não tem.
 ## Com nível, procura a versão do nível (ex.: casa-do-mike-n2.glb).
 func model_file(model_name: String, level := 1) -> String:
+	if model_name == "rtg" and level >= MAX_LEVEL and _models.get("files", {}).has("kilopower"):
+		return _models.files.kilopower   # o RTG no nível 3 vira o Kilopower (modelo do design/03)
 	var file: String = _models.get("files", {}).get(model_name, "")
 	if level > 1 and file.contains("-n1."):
 		var leveled := file.replace("-n1.", "-n%d." % level)
@@ -280,18 +285,24 @@ static func width_of(type: String, level: int) -> int:
 	return int(sizes[clampi(level - 1, 0, sizes.size() - 1)])
 
 
-static func cells_of(anchor: Vector2i, type: String, level: int) -> Array[Vector2i]:
+## As casas que o item ocupa. Girado de lado (rot 1 ou 3), a fileira vai para a frente em vez de para o lado.
+static func cells_of(anchor: Vector2i, type: String, level: int, rot := 0) -> Array[Vector2i]:
 	var out: Array[Vector2i] = []
+	var step := Vector2i(1, 0) if rot % 2 == 0 else Vector2i(0, 1)
 	for i in width_of(type, level):
-		out.append(anchor + Vector2i(i, 0))
+		out.append(anchor + step * i)
 	return out
+
+
+static func item_cells(anchor_key: String, it: Dictionary) -> Array[Vector2i]:
+	return cells_of(parse_key(anchor_key), it.type, int(it.level), int(it.get("rot", 0)))
 
 
 ## Mapa "casa ocupada" -> "casa âncora do item que está nela".
 func _occupancy() -> Dictionary:
 	var occ := {}
 	for k in items:
-		for c in cells_of(parse_key(k), items[k].type, int(items[k].level)):
+		for c in item_cells(k, items[k]):
 			occ[key(c)] = k
 	return occ
 
@@ -308,9 +319,9 @@ func item_at(c: Vector2i) -> Dictionary:
 
 
 ## Dá para pôr este item (neste nível) com a âncora em c? (ignore = o próprio item, ao mover ou melhorar)
-func can_place(type: String, level: int, c: Vector2i, ignore := "") -> bool:
+func can_place(type: String, level: int, c: Vector2i, ignore := "", rot := 0) -> bool:
 	var occ := _occupancy()
-	for cell in cells_of(c, type, level):
+	for cell in cells_of(c, type, level, rot):
 		if not in_grid(cell) or (occ.has(key(cell)) and occ[key(cell)] != ignore):
 			return false
 	return true
@@ -349,9 +360,29 @@ func move_targets(from: Vector2i) -> Array[Vector2i]:
 		return out
 	for x in GRID_W:
 		for y in GRID_H:
-			if Vector2i(x, y) != from and can_place(it.type, int(it.level), Vector2i(x, y), key(from)):
+			if Vector2i(x, y) != from and can_place(it.type, int(it.level), Vector2i(x, y), key(from), int(it.get("rot", 0))):
 				out.append(Vector2i(x, y))
 	return out
+
+
+## Girar 90°. Quem ocupa mais de uma casa só gira se a fileira nova couber.
+func rotate_block_reason(c: Vector2i) -> String:
+	var it: Dictionary = items.get(key(c), {})
+	if it.is_empty():
+		return "MAX_LEVEL"
+	if base_locked_reason() != "":
+		return base_locked_reason()
+	if not can_place(it.type, int(it.level), c, key(c), (int(it.get("rot", 0)) + 1) % 4):
+		return "NEED_SPACE"
+	return ""
+
+
+func rotate(c: Vector2i) -> bool:
+	if rotate_block_reason(c) != "":
+		return false
+	items[key(c)].rot = (int(items[key(c)].get("rot", 0)) + 1) % 4
+	_after_action()
+	return true
 
 
 # ───────────── Ações (cada uma salva e avisa a tela) ─────────────
@@ -398,7 +429,7 @@ func move(from: Vector2i, to: Vector2i) -> bool:
 	if base_locked_reason() != "" or not items.has(key(from)) or from == to:
 		return false
 	var it: Dictionary = items[key(from)]
-	if not can_place(it.type, int(it.level), to, key(from)):
+	if not can_place(it.type, int(it.level), to, key(from), int(it.get("rot", 0))):
 		return false
 	items[key(to)] = items[key(from)]
 	items.erase(key(from))
@@ -408,7 +439,7 @@ func move(from: Vector2i, to: Vector2i) -> bool:
 
 func upgrade_cost(c: Vector2i) -> int:
 	var it := item_at(c)
-	if it.is_empty() or ITEMS[it.type].has("decor") or ITEMS[it.type].has("max"):
+	if it.is_empty():
 		return -1
 	return UPGRADE_COST.get(int(it.level), -1)
 
@@ -421,7 +452,7 @@ func upgrade_block_reason(c: Vector2i) -> String:
 		return "MAX_LEVEL"
 	if base_locked_reason() != "":
 		return base_locked_reason()
-	if not can_place(it.type, int(it.level) + 1, c, key(c)):
+	if not can_place(it.type, int(it.level) + 1, c, key(c), int(it.get("rot", 0))):
 		return "NEED_SPACE"
 	if not can_afford(cost):
 		return "NEED_ENERGY"
@@ -529,10 +560,10 @@ func exploring() -> bool:
 func explore_block_reason() -> String:
 	if base_locked_reason() != "":
 		return base_locked_reason()
-	if mike_inside():
-		return "LOCK_STORM"
 	if oxygen < EXPLORE_OXYGEN:
 		return "LOCK_OXYGEN"
+	if mike_inside():
+		return "LOCK_STORM"
 	return ""
 
 
@@ -593,7 +624,7 @@ func storm_active() -> bool:
 
 ## Sem escudo, o Mike fica em casa até a tempestade passar (não sai para explorar).
 func mike_inside() -> bool:
-	return storm_left > 0 and not storm_shielded
+	return (storm_left > 0 and not storm_shielded) or oxygen <= 0.0
 
 
 func choose_storm(raise_shield: bool) -> bool:
@@ -748,13 +779,27 @@ func _tick() -> void:
 		# O MOXIE precisa de energia para fazer oxigênio, como o de verdade.
 		if def.has("oxygen") and energy > 0.0:
 			d_oxygen += def.oxygen * bonus
-		if it.type == "greenhouse" and it.plant != "" and not greenhouse_off:
+		if it.type == "greenhouse" and it.plant != "" and not greenhouse_off and energy > 0.0:
 			var speed := 1.0 if energy >= LOW else SLOW_GROWTH
 			if cold_left > 0 and not cold_heated:
 				speed = COLD_GROWTH
 			it.growth += speed * (1.0 + GREENHOUSE_LEVEL_SPEED * (int(it.level) - 1))
+			# Planta crescendo faz oxigênio (fotossíntese), como na Estação Espacial.
+			d_oxygen += PLANT_OXYGEN
+	# O Mike respira. E a casa tem uma bateria de emergência: com pouca energia, ela ajuda devagar
+	# (assim a criança nunca fica presa sem conseguir construir nada).
+	d_oxygen -= OXYGEN_BREATH
+	if energy < LOW:
+		d_energy += EMERGENCY_ENERGY
+	var had_energy := energy > 0.0
+	var had_oxygen := oxygen > 0.0
 	energy = clampf(energy + d_energy, 0.0, BAR_MAX)
 	oxygen = clampf(oxygen + d_oxygen, 0.0, BAR_MAX)
+	if not _offline:
+		if had_energy and energy <= 0.0:
+			event_message.emit("OUT_ENERGY", "")
+		if had_oxygen and oxygen <= 0.0:
+			event_message.emit("OUT_OXYGEN", "")
 	if energy > LOW:
 		shield = minf(BAR_MAX, shield + SHIELD_RECHARGE)
 	sol += 1
@@ -873,7 +918,7 @@ func _read_json(path: String, fallback: Variant = {}) -> Variant:
 
 
 func _new_item(type: String) -> Dictionary:
-	return {"type": type, "level": 1, "plant": "", "growth": 0.0, "spent": 0.0}
+	return {"type": type, "level": 1, "plant": "", "growth": 0.0, "spent": 0.0, "rot": 0}
 
 
 func _after_action() -> void:

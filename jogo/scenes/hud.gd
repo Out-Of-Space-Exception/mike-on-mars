@@ -91,10 +91,16 @@ func _ready() -> void:
 	State.storm_started.connect(_show_storm)
 	State.storm_ended.connect(func(_s: bool) -> void: _show_toast(tr("STORM_OVER")))
 	State.event_started.connect(_show_event)
-	State.event_message.connect(func(k: String, extra: String) -> void: _show_toast(tr(k).format({"name": extra})))
+	State.event_message.connect(_on_event_message)
 	State.card_won.connect(_queue_card)
 	State.explore_returned.connect(func(_id: int) -> void: get_tree().create_timer(1.6).timeout.connect(_show_tube))
 	_refresh()
+
+
+func _on_event_message(key: String, extra: String) -> void:
+	_show_toast(tr(key).format({"name": extra}))
+	if key.begins_with("OUT_"):
+		Sfx.play("alerta")
 
 
 # ───────────── Tela inicial ─────────────
@@ -281,6 +287,7 @@ func _refresh_panel() -> void:
 	if State.base_locked_reason() != "":
 		return
 	_add_panel_button(tr("BTN_MOVE"), _on_move)
+	_add_panel_button(tr("BTN_ROTATE"), _on_rotate)
 	var cost := State.upgrade_cost(selected)
 	if cost >= 0:
 		var up := _add_panel_button("%s -%d" % [tr("BTN_UPGRADE"), cost], _on_upgrade)
@@ -303,6 +310,15 @@ func _on_move() -> void:
 	Sfx.play("toque-botao")
 	_panel.visible = false
 	_set_mode(Mode.MOVE)
+
+
+func _on_rotate() -> void:
+	var reason := State.rotate_block_reason(selected)
+	if reason == "" and State.rotate(selected):
+		Sfx.play("construir")
+	else:
+		_show_toast(tr(reason))
+		Sfx.play("travado")
 
 
 func _on_upgrade() -> void:
@@ -560,6 +576,10 @@ func _status_text() -> String:
 		return tr("TUT_BUILD")
 	if mode == Mode.MOVE:
 		return tr("MOVE_HINT")
+	if State.oxygen <= 0.0:
+		return tr("OUT_OXYGEN_HINT")
+	if State.energy <= 0.0:
+		return tr("OUT_ENERGY_HINT")
 	if State.cold_left > 0:
 		return tr("COLD_LEFT").format({"n": State.cold_left})
 	if State.dust_left > 0:

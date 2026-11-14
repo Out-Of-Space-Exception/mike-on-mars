@@ -127,6 +127,11 @@ HOW_PACKAGE,"Chega no pacote da Terra, depois do evento Sem sinal.","It comes in
 HOW_TIME,Continue jogando: ela chega com o tempo.,Keep playing: it comes with time.,Keep playing: it comes with time.,Keep playing: it comes with time.
 HOW_TUBE,Explore: pode vir no tubo de amostra.,Explore: it can come in the sample tube.,Explore: it can come in the sample tube.,Explore: it can come in the sample tube.
 HOW_LOCKED,Em breve: está em outro lugar de Marte.,Coming soon: it's in another place on Mars.,Coming soon: it's in another place on Mars.,Coming soon: it's in another place on Mars.
+BTN_ROTATE,Girar,Rotate,Rotate,Rotate
+OUT_ENERGY,Apagão! Acabou a energia.,Blackout! The energy ran out.,Blackout! The energy ran out.,Blackout! The energy ran out.
+OUT_OXYGEN,Acabou o oxigênio! O Mike ficou em casa.,Out of oxygen! Mike stays inside.,Out of oxygen! Mike stays inside.,Out of oxygen! Mike stays inside.
+OUT_ENERGY_HINT,Sem energia: construa um painel solar ou um RTG.,No energy: build a solar panel or an RTG.,No energy: build a solar panel or an RTG.,No energy: build a solar panel or an RTG.
+OUT_OXYGEN_HINT,Sem oxigênio: construa o MOXIE ou plante na estufa.,No oxygen: build a MOXIE or plant in the greenhouse.,No oxygen: build a MOXIE or plant in the greenhouse.,No oxygen: build a MOXIE or plant in the greenhouse.
 CARD_1_NAME,Alface,Lettuce,Lettuce,Lettuce
 CARD_1_FACT,"Os astronautas comeram alface plantada no espaço, em 10/08/2015.","Astronauts ate lettuce grown in space on August 10, 2015.","Astronauts ate lettuce grown in space on August 10, 2015.","Astronauts ate lettuce grown in space on August 10, 2015."
 CARD_2_NAME,Rabanete,Radish,Radish,Radish
