@@ -6,3 +6,8 @@ ia,Claude (Anthropic): sugeriu a paleta de 5 cores e a fonte e conferiu o contra
 modelo,Animated Characters Protagonists (pacote 3D),Mike (characterMedium + skin repintada de criminalMaleA + cabelo 3D do time),Kenney,CC0,https://kenney.nl/assets/animated-characters-protagonists,Design
 ia,Claude (Anthropic): repintou a skin do Mike e modelou o cabelo 3D no Blender (script mike-cabelo3d.py) e montou o mike.png,design/01-mike,Anthropic,-,https://claude.ai,Design
 ferramenta,Blender 5.3,modelar o cabelo 3D do Mike,Blender Foundation,GPL,https://www.blender.org/about/license/,Design
+modelo,Food Kit (pacote 3D),itens do jogo (plantas),Kenney,CC0,https://kenney.nl/assets/food-kit,Design
+modelo,Nature Kit (pacote 3D),itens do jogo (zínia + pedra + vaso),Kenney,CC0,https://kenney.nl/assets/nature-kit,Design
+modelo,Space Kit (pacote 3D),itens do jogo (máquinas + pedras + antena),Kenney,CC0,https://kenney.nl/assets/space-kit,Design
+imagem,Skyboxes,céu da base (skybox-morning),Kenney,CC0,https://kenney.nl/assets/skyboxes,Design
+ia,Claude (Anthropic): escolheu os itens com a dupla e modelou no Blender o painel solar + a bandeira + as luzinhas (modelos-novos.py),design/03-itens-do-jogo,Anthropic,-,https://claude.ai,Design

@@ -1,0 +1,18 @@
+item_do_jogo,pacote,arquivo_do_modelo,observacao
+alface,Food Kit,cabbage.glb,o pacote não tem alface solta; o repolho parece um pé de alface
+pimenta,Food Kit,pepper.glb,pimenta vermelha
+rabanete,Food Kit,radish.glb,
+couve,Food Kit,NAO-TEM,não achei no Food Kit nem no Nature Kit
+batata,Food Kit,NAO-TEM,não achei no Food Kit nem no Nature Kit
+zinia,Nature Kit,flower_redA.glb,flor vermelha (combina com a paleta)
+hematita,Space Kit,rocks_smallA.glb,pedrinhas pequenas (as bolinhas de hematita); cor no passo 04
+enxofre,Space Kit,rock_crystals.glb,pedra com cristais; pintar de amarelo no passo 04
+leopardo,Nature Kit,rock_smallA.glb,pedra lisa para pintar as manchas no passo 04
+painel-solar,feito pelo time (Blender),painel-solar.glb,não existe no Space Kit; moldura dourada #E8B23A; arquivo nesta pasta
+moxie,Space Kit,machine_generator.glb,pintar de dourado no passo 04
+rtg,Space Kit,machine_barrel.glb,
+ceu,Skyboxes,skybox-morning.png,céu pêssego/caramelo
+decoracao-bandeira,feito pelo time (Blender),decoracao-bandeira.glb,mastro dourado e flâmula vermelha (sem bandeira de país nem da NASA); arquivo nesta pasta
+decoracao-luzinhas,feito pelo time (Blender),decoracao-luzinhas.glb,postes dourados e lâmpadas que brilham; arquivo nesta pasta
+decoracao-vaso,Nature Kit,pot_small.glb,vaso de terracota
+decoracao-antena,Space Kit,satelliteDish.glb,
