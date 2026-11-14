@@ -1,13 +1,17 @@
 # Telas
 - Link: sem Figma; as telas são feitas direto no Godot (arquivos nesta pasta)
 - tela-carregamento.png (extra): Marte 3D girando, a nave branca e dourada é a barra de progresso e deixa um rastro de constelação dourado
-- tela-inicial.png: a fazer
-- hud-barras.png: a fazer
-- album.png: a fazer
-- carta.png: a fazer
-- aviso-tempestade.png: a fazer
-- tubo-revelacao.png: a fazer
-- cartao-postal.png: a fazer
+- tela-inicial.png: título, o Mike correndo com o rastro de constelação, o horizonte de Marte e o botão Play
+- hud-barras.png: a base 3D, as 3 barras (Energy dourada, Oxygen creme, Shield terracota), "Sol 12 · Gale Crater" e 4 botões (Build, Explore, Album, Photo); o Mike deixa o rastro ao correr
+- album.png: "8/40 cards" e a grade de cartas com borda na cor da raridade; as que faltam ficam apagadas com "?"; o resto rola para baixo
+- carta.png: "New card!", foto da NASA, etiqueta Rare, MOXIE, "This is real:" e o fato, com o rastro em volta da carta
+- aviso-tempestade.png: sol, "Solar storm coming!", a data real do DONKI (20/05/2024) e 2 botões grandes: escudo ou ficar dentro
+- tubo-revelacao.png: o tubo de amostra tremendo e brilhando em azul (raro), "Tap to open!" e "Rare"
+- cartao-postal.png: foto da base com moldura creme e dourada, selo e "Sol 47 · Gale Crater"
+
+## Como as telas foram feitas
+- Todas foram montadas no Godot com o código da pasta [telas-godot](telas-godot/) ([telas.gd](telas-godot/telas.gd)), com as 5 cores do cores.csv, as cores de raridade do design/04 e a fonte Rubik. O Dev pode copiar dali tamanhos, cores e posições.
+- Ícones da Kenney (Game Icons): wrench (Build), target (Explore), menuGrid (Album), home (Mike stays inside). Raio, oxigênio, escudo, câmera e sol não existem nos pacotes: foram desenhados simples no código; a escolha final é do passo 07.
 
 ## Para o Dev: a tela de carregamento (pasta [carregamento](carregamento/))
 - [tela_carregamento.tscn](carregamento/tela_carregamento.tscn) + [tela_carregamento.gd](carregamento/tela_carregamento.gd): a tela pronta. Mude `progresso` (0.0 a 1.0) enquanto o jogo carrega e desligue `demo`. O caminho no `.tscn` supõe a pasta copiada para `res://design/05-telas/carregamento/`; ajuste se mover.

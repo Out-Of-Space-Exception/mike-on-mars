@@ -14,3 +14,5 @@ ia,Claude (Anthropic): escolheu os itens com a dupla e modelou no Blender o pain
 ia,Claude (Anthropic): repintou hematita + enxofre + MOXIE + vaso e fez no Blender a textura do leopardo e o pé de pimenta,design/04-cores-das-coisas e design/03-itens-do-jogo,Anthropic,-,https://claude.ai,Design
 modelo,Space Kit (craft_speederA),nave da tela de carregamento (pintada de branco e dourado),Kenney,CC0,https://kenney.nl/assets/space-kit,Design
 ia,Claude (Anthropic): fez a tela de carregamento no Godot (Marte em shader + nave + efeito de constelação constelacao_rastro.gd),design/05-telas,Anthropic,-,https://claude.ai,Design
+icone,Game Icons (wrench + target + menuGrid + home),botões das telas,Kenney,CC0,https://kenney.nl/assets/game-icons,Design
+ia,Claude (Anthropic): montou as 7 telas do passo 05 no Godot (telas.gd) e renderizou o Mike e a base no Blender,design/05-telas,Anthropic,-,https://claude.ai,Design
