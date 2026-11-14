@@ -32,3 +32,4 @@ ia,Claude (Anthropic): modelou a casa do Mike no Blender (casa-do-mike.py) e rep
 ia,Claude (Anthropic): modelou no Blender os 3 níveis de casa do Mike + estufa + painel solar (niveis/construcoes.py),design/03-itens-do-jogo/niveis,Anthropic,-,https://claude.ai,Design
 ia,Claude (Anthropic): juntou as animações idle/run/jump no mike.glb e escolheu com a dupla os ícones dos botões (icones.csv),design/01-mike e design/07-icones-dos-botoes,Anthropic,-,https://claude.ai,Design
 ia,Claude (Anthropic): criou o céu de Marte + a textura do chão + o terreno com crateras e o efeito de poeira (pasta cenario),design/03-itens-do-jogo/cenario,Anthropic,-,https://claude.ai,Design
+ia,Claude (Anthropic): modelou no Blender os 3 níveis de MOXIE + RTG + antena + plataforma de pouso + bandeira + luzinhas + vaso (niveis/construcoes-2.py),design/03-itens-do-jogo/niveis,Anthropic,-,https://claude.ai,Design

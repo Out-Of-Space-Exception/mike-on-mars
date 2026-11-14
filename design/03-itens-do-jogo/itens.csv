@@ -9,15 +9,16 @@ hematita,Space Kit,rocks_smallA.glb,pintada de cinza-escuro: design/04-cores-das
 enxofre,Space Kit,rock_crystals.glb,cristais amarelos: design/04-cores-das-coisas/enxofre.glb
 leopardo,Space Kit,rock_largeA.glb,com textura de jaspe-leopardo: design/04-cores-das-coisas/leopardo.glb
 painel-solar,feito pelo time (Blender),niveis/painel-solar-n1.glb,3 níveis de upgrade: niveis/painel-solar-n1.glb / n2.glb / n3.glb (1 painel → 2 com escovinha → 6 com bateria)
-moxie,Space Kit,machine_generator.glb,pintado de dourado: design/04-cores-das-coisas/moxie.glb
-rtg,Space Kit,machine_barrel.glb,arquivo: design/03-itens-do-jogo/kenney/machine-barrel.glb
+moxie,Space Kit,machine_generator.glb,pintado de dourado: design/04-cores-das-coisas/moxie.glb; 3 níveis: niveis/moxie-n1.glb / n2 / n3
+rtg,Space Kit,machine_barrel.glb,arquivo: design/03-itens-do-jogo/kenney/machine-barrel.glb; 3 níveis: niveis/rtg-n1.glb / n2 / n3 (nível 3 = Kilopower)
 ceu,feito pelo time (Godot),cenario/ceu-marte.png,céu 360° (equiretangular 4096x2048) com Sol + Fobos + Deimos + poeira + estrelinhas douradas; substitui o skybox-morning.png; receita: cenario/ceu.gd
-decoracao-bandeira,feito pelo time (Blender),decoracao-bandeira.glb,mastro dourado e flâmula vermelha (sem bandeira de país nem da NASA); arquivo nesta pasta
-decoracao-luzinhas,feito pelo time (Blender),decoracao-luzinhas.glb,postes dourados e lâmpadas que brilham; arquivo nesta pasta
-decoracao-vaso,Nature Kit,pot_small.glb,creme para não sumir no chão de Marte: design/04-cores-das-coisas/decoracao-vaso.glb
-decoracao-antena,Space Kit,satelliteDish.glb,arquivo: design/03-itens-do-jogo/kenney/satellite-dish.glb
+decoracao-bandeira,feito pelo time (Blender),decoracao-bandeira.glb,mastro dourado e flâmula vermelha (sem bandeira de país nem da NASA); arquivo nesta pasta; 3 níveis: niveis/decoracao-bandeira-n1.glb / n2 / n3
+decoracao-luzinhas,feito pelo time (Blender),decoracao-luzinhas.glb,postes dourados e lâmpadas que brilham; arquivo nesta pasta; 3 níveis: niveis/decoracao-luzinhas-n1.glb / n2 / n3
+decoracao-vaso,Nature Kit,pot_small.glb,creme para não sumir no chão de Marte: design/04-cores-das-coisas/decoracao-vaso.glb; 3 níveis: niveis/decoracao-vaso-n1.glb / n2 / n3
+decoracao-antena,Space Kit,satelliteDish.glb,arquivo: design/03-itens-do-jogo/kenney/satellite-dish.glb; 3 níveis: niveis/decoracao-antena-n1.glb / n2 / n3
 casa-do-mike,feito pelo time (Blender),niveis/casa-do-mike-n1.glb,3 níveis de upgrade: niveis/casa-do-mike-n1.glb / n2.glb / n3.glb (o casa-do-mike.glb antigo = nível 2)
 cenario-paredes,Modular Dungeon Kit,colormap-marte.png,paredes creme com base dourada e pilares vinho; chão de terra do kit; troque o Textures/colormap.png do kit por design/03-itens-do-jogo/kenney/modular-dungeon-kit/colormap-marte.png
 estufa,feito pelo time (Blender),niveis/estufa-n1.glb,3 níveis de upgrade: niveis/estufa-n1.glb / n2.glb / n3.glb (cúpula → túnel → túnel com cúpula e caixa d’água)
 chao,feito pelo time (Godot + Blender),cenario/terreno-marte.glb,terreno com centro plano (base) + morros + dunas + 3 crateras + planaltos; textura sem emenda cenario/chao-marte.png (1024x1024); receitas: cenario/terreno.py e cenario/chao.gd
 efeito-poeira,feito pelo time (Godot),cenario/poeira_flutuando.gd,poeirinha dourada flutuando no ar da base (CPUParticles3D); é só adicionar na cena da base
+plataforma-pouso,feito pelo time (Blender),niveis/plataforma-pouso-n1.glb,3 níveis: niveis/plataforma-pouso-n1.glb / n2 / n3 (no jogo: pad)
