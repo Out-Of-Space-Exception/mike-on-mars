@@ -10,3 +10,4 @@
 - **Animações (já dentro do mike.glb):** `idle` (parado, 1,4 s), `run` (correr, 0,7 s) e `jump` (pular, 0,5 s), do pacote da Kenney. Use o `AnimationPlayer` do modelo; o cabelo acompanha a cabeça.
 - **Editar:** a pintura em [mike-skin.svg](mike-skin.svg); o cabelo é gerado pelo script [mike-cabelo3d.py](mike-cabelo3d.py) no Blender 5.3 (`blender --background --python mike-cabelo3d.py -- <characterMedium.fbx> <mike-skin.png> <prefixo-das-fotos> <saida.glb>`).
 - [mike.png](mike.png): o Mike de frente, 3/4, lado e costas no céu caramelo.
+- **Mike astronauta:** [mike-astronauta.glb](mike-astronauta.glb) (mesmas animações; capacete, gola e mochila presos aos ossos `Head` e `UpperChest`), textura [mike-astronauta-skin.png](mike-astronauta-skin.png), prévia [mike-astronauta.png](mike-astronauta.png).

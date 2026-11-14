@@ -38,3 +38,4 @@ imagem,Modelo da moldura das cartas,design/05-telas/moldura-carta-*.png,CONFERIR
 ia,Claude (Anthropic): refez o título do logo com a Junegull e borda #F2D091 e tirou o fundo do espaço (logo.png),design/06-logo-e-icone,Anthropic,-,https://claude.ai,Design
 ia,Claude (Anthropic): adaptou a moldura das cartas (símbolo e cor da borda por raridade + janela da foto),design/05-telas,Anthropic,-,https://claude.ai,Design
 ia,Claude (Anthropic): modelou o Kilopower no Blender (kilopower.py),design/03-itens-do-jogo,Anthropic,-,https://claude.ai,Design
+ia,Claude (Anthropic): criou o Mike astronauta no Blender (capacete + gola + mochila + textura do traje),design/01-mike,Anthropic,-,https://claude.ai,Design
