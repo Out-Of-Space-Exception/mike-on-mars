@@ -1,6 +1,8 @@
 # CONTEXTO — Mike on Mars (NASA Space Apps 2026)
 
-> **Como usar:** cole este arquivo inteiro no começo da conversa com qualquer IA (Gemini, ChatGPT etc.) e escreva: *"Use este contexto em tudo o que você fizer comigo. Se algo não estiver aqui, pergunte antes de inventar."* Depois, peça a sua tarefa.
+> **No repositório?** Comece pelo [AGENTS.md](AGENTS.md).
+>
+> **Como usar:** cole este arquivo inteiro no começo da conversa com qualquer IA e escreva: *"Use este contexto em tudo o que você fizer comigo. Se algo não estiver aqui, pergunte antes de inventar."* Depois, peça a sua tarefa.
 >
 > **Regra do Space Apps:** sempre que usar IA, avise no grupo **o que** foi feito com IA. A gente precisa declarar isso na entrega.
 
@@ -15,7 +17,7 @@ Você está ajudando o time **Out of Space Exception** (Brasil) no NASA Space Ap
 3. **Idioma:** tudo o que o jurado ou o jogador lê sai em **inglês simples**, a menos que eu peça outro. O jogo também terá português (Brasil), espanhol e francês.
 4. **Nada de logo, bandeira ou marca da NASA** em imagens, textos ou ícones gerados.
 5. **Imagem ou vídeo gerado por IA** precisa de marca d'água visível ("Made with AI").
-6. **Só sugira assets com licença CC0 ou CC-BY**, sempre com link, autor e licença.
+6. **Só sugira assets com licença CC0 ou CC-BY** (fontes: também OFL), sempre com link, autor e licença.
 7. **Respostas curtas e diretas.** Sem enrolação.
 
 ---
