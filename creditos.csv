@@ -39,3 +39,4 @@ ia,Claude (Anthropic): refez o título do logo com a Junegull e borda #F2D091 e 
 ia,Claude (Anthropic): adaptou a moldura das cartas (símbolo e cor da borda por raridade + janela da foto),design/05-telas,Anthropic,-,https://claude.ai,Design
 ia,Claude (Anthropic): modelou o Kilopower no Blender (kilopower.py),design/03-itens-do-jogo,Anthropic,-,https://claude.ai,Design
 ia,Claude (Anthropic): procurou e conferiu nas páginas da NASA as fontes de 12 cartas e reescreveu os fatos que a fonte não dizia,conteudo/02-cartas,Anthropic,-,https://claude.ai,Conteúdo
+ia,Claude (Anthropic): escreveu com a dupla o texto dos 7 slides (slides.md) a partir do CONTEXTO.md e do cartas.csv,conteudo/04-slides,Anthropic,-,https://claude.ai,Conteúdo
