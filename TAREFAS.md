@@ -23,7 +23,7 @@
 - [ ] 12h30 · [Os sons](conteudo/01-sons/PASSO.md)
 - [ ] 15h · [As cartas](conteudo/02-cartas/PASSO.md)
 - [ ] 16h · [Textos das cartas e dos avisos](conteudo/03-textos/PASSO.md)
-- [ ] 17h · [Slides](conteudo/04-slides/PASSO.md)
+- [x] 17h · [Slides](conteudo/04-slides/PASSO.md) — versão de apoio em pt-BR aprovada pelo time; publicação no repositório autorizada. Demo oficial escolhida: vídeo em inglês.
 - [ ] 17h30 · [Traduções](conteudo/05-traducoes/PASSO.md)
 - [ ] 18h30 · [Texto da página do projeto](conteudo/06-pagina-do-projeto/PASSO.md)
 - [x] 19h · [Roteiro do vídeo](conteudo/07-roteiro-do-video/PASSO.md)

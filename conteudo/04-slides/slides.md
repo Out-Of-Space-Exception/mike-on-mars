@@ -1,65 +1,81 @@
-# Slides · Mike on Mars
-Link: COLE AQUI O LINK DO GOOGLE SLIDES OU DO CANVA
+# Slides - Mike em Marte
 
-## 1. Title
-**Mike on Mars**
-Help astronaut Mike run a base on Mars and make the hard choices of a real mission.
-- Team: Out of Space Exception (Brazil)
-- Challenge: Build a Junior Astronaut Mission Trainer
-- Play now: out-of-space-exception.github.io/mike-on-mars
+Apresentação editável: [slides.pptx](slides.pptx). PDF: [slides.pdf](slides.pdf).
 
-Imagem: print do Mike na base, tirado do jogo + QR code (`ferramentas/qr-code.png`).
+Versão em português do Brasil aprovada pelo time para uso interno. Sete slides, horizontal 16:9, com a paleta e a fonte Rubik do projeto. As capturas reais permanecem com a interface original em inglês. O PDF preserva os slides como imagens; editar textos no PPTX ou na apresentação ao vivo.
 
-## 2. Problem
-**Real missions are full of hard choices**
-- On Mars, astronauts must share power, air and protection.
-- Every choice has a cost: Mars gets at most 45% of the sunlight Earth gets, and dust makes it worse.
-- How can kids aged 7 to 12 feel these choices, not just read about them?
+A pedido do time, esta entrega substitui o rascunho em inglês. Publicação no repositório autorizada pelo time. Não é a demo oficial de submissão, para a qual o time escolheu o vídeo em inglês. Não há pendência de Google Slides/Canva para esta versão interna.
 
-Imagem: foto da carta "Dust storm" (InSight). Crédito embaixo: copiar da página https://science.nasa.gov/resource/insights-power-generation-after-landing-and-spring-2022/
-Fonte do 45%: https://www.nasa.gov/wp-content/uploads/2024/01/mars-surface-power-generation-challenges-and-considerations.pdf
+## 1. Título
+**Mike em Marte**
 
-## 3. Solution
-**A Mars base in your pocket**
-- Run a base in Gale Crater, where the Curiosity rover works.
-- Plays in the phone browser: no login, no download.
-- Your base is saved and keeps growing while you are away.
+Um jogo para crianças praticarem como cuidar de uma base em Marte
 
-Imagem: print da base (estufa, painel solar e o Ingenuity voando atrás do Mike).
+- Out of Space Exception · Brasil
+- Desafio: criar um treinador de missões para jovens astronautas
+- Jogue no navegador: out-of-space-exception.github.io/mike-on-mars/
 
-## 4. How it works
-**Build, plant, explore**
-- 3 bars only: Energy, Oxygen and Shield.
-- Explore to bring back sample tubes. Each one opens a real card.
-- Events like solar storms always have a bad side and a good side. No game over.
+Imagem: logo original e QR code do jogo. Aviso: Made with AI · Arte do projeto.
 
-Imagem: print com as 3 barras e o aviso de tempestade solar.
+## 2. Problema
+**Escolhas de missão para 7–12 anos**
 
-## 5. NASA data
-**Real NASA science inside**
-- 140 real solar storms from 2024, from NASA's DONKI database. Archived data, not live.
-- 36 cards, each with a real NASA photo and a 1-line fact.
-- Example: MOXIE made 122 g of oxygen from Mars air.
+- Como praticar as escolhas de uma missão espacial?
+- Energia, oxigênio e proteção precisam de atenção.
+- Nosso desafio: transformar essas escolhas em um jogo.
 
-Sources: DONKI (https://kauai.ccmc.gsfc.nasa.gov/DONKI/) · nasa.gov · science.nasa.gov · jpl.nasa.gov
-Imagem: 3 fotos de cartas, cada uma com o crédito copiado da página:
-- Zinnia: https://www.nasa.gov/image-article/first-flower-grown-space-stations-veggie-facility/
-- Blue sunset: https://www.jpl.nasa.gov/images/pia19400-sunset-in-mars-gale-crater/
-- Leopard spots: https://www.nasa.gov/news-release/nasa-says-mars-rover-discovered-potential-biosignature-last-year/
-Fonte do MOXIE: https://www.nasa.gov/missions/mars-2020-perseverance/perseverance-rover/nasas-oxygen-generating-experiment-moxie-completes-mars-mission/
+Imagem: foto 38, pôr do sol em Gale. Foto: NASA/JPL-Caltech/MSSS/Texas A&M Univ.
+Fonte: https://www.jpl.nasa.gov/images/pia19400-sunset-in-mars-gale-crater/
 
-## 6. Impact
-**Learning that feels like winning**
-- Kids learn real names like MOXIE, Ingenuity and Curiosity. Each fact is a prize, never a lesson.
-- Free, in 4 languages: English, Portuguese, Spanish and French.
-- No login and no child data.
+## 3. Solução
+**Uma base em Marte no navegador**
 
-Imagem: print do cartão-postal ("Sol 47 · Gale").
+- Construa uma base. Cultive. Explore e faça descobertas.
+- Jogue no celular. Sem login. Sem baixar.
+- Salve sua base e volte para continuar jogando.
 
-## 7. Team
-**Out of Space Exception (Brazil)**
-- Content and pitch: Carolina and Davi
-- Design: Maria Fernanda and Thais
-- Game development: Filipe and João
+Imagem: captura-estufa-en.jpg, captura real da versão publicada em inglês em 15/11/2026. Avisos: Jogo publicado · Interface em inglês; Made with AI · Recursos do jogo; veja os créditos.
 
-Imagem: sem foto de pessoas. QR code do jogo + link do repositório: github.com/Out-Of-Space-Exception/mike-on-mars
+## 4. Como funciona
+**Construir, cultivar e explorar**
+
+- Cuide de três barras: Energia, Oxigênio e Escudo.
+- Construa, plante e explore para ampliar sua coleção.
+- Eventos trazem escolhas. Recursos baixos limitam ações, sem encerrar a partida.
+
+Imagem: captura-base-en.jpg, captura real da versão publicada em inglês. Aviso: Made with AI · Recursos do jogo; veja os créditos.
+
+## 5. Dados NASA
+**Ciência real da NASA no jogo**
+
+- NASA DONKI: Eventos solares do arquivo inspiram as tempestades.
+- 36 cartas de descobertas: Fotos da NASA, fatos curtos e links para as fontes.
+- Custos de recursos e escudo são regras simplificadas.
+
+Imagem: foto 09, enxofre. Cristais de enxofre · Foto: NASA/JPL-Caltech/MSSS.
+Fontes visíveis: ccmc.gsfc.nasa.gov/DONKI/ · science.nasa.gov
+Fontes completas nas notas: https://ccmc.gsfc.nasa.gov/DONKI/ e https://science.nasa.gov/resource/curiosity-views-sulfur-crystals-within-a-crushed-rock/
+Quantidade atual: 36, apos inclusao de Rocknest 3; atualizacao e82c03f e verificacao em jogo/test/game_test.gd. O CONTEXTO.md ainda cita 35; este slide acompanha a entrega atual, sem alterar o contexto de outra dupla.
+
+## 6. Impacto
+**Praticar a gestão de recursos**
+
+- Faça uma escolha. Veja o efeito. Ajuste o plano.
+- Descubra missões reais da NASA brincando.
+- Grátis e em quatro idiomas. Sem conta nem cadastro de dados pessoais.
+
+Imagem: foto 01, alface. Foto: NASA · Tripulação da Expedition 53.
+Fonte: https://www.nasa.gov/image-article/tending-your-garden-space/
+A foto é de 2017 e ilustra cultivo espacial; não representa a refeição de 2015. A proposta educativa não afirma resultados medidos de aprendizagem.
+
+## 7. Equipe
+**Out of Space Exception**
+
+- Conteúdo e apresentação: Carolina e Davi
+- Design: Maria Fernanda e Thais
+- Desenvolvimento do jogo: Filipe e João
+
+Imagem: QR code do jogo; sem fotos de participantes.
+Texto: Jogue Mike em Marte
+Repositório: github.com/Out-Of-Space-Exception/mike-on-mars
+Fontes e usos de IA nas notas: https://github.com/Out-Of-Space-Exception/mike-on-mars/blob/main/creditos.csv
