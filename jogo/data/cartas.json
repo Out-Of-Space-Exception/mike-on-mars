@@ -8,7 +8,6 @@
   "number": "33 dias para crescer",
   "source": "https://www.nasa.gov/mission_pages/station/research/news/veggie",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -18,9 +17,8 @@
   "how": "colher na estufa",
   "place": "Gale",
   "number": "27 dias",
-  "source": "https://space.com/nasa-astronaut-harvests-radishes-space-station",
+  "source": "https://www.nasa.gov/missions/station/astronauts-harvest-radish-crop-on-international-space-station/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -29,10 +27,9 @@
   "rarity": "comum",
   "how": "colher na estufa",
   "place": "Gale",
-  "number": "28 dias",
-  "source": "https://www.nasa.gov/blogs/stationreport/2018/10/25/iss-daily-summary-report-10-25-2018/",
+  "number": "",
+  "source": "https://www.nasa.gov/exploration-research-and-technology/growing-plants-in-space/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -41,10 +38,9 @@
   "rarity": "comum",
   "how": "colher na estufa",
   "place": "Gale",
-  "number": "",
-  "source": "https://blogs.nasa.gov/kennedy/2016/08/18/growing-potatoes-in-martian-gardens/",
+  "number": "o dobro",
+  "source": "https://www.nasa.gov/science-research/nasa-plant-researchers-explore-question-of-deep-space-food-crops/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -56,7 +52,6 @@
   "number": "16/01/2016",
   "source": "https://www.nasa.gov/image-article/first-flower-grown-space-stations-veggie-facility/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -68,31 +63,6 @@
   "number": "~4 meses",
   "source": "https://www.nasa.gov/image-article/fresh-chiles-spice-up-taco-night/",
   "photo": "",
-  "locked": false,
-  "photo_file": ""
- },
- {
-  "id": 7,
-  "category": "Minerais",
-  "rarity": "comum",
-  "how": "tubo de amostra",
-  "place": "Meridiani (em breve)",
-  "number": "",
-  "source": "https://www.jpl.nasa.gov/news/opportunity-rover-finds-strong-evidence-meridiani-planum-was-wet/",
-  "photo": "",
-  "locked": true,
-  "photo_file": ""
- },
- {
-  "id": 8,
-  "category": "Minerais",
-  "rarity": "comum",
-  "how": "tubo de amostra",
-  "place": "Meridiani (em breve)",
-  "number": "",
-  "source": "https://www.jpl.nasa.gov/news/opportunity-rover-finds-strong-evidence-meridiani-planum-was-wet/",
-  "photo": "",
-  "locked": true,
   "photo_file": ""
  },
  {
@@ -102,21 +72,8 @@
   "how": "tubo de amostra",
   "place": "Gale",
   "number": "30/05/2024",
-  "source": "https://www.space.com/nasa-mars-curiosity-sulfur-rocks",
+  "source": "https://www.nasa.gov/missions/mars-science-laboratory/curiosity-rover/nasas-curiosity-rover-discovers-a-surprise-in-a-martian-rock/",
   "photo": "",
-  "locked": false,
-  "photo_file": ""
- },
- {
-  "id": 10,
-  "category": "Minerais",
-  "rarity": "lendário",
-  "how": "tubo de amostra",
-  "place": "Jezero (em breve)",
-  "number": "",
-  "source": "https://www.nasa.gov/news-release/nasa-says-mars-rover-discovered-potential-biosignature-last-year/",
-  "photo": "",
-  "locked": true,
   "photo_file": ""
  },
  {
@@ -128,7 +85,6 @@
   "number": "45%",
   "source": "https://www.nasa.gov/wp-content/uploads/2024/01/mars-surface-power-generation-challenges-and-considerations.pdf",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -138,9 +94,8 @@
   "how": "construir",
   "place": "Gale",
   "number": "",
-  "source": "",
+  "source": "https://science.nasa.gov/planetary-science/programs/radioisotope-power-systems/faq/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -152,7 +107,6 @@
   "number": "122 g",
   "source": "https://www.nasa.gov/missions/mars-2020-perseverance/perseverance-rover/nasas-oxygen-generating-experiment-moxie-completes-mars-mission/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -161,10 +115,9 @@
   "rarity": "raro",
   "how": "construir",
   "place": "Gale",
-  "number": "1 a 10 kW",
-  "source": "https://www.nasa.gov/directorates/spacetech/kilopower",
+  "number": "até 10 kW",
+  "source": "https://www.nasa.gov/news-release/demonstration-proves-nuclear-fission-system-can-provide-space-exploration-power/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -174,9 +127,8 @@
   "how": "construir",
   "place": "Gale",
   "number": "72 voos",
-  "source": "https://www.nbcnews.com/science/space/nasas-little-helicopter-mars-logged-last-flight-rcna135757",
+  "source": "https://www.nasa.gov/news-release/after-three-years-on-mars-nasas-ingenuity-helicopter-mission-ends/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -188,31 +140,6 @@
   "number": "",
   "source": "https://www.nasa.gov/solar-system/planets/mars/nasa-watches-mars-light-up-during-epic-solar-storm",
   "photo": "",
-  "locked": false,
-  "photo_file": ""
- },
- {
-  "id": 17,
-  "category": "Robôs",
-  "rarity": "raro",
-  "how": "explorar",
-  "place": "Meridiani (em breve)",
-  "number": "junho de 2018",
-  "source": "https://www.jpl.nasa.gov/news/opportunity-hunkers-down-during-dust-storm/",
-  "photo": "",
-  "locked": true,
-  "photo_file": ""
- },
- {
-  "id": 18,
-  "category": "Robôs",
-  "rarity": "épico",
-  "how": "explorar",
-  "place": "Jezero (em breve)",
-  "number": "",
-  "source": "https://www.nasa.gov/news-release/nasa-says-mars-rover-discovered-potential-biosignature-last-year/",
-  "photo": "",
-  "locked": true,
   "photo_file": ""
  },
  {
@@ -224,7 +151,6 @@
   "number": "24 h 39 min",
   "source": "https://www.nasa.gov/wp-content/uploads/2024/01/mars-surface-power-generation-challenges-and-considerations.pdf",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -236,7 +162,6 @@
   "number": "−70 °C",
   "source": "https://science.nasa.gov/resource/steady-temperatures-at-mars-gale-crater",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -248,7 +173,6 @@
   "number": "5.000 → 500 Wh por sol",
   "source": "https://science.nasa.gov/resource/insights-power-generation-after-landing-and-spring-2022/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -258,9 +182,8 @@
   "how": "aguentar o evento",
   "place": "Gale",
   "number": "",
-  "source": "",
+  "source": "https://www.jpl.nasa.gov/news/spirit-gets-energy-boost-from-cleaner-solar-panels/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -272,7 +195,6 @@
   "number": "30 raios-X",
   "source": "https://www.nasa.gov/solar-system/planets/mars/nasa-watches-mars-light-up-during-epic-solar-storm",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -282,9 +204,8 @@
   "how": "de manhã após a noite congelante",
   "place": "Gale",
   "number": "",
-  "source": "",
+  "source": "https://www.jpl.nasa.gov/images/pia00530-frost-on-utopia-planitia/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -294,9 +215,8 @@
   "how": "chance após tempestade solar com escudo",
   "place": "Gale",
   "number": "",
-  "source": "",
+  "source": "https://science.nasa.gov/solar-system/planets/mars/nasa-observes-first-visible-light-auroras-at-mars/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -308,7 +228,6 @@
   "number": "fotos de 13/12/2012",
   "source": "https://science.nasa.gov/resource/veins-in-sheepbed-outcrop/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -320,7 +239,6 @@
   "number": "1ª análise de raios X em Marte (30/10/2012)",
   "source": "https://www.jpl.nasa.gov/news/nasa-rovers-first-soil-studies-help-fingerprint-martian-minerals/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -332,7 +250,6 @@
   "number": "até ~1 m por ano",
   "source": "https://science.nasa.gov/resource/high-dune-is-first-martian-dune-studied-up-close-2",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -344,7 +261,6 @@
   "number": "5 km",
   "source": "https://www.jpl.nasa.gov/news/cracks-in-ancient-martian-mud-surprise-nasas-curiosity-rover-team/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -356,7 +272,6 @@
   "number": "3,8 a 3,3 bilhões de anos",
   "source": "https://www.jpl.nasa.gov/news/nasas-curiosity-rover-team-confirms-ancient-lakes-on-mars/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -368,7 +283,6 @@
   "number": "notícia de 09/08/2023",
   "source": "https://www.jpl.nasa.gov/news/cracks-in-ancient-martian-mud-surprise-nasas-curiosity-rover-team/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -380,7 +294,6 @@
   "number": "notícia de 27/06/2016",
   "source": "https://www.jpl.nasa.gov/news/nasa-rover-findings-point-to-a-more-earth-like-martian-past/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -392,7 +305,6 @@
   "number": "~0,1% da rocha",
   "source": "https://www.jpl.nasa.gov/news/mars-rock-ingredient-stew-seen-as-plus-for-habitability/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -404,7 +316,6 @@
   "number": "12/03/2013",
   "source": "https://www.jpl.nasa.gov/news/nasa-rover-finds-conditions-once-suited-for-ancient-life-on-mars/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -416,7 +327,6 @@
   "number": "~2 m",
   "source": "https://www.jpl.nasa.gov/images/pia18387-curiosity-finds-iron-meteorite-on-mars/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -428,7 +338,6 @@
   "number": "10 a 12 carbonos",
   "source": "https://science.nasa.gov/missions/mars-science-laboratory/nasas-curiosity-rover-detects-largest-organic-molecules-found-on-mars/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -440,7 +349,6 @@
   "number": "3 voltas por dia",
   "source": "https://science.nasa.gov/mars/moons/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -452,7 +360,6 @@
   "number": "foto de 15/04/2015",
   "source": "https://www.jpl.nasa.gov/images/pia19400-sunset-in-mars-gale-crater/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -464,7 +371,6 @@
   "number": "31/01/2014",
   "source": "https://science.nasa.gov/resource/bright-evening-star-seen-from-mars-is-earth/",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  },
  {
@@ -476,7 +382,6 @@
   "number": "12 tomates (2023)",
   "source": "https://www.nasa.gov/missions/station/nasa-teams-persevere-through-plant-challenges-in-space",
   "photo": "",
-  "locked": false,
   "photo_file": ""
  }
 ]

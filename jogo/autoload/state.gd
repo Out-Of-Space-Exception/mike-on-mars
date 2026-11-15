@@ -21,6 +21,8 @@ const LOW := 20.0                   # barra abaixo disso trava ou desacelera
 const START := {"energy": 60.0, "oxygen": 60.0, "shield": 100.0}
 const START_ITEMS := {"2,3": "habitat"}
 const MAX_LEVEL := 3
+## A área da base cresce com o nível da Casa do Mike: 4x4 no nível 1, 6x6 no 2 e a grade inteira (6x8) no 3.
+const ZONES := {1: Rect2i(1, 2, 4, 4), 2: Rect2i(0, 1, 6, 6), 3: Rect2i(0, 0, GRID_W, GRID_H)}
 const LEVEL_BONUS := 0.5            # +50% de produção por nível acima do 1
 const UPGRADE_COST := {1: 20, 2: 40}  # energia para subir do nível N para N+1
 const SHIELD_RECHARGE := 2.0        # por sol, se a energia estiver acima de LOW
@@ -160,6 +162,13 @@ func cards_total() -> int:
 	return _cards_info.size()
 
 
+## Os números das cartas do álbum, em ordem.
+func card_ids() -> Array:
+	var ids := _cards_info.keys()
+	ids.sort()
+	return ids
+
+
 func donki_count() -> int:
 	return _donki.size()
 
@@ -214,9 +223,6 @@ func card_hint(id: int) -> String:
 		return tr("HOW_PACKAGE")
 	if SOL_CARDS.values().has(id):
 		return tr("HOW_TIME")
-	var info := card_info(id)
-	if info.get("locked", false):
-		return tr("HOW_LOCKED")
 	return tr("HOW_TUBE")
 
 
@@ -279,6 +285,24 @@ static func in_grid(c: Vector2i) -> bool:
 	return c.x >= 0 and c.y >= 0 and c.x < GRID_W and c.y < GRID_H
 
 
+## Nível da Casa do Mike: ele abre área nova na base e é o nível máximo das outras construções.
+func house_level() -> int:
+	var lv := 1
+	for k in items:
+		if items[k].type == "habitat":
+			lv = maxi(lv, int(items[k].level))
+	return lv
+
+
+## A área aberta para construir com a casa no nível "level" (0 = o nível de agora).
+func zone(level := 0) -> Rect2i:
+	return ZONES[clampi(level if level > 0 else house_level(), 1, MAX_LEVEL)]
+
+
+func cell_open(c: Vector2i, level := 0) -> bool:
+	return zone(level).has_point(c)
+
+
 ## Quantas casas o item ocupa (para a direita da casa âncora), conforme o nível.
 static func width_of(type: String, level: int) -> int:
 	var sizes: Array = FOOTPRINT.get(type, [1])
@@ -321,8 +345,10 @@ func item_at(c: Vector2i) -> Dictionary:
 ## Dá para pôr este item (neste nível) com a âncora em c? (ignore = o próprio item, ao mover ou melhorar)
 func can_place(type: String, level: int, c: Vector2i, ignore := "", rot := 0) -> bool:
 	var occ := _occupancy()
+	# A própria casa usa a área do nível dela (ao crescer, ela já abre a área nova).
+	var area := zone(level if type == "habitat" else 0)
 	for cell in cells_of(c, type, level, rot):
-		if not in_grid(cell) or (occ.has(key(cell)) and occ[key(cell)] != ignore):
+		if not area.has_point(cell) or (occ.has(key(cell)) and occ[key(cell)] != ignore):
 			return false
 	return true
 
@@ -344,9 +370,10 @@ func item_name(it: Dictionary) -> String:
 
 func free_cells() -> Array[Vector2i]:
 	var occ := _occupancy()
+	var area := zone()
 	var out: Array[Vector2i] = []
-	for x in GRID_W:
-		for y in GRID_H:
+	for x in range(area.position.x, area.end.x):
+		for y in range(area.position.y, area.end.y):
 			if not occ.has(key(Vector2i(x, y))):
 				out.append(Vector2i(x, y))
 	return out
@@ -452,6 +479,9 @@ func upgrade_block_reason(c: Vector2i) -> String:
 		return "MAX_LEVEL"
 	if base_locked_reason() != "":
 		return base_locked_reason()
+	# Nenhuma construção passa do nível da Casa do Mike.
+	if it.type != "habitat" and int(it.level) >= house_level():
+		return "NEED_HOUSE"
 	if not can_place(it.type, int(it.level) + 1, c, key(c), int(it.get("rot", 0))):
 		return "NEED_SPACE"
 	if not can_afford(cost):
@@ -468,6 +498,8 @@ func upgrade(c: Vector2i) -> bool:
 	items[key(c)].spent += cost
 	if items[key(c)].type == "rtg" and int(items[key(c)].level) == MAX_LEVEL and not cards.has(str(CARD_KILOPOWER)):
 		add_card(CARD_KILOPOWER)
+	if items[key(c)].type == "habitat":
+		event_message.emit("MAP_GROW", "")
 	_after_action()
 	return true
 
@@ -598,7 +630,7 @@ func _draw_tube() -> int:
 	var pool := {}
 	for id in _cards_info:
 		var c: Dictionary = _cards_info[id]
-		if c.locked or c.place != "Gale" or not (c.how in ["tubo de amostra", "explorar"]):
+		if c.place != "Gale" or not (c.how in ["tubo de amostra", "explorar"]):
 			continue
 		if not pool.has(c.rarity):
 			pool[c.rarity] = []

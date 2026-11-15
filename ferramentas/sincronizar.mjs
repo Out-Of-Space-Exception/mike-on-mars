@@ -36,11 +36,10 @@ for (const c of cartas) {
 mkdirSync(join(RAIZ, 'jogo/data'), {recursive: true});
 writeFileSync(join(RAIZ, 'jogo/data/textos.csv'), linhas.join('\n') + '\n');
 
-// 2. Dados das cartas (sem os textos, que já estão no textos.csv)
-const dados = cartas.map(c => ({
+// 2. Dados das cartas (sem os textos, que já estão no textos.csv). Cartas de lugares "em breve" ficam fora do jogo.
+const dados = cartas.filter(c => !/em breve/i.test(c.onde)).map(c => ({
   id: Number(c.id), category: c.categoria, rarity: c.raridade, how: c.como_ganha, place: c.onde,
   number: c.numero_real, source: c.fonte, photo: c.foto_nasa,
-  locked: /em breve/i.test(c.onde),
 }));
 writeFileSync(join(RAIZ, 'jogo/data/cartas.json'), JSON.stringify(dados, null, 1) + '\n');
 
@@ -59,7 +58,7 @@ const fotos = copiar('conteudo/02-cartas/fotos', 'jogo/ui/cards');
 // 4. O Mike do design/01 (o mike.glb já traz as animações idle, run e jump)
 mkdirSync(join(RAIZ, 'jogo/models/mike'), {recursive: true});
 let mike = 0;
-for (const f of ['mike.glb']) {
+for (const f of ['mike.glb', 'mike-astronauta.glb']) {
   const de = join(RAIZ, 'design/01-mike', f);
   if (existsSync(de)) { copyFileSync(de, join(RAIZ, 'jogo/models/mike', f)); mike++; }
 }

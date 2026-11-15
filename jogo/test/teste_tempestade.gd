@@ -20,6 +20,8 @@ func _ready() -> void:
 	_ingenuity(main.get_node("Base"))
 	_niveis_e_album()
 	_girar_energia_oxigenio()
+	_area_da_casa()
+	_caminho_do_mike(main.get_node("Base"))
 	print("RESULTADO: ", "TUDO OK" if falhas == 0 else "%d FALHA(S)" % falhas)
 	get_tree().quit(falhas)
 
@@ -53,26 +55,26 @@ func _expedicao() -> void:
 	_ticks(State.EXPLORE_SOLS)
 	ok(not State.exploring() and State.tube_card != 0, "volta depois de 4 sóis com um tubo")
 	var info := State.card_info(State.tube_card)
-	ok(info.place == "Gale" and not info.locked, "o tubo só traz carta da Gale (nunca trancada)")
+	ok(info.place == "Gale", "o tubo só traz carta da Gale")
 	var carta := State.open_tube()
 	ok(State.cards.has(str(carta)), "abrir o tubo dá a carta")
 
 
 func _construir_e_plantar() -> void:
 	State.energy = 100.0
-	ok(State.build("solar", Vector2i(0, 0)), "constrói um painel solar")
+	ok(State.build("solar", Vector2i(1, 2)), "constrói um painel solar")
 	ok(State.cards.has("11"), "o 1º painel solar dá a carta Painel solar")
 	ok(State.build_block_reason("flag") == "" or State.cards.size() < 5, "a bandeira destrava com 5 cartas")
 	State.energy = 100.0
-	ok(State.build("antenna", Vector2i(1, 0)), "constrói a antena")
+	ok(State.build("antenna", Vector2i(2, 2)), "constrói a antena")
 	ok(State.build_block_reason("antenna") == "NEED_MAX", "só dá para ter uma antena")
 	State.energy = 100.0
-	State.build("greenhouse", Vector2i(4, 6))
+	State.build("greenhouse", Vector2i(4, 5))
 	ok(State.unlocked_plants().size() == 2, "começa com alface e rabanete")
-	ok(State.plant(Vector2i(4, 6), "radish"), "planta rabanete")
+	ok(State.plant(Vector2i(4, 5), "radish"), "planta rabanete")
 	State.energy = 100.0
 	_ticks(State.PLANTS.radish.sols)
-	ok(State.harvest(Vector2i(4, 6)) == "radish", "colhe o rabanete")
+	ok(State.harvest(Vector2i(4, 5)) == "radish", "colhe o rabanete")
 	ok("kale" in State.unlocked_plants(), "a 1ª colheita destrava a couve")
 
 
@@ -85,7 +87,7 @@ func _eventos() -> void:
 	_ticks(State.COLD_SOLS)
 	_forcar_evento("nosignal")
 	hud._on_choice(0)
-	ok(State.base_locked_reason() == "LOCK_NOSIGNAL" and not State.build("rtg", Vector2i(5, 7)), "sem sinal: não dá para mexer na base")
+	ok(State.base_locked_reason() == "LOCK_NOSIGNAL" and not State.build("rtg", Vector2i(1, 4)), "sem sinal: não dá para mexer na base")
 	_ticks(State.NOSIGNAL_SOLS)
 	ok(State.cards.has("4"), "quando o sinal volta, o pacote traz a carta Batata")
 	_forcar_evento("dust")
@@ -98,8 +100,8 @@ func _eventos() -> void:
 
 func _jogo_fechado() -> void:
 	State.energy = 100.0
-	State.build("greenhouse", Vector2i(5, 0))
-	State.plant(Vector2i(5, 0), "lettuce")
+	State.build("greenhouse", Vector2i(1, 5))
+	State.plant(Vector2i(1, 5), "lettuce")
 	var sol_antes: int = State.sol
 	State._catch_up(int(Time.get_unix_time_from_system()) - 600)
 	ok(State.sol > sol_antes and int(State.away.get("sols", 0)) > 0, "com o jogo fechado, o tempo passa")
@@ -146,7 +148,7 @@ func ok(cond: bool, nome: String) -> void:
 
 func _ingenuity(base: Node3D) -> void:
 	State.energy = 100.0
-	State.build("pad", Vector2i(3, 7))
+	State.build("pad", Vector2i(4, 2))
 	ok(base._pet != null, "a pista do Ingenuity faz o pet aparecer")
 	if base._pet == null:
 		return
@@ -179,10 +181,10 @@ func _niveis_e_album() -> void:
 	State.upgrade(Vector2i(0, 0))
 	ok(State.item_name(State.item_at(Vector2i(0, 0))) == "B_KILOPOWER" and State.cards.has("14"), "RTG no nível 3 vira Kilopower e dá a carta")
 	var sem_dica := 0
-	for id in range(1, State.cards_total() + 1):
+	for id in State.card_ids():
 		if State.card_hint(id).strip_edges() == "":
 			sem_dica += 1
-	ok(sem_dica == 0, "todas as 40 cartas dizem como ganhar")
+	ok(sem_dica == 0, "todas as %d cartas dizem como ganhar" % State.cards_total())
 	State.energy = 100.0
 	State.build("greenhouse", Vector2i(0, 6))
 	State.plant(Vector2i(0, 6), "radish")
@@ -214,10 +216,82 @@ func _girar_energia_oxigenio() -> void:
 	State._tick()
 	ok(State.oxygen <= 0.0 and State.mike_inside() and State.explore_block_reason() == "LOCK_OXYGEN", "sem oxigênio, o Mike fica em casa e não explora")
 	State.energy = 100.0
-	State.build("greenhouse", Vector2i(0, 0))
-	State.plant(Vector2i(0, 0), "lettuce")
+	State.build("greenhouse", Vector2i(1, 2))
+	State.plant(Vector2i(1, 2), "lettuce")
 	State.oxygen = 10.0
 	var antes: float = State.oxygen
 	State.energy = 100.0
 	State._tick()
 	ok(is_equal_approx(State.oxygen, antes - State.OXYGEN_BREATH + State.PLANT_OXYGEN), "o Mike respira e a planta faz oxigênio")
+
+
+func _area_da_casa() -> void:
+	State.new_game()
+	State.energy = 100.0
+	ok(State.free_cells().size() == 15, "casa no nível 1: a base tem 4 x 4 casas (15 livres)")
+	ok(not State.build("solar", Vector2i(0, 0)), "não dá para construir fora da área aberta")
+	ok(State.build("rtg", Vector2i(1, 2)), "dentro da área, dá")
+	State.energy = 100.0
+	ok(State.upgrade_block_reason(Vector2i(1, 2)) == "NEED_HOUSE", "construção não passa do nível da casa")
+	State.upgrade(Vector2i(2, 3))
+	ok(State.free_cells().size() == 36 - 3, "casa no nível 2: a base cresce para 6 x 6")
+	State.energy = 100.0
+	ok(State.upgrade(Vector2i(1, 2)), "com a casa no nível 2, o RTG sobe para o nível 2")
+	State.energy = 100.0
+	ok(State.upgrade_block_reason(Vector2i(1, 2)) == "NEED_HOUSE", "mas não passa para o nível 3")
+	State.energy = 100.0
+	State.upgrade(Vector2i(2, 3))
+	ok(State.zone() == Rect2i(0, 0, State.GRID_W, State.GRID_H), "casa no nível 3: a grade inteira abre")
+	var em_breve := 0
+	for id in State.card_ids():
+		if str(State.card_info(id).get("place", "")).to_lower().contains("em breve"):
+			em_breve += 1
+	ok(em_breve == 0 and State.cards_total() == 35, "nenhuma carta \"em breve\" (35 cartas no álbum)")
+
+
+func _caminho_do_mike(base: Node3D) -> void:
+	State.new_game()
+	State.energy = 100.0
+	State.upgrade(Vector2i(2, 3))
+	State.energy = 100.0
+	State.upgrade(Vector2i(2, 3))
+	State.energy = 100.0
+	State.build("greenhouse", Vector2i(2, 4))
+	# Do lado de trás da casa para a frente da estufa: a linha reta atravessa as duas.
+	var de: Vector3 = base.cell_center(Vector2i(3, 2))
+	var para: Vector3 = base.cell_center(Vector2i(3, 6))
+	var caminho: PackedVector3Array = base._round_corners(base._find_path(de, para))
+	var bateu := 0
+	for i in range(1, caminho.size()):
+		for s in 5:
+			if base._nav_solid(caminho[i - 1].lerp(caminho[i], s / 4.0)):
+				bateu += 1
+	ok(caminho.size() > 2 and bateu == 0, "o Mike dá a volta nas construções (%d pontos, sem bater)" % caminho.size())
+	ok(caminho[-1].distance_to(para) < 0.6, "e chega onde a criança tocou")
+	var curva := true
+	for i in range(1, caminho.size() - 1):
+		var a := (caminho[i] - caminho[i - 1]).normalized()
+		var b := (caminho[i + 1] - caminho[i]).normalized()
+		if a.length() > 0.5 and b.length() > 0.5 and rad_to_deg(a.angle_to(b)) > 50.0:
+			curva = false
+	ok(curva, "sem quina reta: cada virada do caminho é suave")
+	# Construir em cima do Mike: ele sai andando para um lugar livre.
+	base.mike.position = base.cell_center(Vector2i(4, 4))
+	base._path = PackedVector3Array()
+	base._path_i = 0
+	State.energy = 100.0
+	State.build("moxie", Vector2i(4, 4))
+	ok(base._path.size() > 0 and not base._nav_solid(base._path[-1]), "construíram em cima do Mike: ele sai para o lado")
+	# Toque no alto da casa (fora do chão dela) abre a casa.
+	base.whole_grid = false
+	var casa: Node3D = base._nodes["2,3"]
+	var topo: AABB = casa.global_transform * base._merged_aabb(casa)
+	var tela: Vector2 = base.camera.unproject_position(topo.get_center() + Vector3(0, topo.size.y * 0.4, 0))
+	var acerto: Dictionary = base._item_under(base.camera.project_ray_origin(tela), base.camera.project_ray_normal(tela))
+	ok(not acerto.is_empty() and State.anchor_of(acerto.cell) == Vector2i(2, 3), "tocar no telhado da casa abre a casa")
+	ok(base._mike_skins.has("suit"), "o Mike de traje está carregado para a expedição")
+	base._set_suit(true)
+	ok(base._mike_skins.suit[0].visible and not base._mike_skins.casual[0].visible, "na expedição, o Mike veste o traje")
+	base._set_suit(false)
+	var anims: PackedStringArray = base._mike_anim.get_animation_list() if base._mike_anim else PackedStringArray()
+	ok("run" in anims and "idle" in anims, "o Mike tem as animações idle e run: %s" % ", ".join(anims))

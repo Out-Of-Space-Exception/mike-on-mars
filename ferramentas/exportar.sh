@@ -9,5 +9,9 @@ rm -rf "$RAIZ/build" && mkdir -p "$RAIZ/build"
 "$GODOT" --headless --path "$RAIZ/jogo" --import > /dev/null 2>&1 || true
 "$GODOT" --headless --path "$RAIZ/jogo" --export-release "Web" "$RAIZ/build/index.html"
 cp "$RAIZ/jogo/web/nave.png" "$RAIZ/jogo/web/rubik.ttf" "$RAIZ/build/"
+# Nome novo para o pacote do jogo a cada versão: o navegador não usa a versão velha guardada.
+H="$(md5sum "$RAIZ/build/index.pck" | cut -c1-8)"
+mv "$RAIZ/build/index.pck" "$RAIZ/build/index-$H.pck"
+sed -i "s|\"executable\":\"index\"|\"executable\":\"index\",\"mainPack\":\"index-$H.pck\"|; s|\"index.pck\":|\"index-$H.pck\":|" "$RAIZ/build/index.html"
 touch "$RAIZ/build/.nojekyll"
 echo "Versão web pronta em build/"

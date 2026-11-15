@@ -33,12 +33,13 @@ ia,Claude (Anthropic): modelou no Blender os 3 níveis de casa do Mike + estufa 
 ia,Claude (Anthropic): juntou as animações idle/run/jump no mike.glb e escolheu com a dupla os ícones dos botões (icones.csv),design/01-mike e design/07-icones-dos-botoes,Anthropic,-,https://claude.ai,Design
 ia,Claude (Anthropic): criou o céu de Marte + a textura do chão + o terreno com crateras e o efeito de poeira (pasta cenario),design/03-itens-do-jogo/cenario,Anthropic,-,https://claude.ai,Design
 ia,Claude (Anthropic): modelou no Blender os 3 níveis de MOXIE + RTG + antena + plataforma de pouso + bandeira + luzinhas + vaso (niveis/construcoes-2.py),design/03-itens-do-jogo/niveis,Anthropic,-,https://claude.ai,Design
-fonte,Junegull,título do logo (design/06-logo-e-icone/logo.png e logo-quadrado.png),Ray Larabie (Larabie Fonts),Larabie Fonts Freeware EULA (CONFERIR: não é CC0/CC-BY/OFL),https://www.larabiefonts.com/,Design
-imagem,Modelo da moldura das cartas,design/05-telas/moldura-carta-*.png,CONFERIR,CONFERIR,CONFERIR,Design
+fonte,Junegull,título do logo (design/06-logo-e-icone/logo.png e logo-quadrado.png),Ray Larabie (Larabie Fonts),Larabie Fonts Freeware EULA: grátis para uso pessoal e comercial (exceção à regra 6 aprovada pela dupla de Design: usada só como imagem no logo),https://www.larabiefonts.com/,Design
 ia,Claude (Anthropic): refez o título do logo com a Junegull e borda #F2D091 e tirou o fundo do espaço (logo.png),design/06-logo-e-icone,Anthropic,-,https://claude.ai,Design
-ia,Claude (Anthropic): adaptou a moldura das cartas (símbolo e cor da borda por raridade + janela da foto),design/05-telas,Anthropic,-,https://claude.ai,Design
+ia,Claude (Anthropic): desenhou do zero por código as 4 molduras das cartas (moldura-carta.gd),design/05-telas,Anthropic,-,https://claude.ai,Design
 ia,Claude (Anthropic): modelou o Kilopower no Blender (kilopower.py),design/03-itens-do-jogo,Anthropic,-,https://claude.ai,Design
+ia,Claude (Anthropic): criou o Mike astronauta no Blender (capacete + gola + mochila + textura do traje),design/01-mike,Anthropic,-,https://claude.ai,Design
 ia,Claude (Anthropic): procurou e conferiu nas páginas da NASA as fontes de 12 cartas e reescreveu os fatos que a fonte não dizia,conteudo/02-cartas,Anthropic,-,https://claude.ai,Conteúdo
+<<<<<<< HEAD
 ia,ChatGPT (OpenAI): pesquisou fontes e fotos; organizou downloads PNG; ajustou recortes e montou fotos reais das luas na diagonal por scripts; preparou previas,conteudo/01-sons/conferencia.md; conteudo/02-cartas/,OpenAI,-,https://chatgpt.com,Conteudo
 foto,Foto da carta Couve,conteudo/02-cartas/fotos/03-couve.png,NASA/Anil Menon,imagem publica da NASA (com credito),https://images.nasa.gov/details/iss075e0250227,Conteudo
 foto,Foto da carta Batata (recorte),conteudo/02-cartas/fotos/04-batata.png,NASA/KSC (centro de origem; fotografo nao informado),imagem publica da NASA (com credito),https://images.nasa.gov/details/KSC-95pc1197,Conteudo
@@ -81,3 +82,10 @@ foto,Foto da carta Pôr do sol azul,conteudo/02-cartas/fotos/38-por-do-sol-azul.
 foto,Foto da carta Terra vista de Marte,conteudo/02-cartas/fotos/39-terra-vista-de-marte.png,NASA/JPL-Caltech/MSSS/TAMU,imagem publica da NASA (com credito),https://science.nasa.gov/resource/bright-evening-star-seen-from-mars-is-earth/,Conteudo
 foto,Foto da carta Tomate-anão,conteudo/02-cartas/fotos/40-tomate-anao.png,NASA,imagem publica da NASA (com credito),https://www.nasa.gov/missions/station/nasa-teams-persevere-through-plant-challenges-in-space/,Conteudo
 foto,Fonte Deimos para montagem diagonal das duas luas,conteudo/02-cartas/fotos/37-fobos-e-deimos.png,NASA/JPL-Caltech/University of Arizona,imagem publica da NASA (com credito),https://science.nasa.gov/photojournal/martian-moon-deimos-in-high-resolution/,Conteudo
+=======
+ia,Claude (Anthropic): escreveu com a dupla o texto dos 7 slides (slides.md) a partir do CONTEXTO.md e do cartas.csv,conteudo/04-slides,Anthropic,-,https://claude.ai,Conteúdo
+ia,Claude (Anthropic): traduziu para espanhol e francês os textos do jogo (textos.csv),conteudo/03-textos/textos.csv,Anthropic,-,https://claude.ai,Conteúdo
+ia,Claude (Anthropic): escreveu com a dupla o texto da página do projeto (pagina.md) a partir do CONTEXTO.md + cartas.csv + creditos.csv,conteudo/06-pagina-do-projeto,Anthropic,-,https://claude.ai,Conteúdo
+ia,Claude (Anthropic): animação construir do Mike (mike-construir.py) e efeito de obra com bloquinhos (construcao.gd),design/01-mike e design/03-itens-do-jogo/construcao,Anthropic,-,https://claude.ai,Design
+ia,Claude (Anthropic): painel de informação da construção (telas + info_construcao.gd + textos),design/05-telas/info-construcao,Anthropic,-,https://claude.ai,Design
+>>>>>>> 2d02e99af1814f1c312d78d27cdac48a612e50f8

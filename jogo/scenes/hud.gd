@@ -112,6 +112,7 @@ func _on_play() -> void:
 	Sfx.play("toque-botao")
 	Sfx.play_music("musica-base")
 	_start.visible = false
+	_root.visible = true
 	base.orbit = false
 	State.start()
 	var away: Dictionary = State.away
@@ -154,6 +155,12 @@ func on_cell_tapped(c: Vector2i) -> void:
 		_build_menu.visible = false
 		return
 	var free: bool = c != base.OUTSIDE and State.item_at(c).is_empty()
+	# Área ainda fechada: abre quando a Casa do Mike sobe de nível.
+	if c != base.OUTSIDE and free and not State.cell_open(c) and mode != Mode.MOVE:
+		_show_toast(tr("MAP_LOCKED"), true)
+		Sfx.play("travado")
+		_close_panel()
+		return
 	match mode:
 		Mode.BUILD:
 			if c != base.OUTSIDE and State.build(build_type, c):
@@ -287,7 +294,10 @@ func _refresh_panel() -> void:
 		if it.plant == "":
 			for p in State.unlocked_plants():
 				var plant_def: Dictionary = State.PLANTS[p]
-				_add_panel_button("%s (%d)" % [tr(plant_def.name), plant_def.sols], _on_plant.bind(p))
+				var pb := _add_panel_button("%s (%d)" % [tr(plant_def.name), plant_def.sols], _on_plant.bind(p))
+				pb.icon = _plant_icon(p)   # Design: a planta antes do nome, mais visual
+				pb.expand_icon = true
+				pb.add_theme_constant_override("icon_max_width", 56)
 		elif State.plant_ready(selected):
 			_panel_info.visible = true
 			_panel_info.text = tr("PLANT_READY").format({"plant": tr(State.PLANTS[it.plant].name)})
@@ -517,10 +527,10 @@ func _on_card_source() -> void:
 
 # ───────────── Álbum ─────────────
 func _refresh_album() -> void:
-	_album_title.text = tr("ALBUM_COUNT").format({"n": State.cards.size()})
+	_album_title.text = tr("ALBUM_COUNT").format({"n": State.cards.size(), "total": State.cards_total()})
 	for c in _album_grid.get_children():
 		c.queue_free()
-	for id in range(1, State.cards_total() + 1):
+	for id in State.card_ids():
 		var info := State.card_info(id)
 		var owned := State.cards.has(str(id))
 		var b := Button.new()
@@ -542,9 +552,8 @@ func _refresh_album() -> void:
 			b.text = tr("CARD_%d_NAME" % id)
 			b.pressed.connect(_queue_card.bind(id, false))
 		else:
-			b.text = tr("CARD_LOCKED") if info.get("locked", false) else "?"
-			if b.text == "?":
-				b.add_theme_font_size_override("font_size", 48)
+			b.text = "?"
+			b.add_theme_font_size_override("font_size", 48)
 			# Carta que falta: o toque diz como ganhar.
 			b.pressed.connect(func() -> void: _show_info(tr("HOW_TITLE"), State.card_hint(id), Callable()))
 		_album_grid.add_child(b)
@@ -1165,6 +1174,7 @@ func _build_start() -> void:
 	_start_play.custom_minimum_size = Vector2(360, 170)
 	_start_play.size_flags_horizontal = Control.SIZE_SHRINK_END
 	_start_play.add_theme_font_size_override("font_size", 52)
+	_start_play.autowrap_mode = TextServer.AUTOWRAP_OFF
 	col.add_child(_start_play)
 	var corner := HBoxContainer.new()
 	corner.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
@@ -1176,13 +1186,18 @@ func _build_start() -> void:
 	_start_nasa = _key_button(_on_nasa, true)
 	_start_nasa.custom_minimum_size = Vector2(0, 96)
 	_start_nasa.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	_start_nasa.autowrap_mode = TextServer.AUTOWRAP_OFF
 	corner.add_child(_start_nasa)
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	corner.add_child(spacer)
 	_start_lang = _key_button(_on_lang, true)
 	_start_lang.custom_minimum_size = Vector2(120, 96)
+	_start_lang.size_flags_horizontal = Control.SIZE_SHRINK_END
+	_start_lang.autowrap_mode = TextServer.AUTOWRAP_OFF
 	corner.add_child(_start_lang)
+	# A interface do jogo só aparece depois do Jogar.
+	_root.visible = false
 	# A janela de dados da NASA também abre na tela inicial: fica por cima de tudo.
 	_nasa.reparent(self)
 	_nasa.theme = _root.theme

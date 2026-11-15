@@ -29,17 +29,18 @@ Você está ajudando o time **Out of Space Exception** (Brasil) no NASA Space Ap
 - **Mascote:** **Mike**, um astronauta (personagem do pacote Kenney Mini Characters, com cor de traje e acessório próprios).
 - **Estilo de jogo:** "coleciona e cresce", inspirado em Grow a Garden e Steal a Brainrot (os jogos de Roblox que passaram de 20 milhões de jogadores ao mesmo tempo).
 - **Onde roda:** no navegador, pensado primeiro para o celular. Sem login, sem download, sem guardar dado de criança.
-- **Local:** **cratera Gale**, onde o rover Curiosity trabalha. Meridiani e Jezero aparecem no mapa como "em breve".
+- **Local:** **cratera Gale**, onde o rover Curiosity trabalha.
 
 ---
 
 ## 3. Como o jogo funciona
 
 - **3 barras, só 3:** ⚡ **Energia**, 🫁 **Oxigênio** e 🛡️ **Escudo** (a proteção do Mike contra a radiação do Sol).
-- **Construir:** toca no item, toca no chão (sem arrastar). Dá para **mover, remover sem perder nada e melhorar** (o painel cresce, a estufa aumenta). O álbum destrava **decorações**.
+- **Construir:** toca no item, toca no chão (sem arrastar). Dá para **mover, girar, remover sem perder nada e melhorar** (o painel cresce, a estufa aumenta). O álbum destrava **decorações**.
+- **A Casa do Mike manda na base:** o nível dela abre área nova para construir (4 x 4 casas no nível 1, 6 x 6 no 2, 6 x 8 no 3) e é o nível máximo das outras construções. O planetinha cresce junto.
 - **Plantar:** na estufa. A luz da estufa gasta energia. As plantas crescem num tempo proporcional ao real (alface ≈ 1 min 20 s; pimenta ≈ 5 min).
 - **Explorar:** gasta oxigênio. O Mike volta com um **tubo de amostra** (igual aos que o rover Perseverance lacra em Marte), que treme, brilha na cor da raridade e revela uma **carta**.
-- **Cartas:** **40**, em 4 raridades com cor fixa: comum (cinza), raro (azul), épico (roxo) e lendário (dourado). As mesmas cores que as crianças já conhecem de outros jogos. Cada uma tem **foto real da NASA**, nome de verdade e **1 linha de fato**, que aparece como **prêmio** depois que a criança ganha (nunca como lição).
+- **Cartas:** **35** no jogo (as 5 de Meridiani e Jezero ficaram fora, para o jogo sair fechadinho), em 4 raridades com cor fixa: comum (cinza), raro (azul), épico (roxo) e lendário (dourado). As mesmas cores que as crianças já conhecem de outros jogos. Cada uma tem **foto real da NASA**, nome de verdade e **1 linha de fato**, que aparece como **prêmio** depois que a criança ganha (nunca como lição).
 - **A base fica salva** no aparelho e **cresce até com o jogo fechado** ("enquanto você estava fora, 3 alfaces ficaram prontas!").
 - **Sem game over:** barra baixa só **trava ou desacelera** uma ação até recuperar (sem oxigênio, o Mike não sai; sem energia, a estufa desacelera).
 - **Escolha de verdade:** painel solar dá muita energia, mas sofre com a poeira. Bateria nuclear (RTG) dá pouca, mas nunca para.
