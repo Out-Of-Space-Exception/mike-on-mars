@@ -400,7 +400,7 @@ func _tutorial() -> void:
 	ok(State.tutorial == State.TUTORIAL_DONE and not hud._tut_card.visible, "the tutorial ends and the note goes away")
 	hud._card.visible = false
 	hud._card_queue.clear()
-	ok(hud._sols(tr("COLD_LEFT").format({"n": 1})).ends_with("1 sol"), "1 sol (not \"1 sols\")")
+	ok(hud._sols(tr("COLD_LEFT").format({"n": 1})).ends_with(" sol"), "1 sol (not \"1 sols\")")
 
 
 func _new_rules() -> void:

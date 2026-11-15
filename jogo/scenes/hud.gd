@@ -1179,7 +1179,6 @@ func _refresh() -> void:
 		_refresh_build_menu()
 
 
-## "1 sóis" becomes "1 sol" (and "1 sols", "1 soles" too).
 ## "Next package in 12 sols (0:42)". With no signal, the countdown is paused.
 func _package_text() -> String:
 	if State.nosignal_left > 0:
@@ -1189,10 +1188,11 @@ func _package_text() -> String:
 	return _sols(tr("PACKAGE_NEXT").format({"n": n, "time": "%d:%02d" % [secs / 60, secs % 60]}))
 
 
+## "1 sóis" becomes "1 sol" (and "1 sols", "1 soles", "1 more sols" too).
 func _sols(text: String) -> String:
 	var re := RegEx.new()
-	re.compile("(^|[^0-9/])1 (sóis|sols|soles)")
-	return re.sub(text, "${1}1 sol", true)
+	re.compile("(^|[^0-9/])1 (more )?(sóis|sols|soles)")
+	return re.sub(text, "${1}1 ${2}sol", true)
 
 
 ## NASA date (2024-05-20) the way the child reads it: 20/05/2024 (in English, May 20, 2024).
