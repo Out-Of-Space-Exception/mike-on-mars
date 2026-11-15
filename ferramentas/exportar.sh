@@ -8,7 +8,7 @@ NODE="$(command -v node || echo "/c/Program Files/nodejs/node.exe")"
 rm -rf "$RAIZ/build" && mkdir -p "$RAIZ/build"
 "$GODOT" --headless --path "$RAIZ/jogo" --import > /dev/null 2>&1 || true
 "$GODOT" --headless --path "$RAIZ/jogo" --export-release "Web" "$RAIZ/build/index.html"
-cp "$RAIZ/jogo/web/nave.png" "$RAIZ/jogo/web/rubik.ttf" "$RAIZ/build/"
+cp "$RAIZ/jogo/web/nave.png" "$RAIZ/jogo/web/rubik.ttf" "$RAIZ/jogo/web/share.png" "$RAIZ/build/"
 # Nome novo para o pacote do jogo a cada versão: o navegador não usa a versão velha guardada.
 H="$(md5sum "$RAIZ/build/index.pck" | cut -c1-8)"
 mv "$RAIZ/build/index.pck" "$RAIZ/build/index-$H.pck"

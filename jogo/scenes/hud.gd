@@ -11,7 +11,7 @@ const LANG_NAMES := {"en": "EN", "pt_BR": "PT", "es": "ES", "fr": "FR"}
 const LANG_FLAGS := {"en": "res://ui/flags/us.png", "pt_BR": "res://ui/flags/br.png", "es": "res://ui/flags/es.png", "fr": "res://ui/flags/fr.png"}
 const LANG_LABELS := {"en": "English", "pt_BR": "Português", "es": "Español", "fr": "Français"}
 const BAR_KEYS := {"energy": "BAR_ENERGY", "oxygen": "BAR_OXYGEN", "shield": "BAR_SHIELD"}
-const REVEAL_SOUND := {"comum": "revelar-comum", "raro": "revelar-raro", "épico": "revelar-epico", "lendário": "revelar-lendario"}
+const REVEAL_SOUND := {"common": "revelar-comum", "rare": "revelar-raro", "epic": "revelar-epico", "legendary": "revelar-lendario"}   # sound file names (Content team)
 const BAR_ICONS := {"energy": "res://ui/icons/ic-energia.svg", "oxygen": "res://ui/icons/ic-oxigenio.svg", "shield": "res://ui/icons/ic-escudo.svg"}
 const ICONS := {"build": "res://ui/icons/ic-wrench.png", "explore": "res://ui/icons/ic-target.png", "album": "res://ui/icons/ic-menugrid.png", "photo": "res://ui/icons/ic-camera.svg"}
 const DONKI_URL := "https://kauai.ccmc.gsfc.nasa.gov/DONKI/"
@@ -84,7 +84,7 @@ var _card_name: Label
 var _card_fact: Label
 var _card_photo: TextureRect
 var _card_frame: TextureRect
-var _info_construcao: Control
+var _build_info: Control
 var _icon_cache := {}         # ícones 3D já desenhados
 var _settings: PanelContainer
 var _set_title: Label
@@ -104,7 +104,7 @@ var _tut_ring: Panel          # moldura dourada pulsando em volta do botão que 
 var _tut_done_at := -1.0
 var _pc_hint_shown := false
 const CARD_W := 560.0          # a carta com a moldura do Design (1066 x 1280) nesta largura
-const FRAME := {"comum": "comum", "raro": "raro", "épico": "epico", "lendário": "lendario"}
+const FRAME := {"common": "comum", "rare": "raro", "epic": "epico", "legendary": "lendario"}   # card frame file names (Design team)
 var _card_source := ""
 var _card_queue: Array[int] = []
 var _card_new: Array[bool] = []
@@ -129,7 +129,7 @@ var _album_page_title: Label
 var _album_page := 0
 var _album_badge: PanelContainer
 var _album_box: StyleBoxFlat
-var _estante: Control
+var _shelf: Control
 const ALBUM_MAX_W := 1000.0   # no PC o álbum fica no meio, no máximo desta largura   # bolinha vermelha no botão Álbum: quantas cartas novas
 var _nasa: PanelContainer
 var _nasa_text: Label
@@ -157,15 +157,15 @@ func _ready() -> void:
 	_build_album()
 	_build_popups()
 	# Painel de informação da construção (Design 05): abre ao tocar num item do menu Construir.
-	_info_construcao = preload("res://scenes/info_construcao.gd").new()
-	_info_construcao.icons = {"energy": _icon("energy"), "oxygen": _icon("oxygen"), "shield": _icon("shield"), "card": _icon("card")}
-	_info_construcao.model_for = func(type: String) -> Node3D: return _item_model(type, 1.25)
-	_root.add_child(_info_construcao)
-	_estante = preload("res://scenes/estante.gd").new()
-	_estante.hud = self
-	_estante.red_x = _red_x
-	_root.add_child(_estante)
-	_info_construcao.construir.connect(_on_build_item)
+	_build_info = preload("res://scenes/build_info.gd").new()
+	_build_info.icons = {"energy": _icon("energy"), "oxygen": _icon("oxygen"), "shield": _icon("shield"), "card": _icon("card")}
+	_build_info.model_for = func(type: String) -> Node3D: return _item_model(type, 1.25)
+	_root.add_child(_build_info)
+	_shelf = preload("res://scenes/shelf.gd").new()
+	_shelf.hud = self
+	_shelf.red_x = _red_x
+	_root.add_child(_shelf)
+	_build_info.build_pressed.connect(_on_build_item)
 	_build_settings()
 	_build_postcard()
 	_build_tutorial()
@@ -511,11 +511,11 @@ func _refresh_panel() -> void:
 				"plant": tr(State.PLANTS[it.plant].name), "n": int(it.growth), "max": State.PLANTS[it.plant].sols})
 	# Estante: o botão dourado "Ver estante" (câmera de frente e as vagas para escolher o que expor).
 	if it.type == "shelf":
-		var chave := State.key(State.anchor_of(selected))
+		var shelf_key := State.key(State.anchor_of(selected))
 		var ver := _add_panel_button(tr("BTN_SHELF"), func() -> void:
 			Sfx.play("abrir-menu")
 			_close_panel()
-			_estante.abrir(chave), true)
+			_shelf.open(shelf_key), true)
 		ver.custom_minimum_size.y = 88
 		ver.set_meta("base_color", Palette.GOLD)
 		_style_key(ver, true)
@@ -526,7 +526,7 @@ func _refresh_panel() -> void:
 	if it.get("broken", false):
 		_panel_info.visible = true
 		_panel_info.text = tr("BROKEN_TEXT")
-		var fix := _add_panel_button("%s  -%d" % [tr("BTN_REPAIR"), State.repair_cost(selected)], _on_repair, true)
+		var fix := _add_panel_button("%s  %d" % [tr("BTN_REPAIR"), State.repair_cost(selected)], _on_repair, true)
 		fix.icon = _icon("energy")
 		fix.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		fix.custom_minimum_size.y = 88
@@ -534,7 +534,7 @@ func _refresh_panel() -> void:
 		_style_key(fix, State.can_afford(State.repair_cost(selected)))
 		cost = -1
 	if cost >= 0:
-		var up := _add_panel_button("%s  -%d" % [tr("BTN_UPGRADE"), cost], _on_upgrade, true)
+		var up := _add_panel_button("%s  %d" % [tr("BTN_UPGRADE"), cost], _on_upgrade, true)
 		up.icon = _icon("energy")
 		up.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		up.custom_minimum_size.y = 88
@@ -673,9 +673,14 @@ func _show_storm(event: Dictionary) -> void:
 		lines.append(tr("EV_SOLAR_CURIOSITY"))
 	lines.append(tr("EV_SOLAR_Q"))
 	_show_choice(tr("EV_SOLAR_TITLE"), lines,
-		"%s  ·  -%d %s" % [tr("EV_SOLAR_A"), int(State.storm_shield_cost()), tr("BAR_ENERGY").to_lower()], State.can_afford(State.storm_shield_cost()),
+		_with_cost(tr("EV_SOLAR_A"), State.storm_shield_cost()), State.can_afford(State.storm_shield_cost()),
 		_storm_shield, tr("EV_SOLAR_B"), _storm_inside)
 	Sfx.play("alerta")
+
+
+## "Sim, levantar (gasta 30 de energia)": the choice button says how much energy it uses.
+func _with_cost(text: String, cost: float) -> String:
+	return "%s (%s)" % [text, tr("COST_ENERGY").format({"n": int(cost)})]
 
 
 func _storm_shield() -> void:
@@ -697,7 +702,7 @@ func _show_event(type: String) -> void:
 			Sfx.play("energia-volta")
 		"cold":
 			_show_choice(tr("EV_COLD_TITLE"), [tr("EV_COLD_TEXT"), tr("EV_COLD_Q")],
-				"%s  ·  -%d %s" % [tr("EV_COLD_A"), int(State.cold_cost()), tr("BAR_ENERGY").to_lower()], State.can_afford(State.cold_cost()),
+				_with_cost(tr("EV_COLD_A"), State.cold_cost()), State.can_afford(State.cold_cost()),
 				func() -> void: State.choose_cold(true),
 				tr("EV_COLD_B"), func() -> void: State.choose_cold(false))
 			Sfx.play("alerta")
@@ -923,7 +928,7 @@ func _show_next_card() -> void:
 	var id: int = _card_queue.pop_front()
 	var is_new_card: bool = _card_new.pop_front() if not _card_new.is_empty() else false
 	var info := State.card_info(id)
-	var rarity: String = info.get("rarity", "comum")
+	var rarity: String = info.get("rarity", "common")
 	var color: Color = Palette.RARITY.get(rarity, Palette.TEXT)
 	_card_title.text = ""          # o selo "NOVA!" na carta já diz isso
 	_card_title.visible = false
@@ -937,11 +942,11 @@ func _show_next_card() -> void:
 	pill_box.content_margin_left = 26
 	pill_box.content_margin_right = 26
 	_card_rarity_pill.add_theme_stylebox_override("panel", pill_box)
-	_card_rarity.add_theme_color_override("font_color", Color.WHITE if rarity == "épico" else Palette.INK)
+	_card_rarity.add_theme_color_override("font_color", Color.WHITE if rarity == "epic" else Palette.INK)
 	_card_name.text = tr("CARD_%d_NAME" % id).to_upper()
 	var n := _card_name.text.length()
 	_card_name.add_theme_font_size_override("font_size", 30 if n <= 16 else (25 if n <= 24 else 20))
-	_card_fact.text = "%s %s" % [tr("CARD_REAL"), tr("CARD_%d_FACT" % id)]
+	_card_fact.text = tr("CARD_%d_FACT" % id)
 	_card_source = str(info.get("source", ""))
 	var source_btn: Button = _card.find_child("Source", true, false)
 	source_btn.text = tr("BTN_SOURCE")
@@ -1071,7 +1076,7 @@ func _refresh_album() -> void:
 	# Página aberta
 	var page_owned := State.page_owned(_album_page)
 	var page_ids := State.page_cards(_album_page)
-	_album_page_title.text = "%s  ·  %d/%d%s" % [tr(State.ALBUM_PAGES[_album_page][1]), page_owned, page_ids.size(), "  ★" if page_owned == page_ids.size() else ""]
+	_album_page_title.text = "%s  %d/%d%s" % [tr(State.ALBUM_PAGES[_album_page][1]), page_owned, page_ids.size(), "  ★" if page_owned == page_ids.size() else ""]
 	# Todas as cartas juntas, grandes: 2 colunas no celular e mais colunas em tela larga.
 	for c in _album_grid.get_children():
 		c.queue_free()
@@ -1118,7 +1123,7 @@ func _refresh() -> void:
 		rl.add_theme_color_override("font_color", Palette.UP if r > 0.0 else Palette.DOWN)
 		_bar_labels[bar].text = tr(BAR_KEYS[bar])
 		_bars[bar].color = Palette.ALERT if value < State.low_line(bar) else Palette.BAR[bar]
-	_sol_label.text = "%s  •  %s" % [tr("HUD_SOL").format({"n": State.sol}), tr("HUD_PLACE")]
+	_sol_label.text = tr("POSTCARD").format({"n": State.sol})
 	_start_lang.text = LANG_NAMES.get(State.locale, "EN")
 	_start_lang.icon = _icon("flag_" + State.locale)
 	_start_play.text = tr("BTN_PLAY")
@@ -1345,14 +1350,14 @@ func _refresh_build_menu() -> void:
 			bolt.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			cost_row.add_child(bolt)
 			var cost := Label.new()
-			cost.text = "-%d" % def.cost
+			cost.text = str(def.cost)
 			cost.add_theme_font_override("font", Palette.font(700))
 			cost.add_theme_font_size_override("font_size", 19)
 			cost.add_theme_color_override("font_color", Palette.TEXT)
 			cost.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			cost_row.add_child(cost)
 		_style_key(b, State.build_block_reason(type) == "")
-		if type in _info_construcao.COM_INFO:
+		if type in _build_info.WITH_INFO:
 			b.pressed.connect(_open_build_info.bind(type))
 		else:
 			b.pressed.connect(_on_build_item.bind(type))
@@ -1363,7 +1368,7 @@ func _open_build_info(type: String) -> void:
 	if _tut_blocks("build_" + type):
 		return
 	Sfx.play("toque-botao")
-	_info_construcao.abrir(type)
+	_build_info.open(type)
 	_tut_update()
 
 
@@ -1527,7 +1532,7 @@ func _tut_update() -> void:
 				text = tr("TUTO_WAIT_ENERGY")
 			elif mode == Mode.BUILD:
 				text = tr("TUTO_PLACE")
-			elif _info_construcao.visible:
+			elif _build_info.visible:
 				text = tr("TUTO_CONFIRM")
 			elif _build_menu.visible:
 				text = tr("TUTO_PICK").format({"name": tr(State.ITEMS[type].name)})
@@ -1570,8 +1575,8 @@ func _tut_target() -> Variant:
 			var type := "solar" if State.tutorial == 0 else "greenhouse"
 			if mode == Mode.BUILD:
 				return null
-			if _info_construcao.visible:
-				return _info_construcao._btn_construir
+			if _build_info.visible:
+				return _build_info._build_button
 			if _build_menu.visible:
 				for b in _build_grid.get_children():
 					if b is Button and not b.is_queued_for_deletion() and b.get_meta("type", "") == type:
@@ -1616,7 +1621,7 @@ func _tut_target_name() -> String:
 			var type := "solar" if State.tutorial == 0 else "greenhouse"
 			if mode == Mode.BUILD:
 				return tr("TUTO_SQUARE")
-			if _info_construcao.visible:
+			if _build_info.visible:
 				return tr("INFO_BUILD")
 			if _build_menu.visible:
 				return tr(State.ITEMS[type].name)
@@ -2352,7 +2357,7 @@ func _page_icon(page: int) -> Texture2D:
 func _album_tile(id: int, w := 192.0) -> Control:
 	var info := State.card_info(id)
 	var owned := State.cards.has(str(id))
-	var rarity: String = info.get("rarity", "comum")
+	var rarity: String = info.get("rarity", "common")
 	var k := w / 1066.0
 	var f := w / 192.0          # as letras crescem junto com a carta
 	var b := Button.new()
@@ -2450,7 +2455,7 @@ func _album_tile(id: int, w := 192.0) -> Control:
 		badge.add_child(bt)
 		b.add_child(badge)
 	# Lendária que a criança tem: brilha devagar.
-	if owned and rarity == "lendário":
+	if owned and rarity == "legendary":
 		var glow := create_tween().set_loops()
 		glow.tween_property(frame, "modulate", Color(1.35, 1.25, 0.9), 0.8).set_trans(Tween.TRANS_SINE)
 		glow.tween_property(frame, "modulate", Color.WHITE, 0.8).set_trans(Tween.TRANS_SINE)

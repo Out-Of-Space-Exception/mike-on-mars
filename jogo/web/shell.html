@@ -4,7 +4,43 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
 		<meta name="theme-color" content="#3a1418">
-		<title>$GODOT_PROJECT_NAME</title>
+		<title>Mike on Mars: build a base on Mars and learn with NASA</title>
+		<meta name="description" content="A free game for kids aged 7 to 12. Build Mike's base in Gale Crater, grow space plants, face solar storms from NASA data and collect 35 science cards. Plays in the browser in English, Portuguese, Spanish and French.">
+		<link rel="canonical" href="https://out-of-space-exception.github.io/mike-on-mars/">
+		<link rel="icon" href="index.icon.png">
+		<meta property="og:type" content="website">
+		<meta property="og:site_name" content="Mike on Mars">
+		<meta property="og:title" content="Mike on Mars: build a base on Mars and learn with NASA">
+		<meta property="og:description" content="Build a base on Mars, grow plants and survive solar storms from NASA data. A free science game for kids aged 7 to 12.">
+		<meta property="og:url" content="https://out-of-space-exception.github.io/mike-on-mars/">
+		<meta property="og:image" content="https://out-of-space-exception.github.io/mike-on-mars/share.png">
+		<meta property="og:image:width" content="600">
+		<meta property="og:image:height" content="600">
+		<meta property="og:image:alt" content="Mike on Mars logo: a rocket flying around Mars">
+		<meta property="og:locale" content="en_US">
+		<meta property="og:locale:alternate" content="pt_BR">
+		<meta property="og:locale:alternate" content="es_ES">
+		<meta property="og:locale:alternate" content="fr_FR">
+		<meta name="twitter:card" content="summary">
+		<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "VideoGame",
+			"name": "Mike on Mars",
+			"url": "https://out-of-space-exception.github.io/mike-on-mars/",
+			"image": "https://out-of-space-exception.github.io/mike-on-mars/share.png",
+			"description": "A free game for kids aged 7 to 12. Build Mike's base in Gale Crater, grow space plants, face solar storms from NASA data and collect 35 science cards.",
+			"genre": ["Educational", "Simulation"],
+			"gamePlatform": "Web browser",
+			"applicationCategory": "Game",
+			"operatingSystem": "Any",
+			"inLanguage": ["en", "pt-BR", "es", "fr"],
+			"isAccessibleForFree": true,
+			"audience": {"@type": "PeopleAudience", "suggestedMinAge": 7, "suggestedMaxAge": 12},
+			"author": {"@type": "Organization", "name": "Out of Space Exception"},
+			"about": ["Mars", "Gale Crater", "Space weather", "Plants in space", "NASA"]
+		}
+		</script>
 		<!--
 			Página do Mike on Mars no navegador. Troca a tela de carregamento da Godot pela tela
 			do Design (design/05-telas/tela-carregamento.png): Marte girando, a nave como barra de
@@ -59,10 +95,10 @@ body {
 	</head>
 	<body>
 		<canvas id="canvas">
-			Your browser does not support the canvas tag.
+			Mike on Mars needs a browser that can draw on a canvas.
 		</canvas>
 		<noscript>
-			Your browser does not support JavaScript.
+			Mike on Mars needs JavaScript to run. Please turn it on and reload the page.
 		</noscript>
 
 		<canvas id="loader"></canvas>

@@ -117,16 +117,16 @@ const EXPLORE_OXYGEN := 30.0        # o traje gasta oxigênio (bastante: nada de
 const EXPLORE_EMPTY_CHANCE := 0.1   # às vezes o Mike volta sem nada (nunca duas vezes seguidas, nunca no tutorial)
 const EXPLORE_MIN_SHIELD := 25.0     # com o escudo baixo, lá fora tem radiação demais
 const EXPLORE_RADIATION := 5.0      # lá fora a radiação come um pouco do escudo
-const TUBE_ODDS := {"comum": 60, "raro": 27, "épico": 10, "lendário": 3}   # em %
+const TUBE_ODDS := {"common": 60, "rare": 27, "epic": 10, "legendary": 3}   # em %
 ## Toda expedição leva um lanche da estufa. Quanto mais raro o lanche (a raridade da carta da planta),
 ## mais chance de carta rara no tubo.
 const SNACK_ODDS := {
-	"comum": {"comum": 55, "raro": 30, "épico": 11, "lendário": 4},
-	"raro": {"comum": 38, "raro": 37, "épico": 19, "lendário": 6},
-	"épico": {"comum": 22, "raro": 40, "épico": 28, "lendário": 10},
-	"lendário": {"comum": 10, "raro": 35, "épico": 35, "lendário": 20},
+	"common": {"common": 55, "rare": 30, "epic": 11, "legendary": 4},
+	"rare": {"common": 38, "rare": 37, "epic": 19, "legendary": 6},
+	"epic": {"common": 22, "rare": 40, "epic": 28, "legendary": 10},
+	"legendary": {"common": 10, "rare": 35, "epic": 35, "legendary": 20},
 }
-const RARITY_ORDER := ["comum", "raro", "épico", "lendário"]
+const RARITY_ORDER := ["common", "rare", "epic", "legendary"]
 # Crescer com o jogo fechado
 const OFFLINE_MIN_SECONDS := 30
 const OFFLINE_MAX_SOLS := 2000      # ~1h20 de jogo; depois disso para de contar
@@ -167,11 +167,11 @@ var next_break_sol := 140       # quando algo vai quebrar de novo            # c
 
 ## Páginas do álbum, pela coluna "categoria" do cartas.csv (Robôs entra junto com Tecnologia).
 const ALBUM_PAGES := [
-	["plants", "ALBUM_PLANTS", ["Plantas"]],
-	["tech", "ALBUM_TECH", ["Tecnologias", "Robôs"]],
-	["minerals", "ALBUM_MINERALS", ["Minerais"]],
-	["discoveries", "ALBUM_DISCOVERIES", ["Descobertas"]],
-	["sky", "ALBUM_SKY", ["Céu e clima"]],
+	["plants", "ALBUM_PLANTS", ["plants"]],
+	["tech", "ALBUM_TECH", ["tech", "robots"]],
+	["minerals", "ALBUM_MINERALS", ["minerals"]],
+	["discoveries", "ALBUM_DISCOVERIES", ["discoveries"]],
+	["sky", "ALBUM_SKY", ["sky"]],
 ]         # a última expedição voltou sem nada       # a antena já avisou a próxima tempestade
 var snack := ""                 # o lanche (uma colheita) que o Mike levou na expedição de agora
 var music_on := true
@@ -210,12 +210,12 @@ func _ready() -> void:
 	# Atalho para testar e gravar o vídeo: ?tubo traz um tubo de amostra esperando para abrir.
 	if OS.has_feature("web") and str(JavaScriptBridge.eval("location.search", true)).contains("tubo") and tube_card == 0:
 		tube_card = _draw_tube()
-	# Atalho para testar a estante: ?estante deixa a casa no nível 2, com a estante e algumas cartas.
-	if OS.has_feature("web") and str(JavaScriptBridge.eval("location.search", true)).contains("estante") and count_items("shelf") == 0:
+	# Test shortcut: ?shelf sets Mike's House to level 2, with the shelf and a few cards.
+	if OS.has_feature("web") and str(JavaScriptBridge.eval("location.search", true)).contains("shelf") and count_items("shelf") == 0:
 		_test_shelf()
 
 
-## Só para testar (atalho ?estante): casa no nível 2, estante construída e algumas cartas no álbum.
+## Testing only (?shelf shortcut): house at level 2, shelf built and a few cards in the album.
 func _test_shelf() -> void:
 	tutorial = TUTORIAL_DONE
 	for k in items:
@@ -804,7 +804,7 @@ func explore_block_reason() -> String:
 
 ## Raridade de uma planta como lanche: a raridade da carta dela no cartas.csv.
 func plant_rarity(p: String) -> String:
-	return str(card_info(int(PLANTS[p].card)).get("rarity", "comum"))
+	return str(card_info(int(PLANTS[p].card)).get("rarity", "common"))
 
 
 ## O lanche que o Mike leva: o mais raro que tiver colhido.
@@ -846,7 +846,7 @@ func open_tube() -> int:
 
 
 func tube_rarity() -> String:
-	return card_info(tube_card).get("rarity", "comum")
+	return card_info(tube_card).get("rarity", "common")
 
 
 ## Sorteia a raridade pelo TUBE_ODDS e depois uma carta dessa raridade que dá para achar na Gale.
@@ -854,7 +854,7 @@ func _draw_tube() -> int:
 	var pool := {}
 	for id in _cards_info:
 		var c: Dictionary = _cards_info[id]
-		if c.place != "Gale" or not (c.how in ["tubo de amostra", "explorar"]):
+		if c.place != "Gale" or not (c.how in ["tube", "explore"]):
 			continue
 		if not pool.has(c.rarity):
 			pool[c.rarity] = []
@@ -862,7 +862,7 @@ func _draw_tube() -> int:
 	if pool.is_empty():
 		return 0
 	var roll := randi_range(1, 100)
-	var rarity := "comum"
+	var rarity := "common"
 	var odds: Dictionary = SNACK_ODDS.get(plant_rarity(snack), TUBE_ODDS) if snack != "" else TUBE_ODDS
 	snack = ""
 	for r in odds:

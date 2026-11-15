@@ -5,95 +5,74 @@ BTN_BUILD,Construir,Build,Construir,Construire
 BTN_MOVE,Mover,Move,Mover,Déplacer
 BTN_UPGRADE,Melhorar,Upgrade,Mejorar,Améliorer
 BTN_REMOVE,Remover,Remove,Quitar,Retirer
-BTN_PLANT,Plantar,Plant,Plantar,Planter
 BTN_HARVEST,Colher,Harvest,Cosechar,Récolter
 BTN_EXPLORE,Explorar,Explore,Explorar,Explorer
 BTN_ALBUM,Álbum,Album,Álbum,Album
 BTN_PHOTO,Foto,Photo,Foto,Photo
-BTN_OK,OK,OK,OK,OK
-BTN_LANGUAGE,Idioma,Language,Idioma,Langue
-BTN_SOUND,Som,Sound,Sonido,Son
-BTN_CREDITS,Créditos,Credits,Créditos,Crédits
 BAR_ENERGY,Energia,Energy,Energía,Énergie
 BAR_OXYGEN,Oxigênio,Oxygen,Oxígeno,Oxygène
 BAR_SHIELD,Escudo,Shield,Escudo,Bouclier
-HUD_SOL,Sol {n},Sol {n},Sol {n},Sol {n}
-HUD_PLACE,Cratera Gale,Gale Crater,Cráter Gale,Cratère Gale
-B_HABITAT,Casa do Mike,Mike's habitat,Casa de Mike,Maison de Mike
-B_HABITAT_DESC,A casa onde o Mike dorme e se protege. Melhore e a base cresce!,"Mike's home, where he sleeps and stays safe. Upgrade it and the base grows!",La casa donde Mike duerme y se protege. ¡Mejórala y la base crece!,La maison où Mike dort et se protège. Améliore-la et la base grandit !
+B_HABITAT,Casa do Mike,Mike's House,Casa de Mike,Maison de Mike
+B_HABITAT_DESC,"A casa do Mike, onde ele dorme e fica protegido. Melhore a casa e a base cresce, junto com as barras!","Mike's home, where he sleeps and stays safe. Upgrade it and the base grows, and so do the bars!","La casa de Mike, donde duerme y está a salvo. ¡Mejórala y crecen la base y las barras!","La maison de Mike, où il dort et reste à l'abri. Améliore-la et la base grandit, avec les barres !"
 B_GREENHOUSE,Estufa,Greenhouse,Invernadero,Serre
-B_GREENHOUSE_DESC,Aqui as plantas crescem. A luz gasta energia.,Plants grow here. The lights use energy.,Aquí crecen las plantas. Las luces gastan energía.,"Ici, les plantes poussent. Les lumières consomment de l'énergie."
 B_SOLAR,Painel solar,Solar panel,Panel solar,Panneau solaire
-B_SOLAR_DESC,"Muita energia, mas a poeira atrapalha.","Lots of energy, but dust gets in the way.","Mucha energía, pero el polvo estorba.","Beaucoup d'énergie, mais la poussière gêne."
 B_RTG,Bateria nuclear (RTG),Nuclear battery (RTG),Batería nuclear (RTG),Batterie nucléaire (RTG)
-B_RTG_DESC,"Pouca energia, mas nunca para.","A little energy, but it never stops.","Poca energía, pero nunca se detiene.","Peu d'énergie, mais elle ne s'arrête jamais."
 B_MOXIE,MOXIE,MOXIE,MOXIE,MOXIE
-B_MOXIE_DESC,Transforma o ar de Marte em oxigênio.,Turns Mars air into oxygen.,Convierte el aire de Marte en oxígeno.,Transforme l'air de Mars en oxygène.
 B_ANTENNA,Antena,Antenna,Antena,Antenne
-B_ANTENNA_DESC,Recebe os avisos da NASA: a tempestade solar não pega o Mike de surpresa.,Gets NASA's warnings: solar storms don't catch Mike by surprise.,Recibe los avisos de la NASA: la tormenta solar no sorprende a Mike.,Reçoit les alertes de la NASA : la tempête solaire ne surprend pas Mike.
-B_PAD,Pista do Ingenuity,Ingenuity pad,Pista del Ingenuity,Piste d'Ingenuity
-B_PAD_DESC,Lugar de pouso do helicóptero Ingenuity. Ele voa com o Mike!,Landing spot for the Ingenuity helicopter. It flies with Mike!,Lugar de aterrizaje del helicóptero Ingenuity. ¡Vuela con Mike!,Aire d'atterrissage de l'hélicoptère Ingenuity. Il vole avec Mike !
-B_DECOR,Decoração,Decoration,Decoración,Décoration
+B_PAD,Pista do Ingenuity,Ingenuity Pad,Pista del Ingenuity,Piste d'Ingenuity
 P_LETTUCE,Alface,Lettuce,Lechuga,Laitue
 P_RADISH,Rabanete,Radish,Rábano,Radis
 P_KALE,Couve,Kale,Col rizada,Chou kale
 P_POTATO,Batata,Potato,Papa,Pomme de terre
 P_ZINNIA,Zínia,Zinnia,Zinnia,Zinnia
 P_CHILE,Pimenta Hatch,Hatch chile,Chile Hatch,Piment Hatch
-P_TOMATO,Tomate-anão,Dwarf tomato,Tomate enano,Tomate naine
-TUBE_TAP,Toque para abrir!,Tap to open!,¡Toca para abrir!,Touche pour ouvrir !
 RARITY_COMMON,Comum,Common,Común,Commune
-RARITY_RARE,Raro,Rare,Rara,Rare
-RARITY_EPIC,Épico!,Epic!,¡Épica!,Épique !
-RARITY_LEGEND,Lendário!,Legendary!,¡Legendaria!,Légendaire !
+RARITY_RARE,Rara,Rare,Rara,Rare
+RARITY_EPIC,Épica!,Epic!,¡Épica!,Épique !
+RARITY_LEGEND,Lendária!,Legendary!,¡Legendaria!,Légendaire !
 CARD_NEW,Carta nova!,New card!,¡Carta nueva!,Nouvelle carte !
-CARD_REAL,De verdade:,This is real:,Es de verdad:,C'est réel :
-EV_SOLAR_TITLE,Tempestade solar chegando!,Solar storm coming!,¡Viene una tormenta solar!,Tempête solaire en approche !
-EV_SOLAR_REAL,Aconteceu de verdade: {date}. Dado da NASA.,This really happened: {date}. NASA data.,Real: {date} · datos de la NASA (DONKI),Réel : {date} · données de la NASA (DONKI)
-EV_SOLAR_Q,Levantar o escudo?,Raise the shield?,¿Subir el escudo?,Lever le bouclier ?
-EV_SOLAR_A,"Sim, levantar","Yes, shield up",Escudo (gasta energía),Bouclier (consomme de l'énergie)
-EV_SOLAR_B,"Não, ficar em casa","No, stay inside",Mike se queda adentro,Mike reste à l'intérieur
+EV_SOLAR_TITLE,Tempestade solar chegando!,A solar storm is coming!,¡Se acerca una tormenta solar!,Une tempête solaire arrive !
+EV_SOLAR_REAL,"Essa tempestade aconteceu em {date}, e a NASA registrou!","This storm happened on {date}, and NASA recorded it!",¡Esta tormenta pasó el {date} y la NASA la registró!,"Cette tempête a eu lieu le {date}, et la NASA l'a enregistrée !"
+EV_SOLAR_Q,A radiação do Sol faz mal. Levantar o escudo?,The Sun's radiation is harmful. Raise the shield?,La radiación del Sol hace daño. ¿Subimos el escudo?,Les radiations du Soleil sont dangereuses. On lève le bouclier ?
+EV_SOLAR_A,"Sim, levantar","Yes, raise it","Sí, subirlo","Oui, le lever"
+EV_SOLAR_B,"Não, ficar em casa","No, stay inside","No, quedarse adentro","Non, rester à l'intérieur"
 EV_DUST_TITLE,Tempestade de poeira!,Dust storm!,¡Tormenta de polvo!,Tempête de poussière !
-EV_DUST_TEXT,Os painéis ficaram sujos.,The panels got dirty.,Los paneles se ensuciaron.,Les panneaux sont sales.
+EV_DUST_TEXT,A poeira cobriu os painéis solares. Eles vão fazer menos energia por um tempo.,Dust covered the solar panels. They'll make less energy for a while.,El polvo cubrió los paneles solares. Darán menos energía por un tiempo.,La poussière a recouvert les panneaux solaires. Ils feront moins d'énergie pendant un moment.
 EV_DEVIL_TITLE,Redemoinho de poeira!,Dust devil!,¡Remolino de polvo!,Tourbillon de poussière !
-EV_DEVIL_TEXT,Ele limpou os painéis!,It cleaned the panels!,¡Limpió los paneles!,Il a nettoyé les panneaux !
+EV_DEVIL_TEXT,O vento girou e limpou os painéis!,The swirling wind cleaned the panels!,¡El viento giró y limpió los paneles!,Le vent a tourbillonné et a nettoyé les panneaux !
 EV_COLD_TITLE,Noite congelante!,Freezing night!,¡Noche helada!,Nuit glaciale !
-EV_COLD_Q,Aquecer a estufa?,Heat the greenhouse?,¿Calentar el invernadero?,Chauffer la serre ?
+EV_COLD_Q,Aquecer a estufa?,Heat the greenhouse?,¿Calentamos el invernadero?,On chauffe la serre ?
 EV_NOSIGNAL_TITLE,Sem sinal da Terra!,No signal from Earth!,¡Sin señal de la Tierra!,Pas de signal de la Terre !
-EV_NOSIGNAL_Q,Escolha o plano do piloto automático:,Pick the autopilot plan:,Elige el plan del piloto automático:,Choisis le plan du pilote automatique :
-EV_NOSIGNAL_BACK,Sinal de volta! Chegou um pacote.,Signal is back! A package arrived.,¡Volvió la señal! Llegó un paquete.,Le signal est revenu ! Un colis est arrivé.
-EV_AURORA,Uma aurora em Marte!,An aurora on Mars!,¡Una aurora en Marte!,Une aurore sur Mars !
-LOCK_OXYGEN,Pouco oxigênio. O Mike espera aqui dentro.,Low oxygen. Mike waits inside.,Poco oxígeno. Mike espera adentro.,Peu d'oxygène. Mike attend à l'intérieur.
-LOCK_ENERGY,Pouca energia. A estufa ficou mais lenta.,Low energy. The greenhouse slowed down.,Poca energía. El invernadero va más lento.,Peu d'énergie. La serre ralentit.
+EV_NOSIGNAL_Q,"Enquanto isso, o que o piloto automático faz?","Meanwhile, what should the autopilot do?","Mientras tanto, ¿qué hace el piloto automático?","En attendant, que fait le pilote automatique ?"
+EV_NOSIGNAL_BACK,O sinal voltou! Chegou um pacote da Terra.,The signal is back! A package came from Earth.,¡Volvió la señal! Llegó un paquete de la Tierra.,Le signal est revenu ! Un colis est arrivé de la Terre.
+LOCK_OXYGEN,Pouco oxigênio para sair. O Mike espera em casa.,Not enough oxygen to go out. Mike waits at home.,Poco oxígeno para salir. Mike espera en casa.,Pas assez d'oxygène pour sortir. Mike attend à la maison.
 AWAY_TITLE,Enquanto você estava fora…,While you were away…,Mientras no estabas…,Pendant ton absence…
 AWAY_PLANTS,{n} plantas ficaram prontas!,{n} plants are ready!,¡{n} plantas están listas!,{n} plantes sont prêtes !
-ALBUM_COUNT,{n}/{total} cartas,{n}/{total} cards,{n}/{total} cartas,{n}/{total} cartes
-POSTCARD,Sol {n} · Cratera Gale,Sol {n} · Gale Crater,Sol {n} · Cráter Gale,Sol {n} · Cratère Gale
-TUT_BUILD,"Toque num item, depois no chão.","Tap an item, then tap the ground.",Toca un objeto y luego el suelo.,"Touche un objet, puis le sol."
-TUT_EXPLORE,Toque em Explorar para achar amostras.,Tap Explore to find samples.,Toca Explorar para buscar muestras.,Touche Explorer pour trouver des échantillons.
+POSTCARD,Sol {n} na Cratera Gale,Sol {n} in Gale Crater,Sol {n} en el cráter Gale,Sol {n} dans le cratère Gale
+TUT_BUILD,Toque num item e depois num quadrado claro.,"Tap an item, then a light square.",Toca un objeto y luego un cuadrado claro.,"Touche un objet, puis une case claire."
+TUT_EXPLORE,Toque em Explorar para achar amostras de Marte.,Tap Explore to find Mars samples.,Toca Explorar para buscar muestras de Marte.,Touche Explorer pour trouver des échantillons de Mars.
 LEVEL,Nível {n},Level {n},Nivel {n},Niveau {n}
-NEED_ENERGY,Falta energia.,Not enough energy.,Falta energía.,Pas assez d'énergie.
-MOVE_HINT,Toque no lugar novo.,Tap the new spot.,Toca el nuevo lugar.,Touche le nouvel endroit.
-TUT_PLANT,Toque na estufa para plantar.,Tap the greenhouse to plant.,Toca el invernadero para plantar.,Touche la serre pour planter.
-TUTO_HELLO,Oi! Eu sou o Mike. Vamos fazer energia? Toque em Construir.,Hi! I'm Mike. Let's make energy! Tap Build.,¡Hola! Soy Mike. ¿Hacemos energía? Toca Construir.,Salut ! Je suis Mike. On fait de l'énergie ? Touche Construire.
+NEED_ENERGY,Ainda falta energia. Espere a barra amarela encher.,Not enough energy yet. Wait for the yellow bar to fill.,Aún falta energía. Espera a que se llene la barra amarilla.,Pas encore assez d'énergie. Attends que la barre jaune se remplisse.
+MOVE_HINT,Agora toque no lugar novo.,Now tap the new spot.,Ahora toca el nuevo lugar.,"Maintenant, touche le nouvel endroit."
+TUTO_HELLO,Oi! Eu sou o Mike. Vamos fazer energia? Toque em Construir.,Hi! I'm Mike. Let's make some energy! Tap Build.,¡Hola! Soy Mike. ¿Hacemos energía? Toca Construir.,Salut ! Je suis Mike. On fait de l'énergie ? Touche Construire.
 TUTO_PICK,Escolha: {name}.,Pick: {name}.,Elige: {name}.,Choisis : {name}.
 TUTO_CONFIRM,Agora toque em Construir.,Now tap Build.,Ahora toca Construir.,"Maintenant, touche Construire."
 TUTO_PLACE,Toque num quadrado claro para construir.,Tap a light square to build.,Toca un cuadrado claro para construir.,Touche une case claire pour construire.
-TUTO_GREENHOUSE,"Boa! Agora uma Estufa, para plantar comida. Toque em Construir.","Nice! Now a Greenhouse, to grow food. Tap Build.","¡Bien! Ahora un Invernadero, para cultivar comida. Toca Construir.","Bravo ! Maintenant une Serre, pour faire pousser à manger. Touche Construire."
+TUTO_GREENHOUSE,"Boa! Agora uma Estufa, para plantar comida. Toque em Construir.",Nice! Now a Greenhouse to grow food. Tap Build.,¡Bien! Ahora un Invernadero para cultivar comida. Toca Construir.,Bravo ! Maintenant une Serre pour faire pousser à manger. Touche Construire.
 TUTO_PLANT,Toque na Estufa para plantar uma alface.,Tap the Greenhouse to plant lettuce.,Toca el Invernadero para plantar lechuga.,Touche la Serre pour planter une laitue.
 TUTO_EXPLORE,"Enquanto ela cresce, toque em Explorar. Eu levo um lanche e trago um tubo de amostra!","While it grows, tap Explore. I'll take a snack and bring back a sample tube!","Mientras crece, toca Explorar. ¡Llevo una merienda y traigo un tubo de muestra!","Pendant qu'elle pousse, touche Explorer. Je prends un goûter et je rapporte un tube d'échantillon !"
 TUTO_WAIT,Estou explorando a cratera! Volto em {n} sóis.,I'm exploring the crater! Back in {n} sols.,¡Estoy explorando el cráter! Vuelvo en {n} soles.,J'explore le cratère ! Je reviens dans {n} sols.
 TUTO_TUBE,Voltei! Toque no tubo para abrir sua carta.,I'm back! Tap the tube to open your card.,¡Volví! Toca el tubo para abrir tu carta.,Je suis rentré ! Touche le tube pour ouvrir ta carte.
-TUTO_DONE,Muito bem! Cuide das 3 barras e complete o álbum.,Great job! Keep the 3 bars up and fill the album.,¡Muy bien! Cuida las 3 barras y completa el álbum.,Bravo ! Garde les 3 barres pleines et remplis l'album.
+TUTO_DONE,Muito bem! Cuide das 3 barras e complete o álbum.,Great job! Keep the 3 bars full and complete the album.,¡Muy bien! Cuida las 3 barras y completa el álbum.,Bravo ! Garde les 3 barres pleines et complète l'album.
 TUTO_SKIP,Pular,Skip,Saltar,Passer
-HINT_PC,"No PC: botão direito gira, rodinha dá zoom.","On PC: right button turns, wheel zooms.","En PC: botón derecho gira, la rueda hace zoom.","Sur PC : clic droit pour tourner, molette pour zoomer."
-PLANT_GROWING,{plant} · {n}/{max} sóis,{plant} · {n}/{max} sols,{plant} · {n}/{max} soles,{plant} · {n}/{max} sols
+HINT_PC,No computador: arraste com o botão direito para girar e use a rodinha para o zoom.,On a computer: drag with the right button to turn and use the wheel to zoom.,En la computadora: arrastra con el botón derecho para girar y usa la rueda para el zoom.,Sur ordinateur : fais glisser avec le clic droit pour tourner et utilise la molette pour zoomer.
+PLANT_GROWING,{plant} crescendo: {n} de {max} sóis,{plant} growing: {n} of {max} sols,{plant} creciendo: {n} de {max} soles,{plant} pousse : {n} sur {max} sols
 PLANT_READY,Pronto para colher: {plant}!,Ready to harvest: {plant}!,¡Listo para cosechar: {plant}!,Prêt à récolter : {plant} !
-EV_SOLAR_CURIOSITY,O robô Curiosity mediu esta aqui na Gale!,The Curiosity rover measured this one here in Gale!,¡El rover Curiosity midió esta aquí en Gale!,"Le rover Curiosity a mesuré celle-ci ici, à Gale !"
-STORM_SHIELDED,Escudo ligado · {n} sóis,Shield on · {n} sols,Escudo activado · {n} soles,Bouclier activé · {n} sols
-STORM_INSIDE,Mike em casa · {n} sóis,Mike stays inside · {n} sols,Mike adentro · {n} soles,Mike à l'intérieur · {n} sols
+EV_SOLAR_CURIOSITY,"O robô Curiosity mediu essa tempestade aqui mesmo, na Cratera Gale!",The Curiosity rover measured this storm right here in Gale Crater!,"¡El rover Curiosity midió esta tormenta aquí mismo, en el cráter Gale!","Le rover Curiosity a mesuré cette tempête ici même, dans le cratère Gale !"
+STORM_SHIELDED,Escudo ligado por mais {n} sóis,Shield up for {n} more sols,Escudo activado por {n} soles más,Bouclier activé encore {n} sols
+STORM_INSIDE,Mike em casa por mais {n} sóis,Mike stays inside for {n} more sols,Mike se queda adentro {n} soles más,Mike reste à l'intérieur encore {n} sols
 STORM_OVER,A tempestade passou!,The storm is over!,¡La tormenta pasó!,La tempête est finie !
-EXPLORING,Explorando · {n} sóis,Exploring · {n} sols,Explorando · {n} soles,Exploration · {n} sols
+EXPLORING,O Mike está explorando. Volta em {n} sóis,Mike is exploring. Back in {n} sols,Mike está explorando. Vuelve en {n} soles,Mike explore. Retour dans {n} sols
 TUBE_READY,Abrir o tubo!,Open the tube!,¡Abre el tubo!,Ouvre le tube !
 LOCK_STORM,O Mike espera a tempestade passar.,Mike waits for the storm to pass.,Mike espera a que pase la tormenta.,Mike attend la fin de la tempête.
 D_FLAG,Bandeira,Flag,Bandera,Drapeau
@@ -102,34 +81,34 @@ D_LIGHTS,Luzinhas,String lights,Lucecitas,Guirlande
 D_LIGHTS_DESC,Luzinhas para enfeitar as noites geladas de Marte.,Little lights for the cold Mars nights.,Lucecitas para adornar las noches frías de Marte.,Des petites lumières pour les nuits froides de Mars.
 D_POT,Vaso,Flower pot,Maceta,Pot de fleurs
 D_POT_DESC,"Uma plantinha de enfeite, para a base ficar com cara de casa.",A little plant to make the base feel like home.,"Una plantita de adorno, para que la base parezca un hogar.",Une petite plante pour que la base ressemble à une maison.
-LOCKED_DECOR,Junte mais cartas para destravar.,Collect more cards to unlock it.,Junta más cartas para desbloquearla.,Collectionne plus de cartes pour la débloquer.
+LOCKED_DECOR,Junte mais cartas no álbum para liberar.,Collect more album cards to unlock it.,Junta más cartas en el álbum para desbloquearla.,Collectionne plus de cartes dans l'album pour la débloquer.
 NEED_MAX,Você já tem uma.,You already have one.,Ya tienes uno.,Tu en as déjà un.
-LOCK_NOSIGNAL,Sem sinal: o piloto automático manda.,No signal: autopilot is in charge.,Sin señal: manda el piloto automático.,Pas de signal : le pilote automatique décide.
-NOSIGNAL_LEFT,Sem sinal · {n} sóis,No signal · {n} sols,Sin señal · {n} soles,Pas de signal · {n} sols
-EV_NOSIGNAL_TEXT,O Sol ficou entre a Terra e Marte. Sem mensagens por um tempo.,The Sun is between Earth and Mars. No messages for a while.,El Sol está entre la Tierra y Marte. Sin mensajes por un tiempo.,Le Soleil est entre la Terre et Mars. Pas de messages pendant un moment.
+LOCK_NOSIGNAL,Sem sinal da Terra. O piloto automático está cuidando da base.,No signal from Earth. The autopilot is running the base.,Sin señal de la Tierra. El piloto automático cuida la base.,Pas de signal de la Terre. Le pilote automatique s'occupe de la base.
+NOSIGNAL_LEFT,Sem sinal por mais {n} sóis,No signal for {n} more sols,Sin señal por {n} soles más,Pas de signal encore {n} sols
+EV_NOSIGNAL_TEXT,O Sol ficou entre a Terra e Marte e bloqueia as mensagens por uns dias.,The Sun is between Earth and Mars and blocks messages for a few days.,El Sol quedó entre la Tierra y Marte y bloquea los mensajes por unos días.,Le Soleil est entre la Terre et Mars et bloque les messages pendant quelques jours.
 PLAN_SAVE,Economizar energia,Save energy,Ahorrar energía,Économiser l'énergie
 PLAN_PLANT,Continuar plantando,Keep planting,Seguir plantando,Continuer à planter
-EV_COLD_TEXT,"Na Gale, a noite chega perto de −70 °C.","In Gale, nights get close to −70 °C.","En Gale, las noches llegan cerca de −70 °C.","À Gale, les nuits approchent les −70 °C."
+EV_COLD_TEXT,"Na Cratera Gale, a noite chega a quase 70 °C abaixo de zero!","In Gale Crater, nights drop to almost 70 °C below zero!","¡En el cráter Gale, la noche llega a casi 70 °C bajo cero!","Dans le cratère Gale, la nuit descend presque à 70 °C sous zéro !"
 EV_COLD_A,"Sim, aquecer","Yes, heat it","Sí, calentar","Oui, chauffer"
 EV_COLD_B,"Não, deixar esfriar","No, let it cool","No, dejar que se enfríe","Non, laisser refroidir"
-COLD_LEFT,Noite fria · {n} sóis,Cold night · {n} sols,Noche fría · {n} soles,Nuit froide · {n} sols
-DUST_LEFT,Painéis sujos · {n} sóis,Dirty panels · {n} sols,Paneles sucios · {n} soles,Panneaux sales · {n} sols
+COLD_LEFT,Noite fria por mais {n} sóis,Cold nights for {n} more sols,Noches frías por {n} soles más,Nuits froides encore {n} sols
+DUST_LEFT,Painéis sujos por mais {n} sóis,Dirty panels for {n} more sols,Paneles sucios por {n} soles más,Panneaux sales encore {n} sols
 BTN_NASA,Dados da NASA,NASA data,Datos NASA,Données NASA
 BTN_SOURCE,Fonte,Source,Fuente,Source
-NASA_TITLE,Dados reais da NASA neste jogo,Real NASA data in this game,Datos reales de la NASA en este juego,Vraies données de la NASA dans ce jeu
-NASA_DONKI,"Tempestades solares: {n} eventos reais de 2024 do DONKI, o banco de clima espacial da NASA. São dados arquivados, não ao vivo.","Solar storms: {n} real events from 2024, from DONKI, NASA's space weather database. This is archived data, not live.","Tormentas solares: {n} eventos reales de 2024, de DONKI, la base de datos de clima espacial de la NASA. Son datos archivados, no en vivo.","Tempêtes solaires : {n} événements réels de 2024, tirés de DONKI, la base de données de météo spatiale de la NASA. Ce sont des données archivées, pas en direct."
-NASA_CARDS,Cartas: cada uma traz um fato real e o link da fonte.,Cards: each one has a real fact and a link to its source.,Cartas: cada una trae un dato real y el enlace a su fuente.,Cartes : chacune a un fait réel et un lien vers sa source.
+NASA_TITLE,Dados da NASA neste jogo,NASA data in this game,Datos de la NASA en este juego,Données de la NASA dans ce jeu
+NASA_DONKI,"Tempestades solares: {n} tempestades de 2024 guardadas no DONKI, o arquivo de clima espacial da NASA. Elas já passaram, então não é ao vivo.","Solar storms: {n} storms from 2024, saved in DONKI, NASA's space weather archive. They already happened, so it's not live.","Tormentas solares: {n} tormentas de 2024 guardadas en DONKI, el archivo de clima espacial de la NASA. Ya pasaron, así que no es en vivo.","Tempêtes solaires : {n} tempêtes de 2024 gardées dans DONKI, l'archive de météo spatiale de la NASA. Elles sont déjà passées, donc ce n'est pas en direct."
+NASA_CARDS,Cartas: cada uma traz um fato da NASA e o link da fonte.,Cards: each one has a NASA fact and a link to the source.,Cartas: cada una trae un dato de la NASA y el enlace a la fuente.,Cartes : chacune a un fait de la NASA et un lien vers la source.
 NASA_MODEL,Ingenuity: modelo 3D oficial da NASA/JPL-Caltech.,Ingenuity: official 3D model by NASA/JPL-Caltech.,Ingenuity: modelo 3D oficial de NASA/JPL-Caltech.,Ingenuity : modèle 3D officiel de NASA/JPL-Caltech.
 UNLOCK_DECOR,Decoração nova: {name}!,New decoration: {name}!,¡Decoración nueva: {name}!,Nouvelle décoration : {name} !
 SEED_NEW,Semente nova: {name}!,New seed: {name}!,¡Semilla nueva: {name}!,Nouvelle graine : {name} !
 PHOTO_SAVED,Foto salva!,Photo saved!,¡Foto guardada!,Photo enregistrée !
 AWAY_SOLS,Passaram {n} sóis.,{n} sols went by.,Pasaron {n} soles.,{n} sols sont passés.
 B_KILOPOWER,Kilopower,Kilopower,Kilopower,Kilopower
-B_KILOPOWER_DESC,"Uma mini usina nuclear: energia forte, de dia e de noite.","A mini nuclear power plant: strong energy, day and night.","Una mini planta nuclear: energía fuerte, de día y de noche.","Une mini centrale nucléaire : beaucoup d'énergie, jour et nuit."
-NEED_SPACE,Falta espaço livre ao lado.,It needs free space next to it.,Falta espacio libre al lado.,Il faut de la place à côté.
-NEED_HOUSE,"Primeiro, melhore a Casa do Mike.","First, upgrade Mike's habitat.","Primero, mejora la Casa de Mike.","D'abord, améliore la Maison de Mike."
+B_KILOPOWER_DESC,"Uma miniusina nuclear. Dá muita energia, de dia e de noite.","A tiny nuclear power plant. Lots of energy, day and night.","Una minicentral nuclear. Da mucha energía, de día y de noche.","Une mini centrale nucléaire. Beaucoup d'énergie, le jour comme la nuit."
+NEED_SPACE,Precisa de espaço livre ao lado para crescer.,It needs free space next to it to grow.,Necesita espacio libre al lado para crecer.,Il faut de la place à côté pour l'agrandir.
+NEED_HOUSE,"Primeiro, melhore a Casa do Mike.","First, upgrade Mike's House.","Primero, mejora la Casa de Mike.","D'abord, améliore la Maison de Mike."
 MAP_GROW,A base cresceu e as barras ficaram maiores!,The base grew and the bars got bigger!,¡La base creció y las barras se hicieron más grandes!,La base a grandi et les barres sont plus grandes !
-MAP_LOCKED,Melhore a Casa do Mike para abrir aqui.,Upgrade Mike's habitat to open this.,Mejora la Casa de Mike para abrir aquí.,Améliore la Maison de Mike pour ouvrir ici.
+MAP_LOCKED,Melhore a Casa do Mike para usar este lugar.,Upgrade Mike's House to use this spot.,Mejora la Casa de Mike para usar este lugar.,Améliore la Maison de Mike pour utiliser cet endroit.
 HOW_TITLE,Como ganhar esta carta,How to get this card,Cómo ganar esta carta,Comment gagner cette carte
 HOW_HARVEST,Colha {name} na estufa.,Harvest {name} in the greenhouse.,Cosecha {name} en el invernadero.,Récolte {name} dans la serre.
 HOW_SEED,A semente aparece depois de {n} colheitas.,The seed shows up after {n} harvests.,La semilla aparece después de {n} cosechas.,La graine apparaît après {n} récoltes.
@@ -139,21 +118,21 @@ HOW_STORM,Aguente uma tempestade solar.,Get through a solar storm.,Aguanta una t
 HOW_AURORA,Aguente uma tempestade solar com o escudo ligado. É rara!,Get through a solar storm with the shield on. It's rare!,Aguanta una tormenta solar con el escudo activado. ¡Es rara!,Survis à une tempête solaire avec le bouclier activé. C'est rare !
 HOW_DUST,Aguente uma tempestade de poeira.,Get through a dust storm.,Aguanta una tormenta de polvo.,Survis à une tempête de poussière.
 HOW_DEVIL,Espere um redemoinho depois de uma tempestade de poeira.,Wait for a dust devil after a dust storm.,Espera un remolino después de una tormenta de polvo.,Attends un tourbillon après une tempête de poussière.
-HOW_FROST,"Depois de uma noite congelante, olhe de manhã. Sorte!","After a freezing night, look in the morning. Luck!","Después de una noche helada, mira por la mañana. ¡Suerte!","Après une nuit glaciale, regarde le matin. Bonne chance !"
-HOW_SUNSET,Pode aparecer em qualquer pôr do sol. Sorte!,It can show up at any sunset. Luck!,Puede aparecer en cualquier atardecer. ¡Suerte!,Elle peut apparaître à n'importe quel coucher de soleil. Bonne chance !
-HOW_EARTH,Construa a antena e espere. Sorte!,Build the antenna and wait. Luck!,Construye la antena y espera. ¡Suerte!,Construis l'antenne et attends. Bonne chance !
-HOW_PACKAGE,"Chega no pacote da Terra, depois do evento Sem sinal.","It comes in the package from Earth, after the No signal event.","Llega en el paquete de la Tierra, después del evento Sin señal.","Elle arrive dans le colis de la Terre, après l'événement Pas de signal."
+HOW_FROST,"Depois de uma noite congelante, olhe de manhã. Boa sorte!","After a freezing night, look in the morning. Good luck!","Después de una noche helada, mira por la mañana. ¡Suerte!","Après une nuit glaciale, regarde le matin. Bonne chance !"
+HOW_SUNSET,Pode aparecer em qualquer pôr do sol. Boa sorte!,It can show up at any sunset. Good luck!,Puede aparecer en cualquier atardecer. ¡Suerte!,Elle peut apparaître à n'importe quel coucher de soleil. Bonne chance !
+HOW_EARTH,Construa a antena e espere a noite. Boa sorte!,Build the antenna and wait for the night. Good luck!,Construye la antena y espera la noche. ¡Suerte!,Construis l'antenne et attends la nuit. Bonne chance !
+HOW_PACKAGE,"Chega no pacote da Terra, quando o sinal volta.","It comes in the package from Earth, when the signal comes back.","Llega en el paquete de la Tierra, cuando vuelve la señal.","Elle arrive dans le colis de la Terre, quand le signal revient."
 HOW_TIME,Continue jogando: ela chega com o tempo.,Keep playing: it comes with time.,Sigue jugando: llega con el tiempo.,Continue à jouer : elle arrive avec le temps.
-HOW_TUBE,Explore: pode vir no tubo de amostra.,Explore: it can come in the sample tube.,Explora: puede venir en el tubo de muestra.,Explore : elle peut venir dans le tube d'échantillon.
+HOW_TUBE,Explore! Ela pode vir no tubo de amostra.,Explore! It can come in the sample tube.,¡Explora! Puede venir en el tubo de muestra.,Explore ! Elle peut venir dans le tube d'échantillon.
 BTN_ROTATE,Girar,Rotate,Girar,Tourner
-OUT_ENERGY,Apagão! Acabou a energia.,Blackout! The energy ran out.,¡Apagón! Se acabó la energía.,Panne ! Plus d'énergie.
+OUT_ENERGY,Apagão! A energia acabou.,Blackout! The energy ran out.,¡Apagón! Se acabó la energía.,Panne ! Il n'y a plus d'énergie.
 OUT_OXYGEN,Acabou o oxigênio! O Mike ficou em casa.,Out of oxygen! Mike stays inside.,¡Se acabó el oxígeno! Mike se queda adentro.,Plus d'oxygène ! Mike reste à l'intérieur.
 OUT_ENERGY_HINT,Sem energia: construa um painel solar ou um RTG.,No energy: build a solar panel or an RTG.,Sin energía: construye un panel solar o un RTG.,Pas d'énergie : construis un panneau solaire ou un RTG.
 OUT_OXYGEN_HINT,Sem oxigênio: construa o MOXIE ou plante na estufa.,No oxygen: build a MOXIE or plant in the greenhouse.,Sin oxígeno: construye un MOXIE o planta en el invernadero.,Pas d'oxygène : construis un MOXIE ou plante dans la serre.
 MIKE_1,Oi! Bora explorar a cratera?,Hi! Want to explore the crater?,¡Hola! ¿Exploramos el cráter?,Salut ! On explore le cratère ?
-MIKE_2,Planta faz oxigênio pra mim respirar!,Plants make oxygen so I can breathe!,¡Las plantas hacen oxígeno para que yo respire!,Les plantes font de l'oxygène pour que je respire !
+MIKE_2,As plantas fazem oxigênio pra eu respirar!,Plants make oxygen so I can breathe!,¡Las plantas hacen oxígeno para que yo respire!,Les plantes font de l'oxygène pour que je respire !
 MIKE_3,"Se vier tempestade solar, eu me escondo!","If a solar storm comes, I hide!","¡Si viene una tormenta solar, me escondo!","Si une tempête solaire arrive, je me cache !"
-MIKE_4,"Lá longe é o Monte Sharp, com 5 km de altura!","Far away is Mount Sharp, 5 km tall!","¡Allá lejos está el Monte Sharp, de 5 km de altura!","Là-bas, c'est le mont Sharp, haut de 5 km !"
+MIKE_4,Aquela montanha lá longe é o Monte Sharp. Ela tem 5 km de altura!,That mountain far away is Mount Sharp. It's 5 km tall!,Esa montaña a lo lejos es el Monte Sharp. ¡Mide 5 km de altura!,"Cette montagne au loin, c'est le mont Sharp. Elle fait 5 km de haut !"
 SET_TITLE,Configurações,Settings,Ajustes,Réglages
 SET_LANG,Idioma,Language,Idioma,Langue
 SET_MUSIC,Música,Music,Música,Musique
@@ -163,11 +142,11 @@ SET_OFF,desligada,off,apagada,désactivée
 SET_TUTORIAL,Ver o tutorial de novo,See the tutorial again,Ver el tutorial otra vez,Revoir le tutoriel
 SNACK_PACKED,Lanche na mochila: {name}!,Snack packed: {name}!,¡Merienda en la mochila: {name}!,Goûter dans le sac : {name} !
 SNACK_HINT,Cada expedição usa um lanche.,Each expedition uses a snack.,Cada expedición usa una merienda.,Chaque expédition utilise un goûter.
-NEED_FOOD,Falta lanche. Colha na estufa!,No snack. Harvest the greenhouse!,Falta merienda. ¡Cosecha en el invernadero!,Pas de goûter. Récolte dans la serre !
-LOCK_SHIELD,Escudo baixo. Espere ele subir.,Low shield. Wait for it to go up.,Escudo bajo. Espera a que suba.,Bouclier faible. Attends qu'il remonte.
+NEED_FOOD,Falta lanche para a viagem. Colha algo na estufa!,No snack for the trip. Harvest something in the greenhouse!,Falta merienda para el viaje. ¡Cosecha algo en el invernadero!,Pas de goûter pour le voyage. Récolte quelque chose dans la serre !
+LOCK_SHIELD,O escudo está baixo. Espere ele subir para sair.,The shield is low. Wait for it to go up before going out.,El escudo está bajo. Espera a que suba para salir.,Le bouclier est faible. Attends qu'il remonte pour sortir.
 LOCK_EXPLORING,Espere o Mike voltar.,Wait for Mike to come back.,Espera a que Mike vuelva.,Attends que Mike revienne.
-STORM_PLANTS,A radiação atrapalhou as plantas.,Radiation hurt the plants.,La radiación dañó las plantas.,Les radiations ont abîmé les plantes.
-STORM_WARNING,Aviso da NASA: tempestade em {name} sóis!,NASA warning: storm in {name} sols!,Aviso de la NASA: ¡tormenta en {name} soles!,Alerte de la NASA : tempête dans {name} sols !
+STORM_PLANTS,A radiação do Sol deixou as plantas mais lentas.,The Sun's radiation slowed the plants down.,La radiación del Sol hizo más lentas las plantas.,Les radiations du Soleil ont ralenti les plantes.
+STORM_WARNING,Aviso da NASA: tempestade solar em {name} sóis!,NASA warning: solar storm in {name} sols!,Aviso de la NASA: ¡tormenta solar en {name} soles!,Alerte de la NASA : tempête solaire dans {name} sols !
 TUTO_NUDGE,"Primeiro, toque em: {name}","First, tap: {name}","Primero, toca: {name}","D'abord, touche : {name}"
 TUTO_SQUARE,um quadrado claro,a light square,un cuadrado claro,une case claire
 REMOVE_TITLE,Remover: {name}?,Remove: {name}?,¿Quitar: {name}?,Retirer : {name} ?
@@ -187,15 +166,14 @@ ALBUM_MINERALS,Minerais,Minerals,Minerales,Minéraux
 ALBUM_DISCOVERIES,Descobertas,Discoveries,Descubrimientos,Découvertes
 ALBUM_SKY,Céu e clima,Sky and weather,Cielo y clima,Ciel et météo
 ALBUM_NEXT,Faltam {n} cartas para ganhar: {name},{n} more cards to win: {name},Faltan {n} cartas para ganar: {name},Encore {n} cartes pour gagner : {name}
-ALBUM_PAGES_GOAL,Páginas completas: {n} de {total},Pages complete: {n} of {total},Páginas completas: {n} de {total},Pages complètes : {n} sur {total}
-ALBUM_PAGE_DONE,Página completa: {name}!,Page complete: {name}!,¡Página completa: {name}!,Page complète : {name} !
 CARD_NUMBER,Nº {n},No. {n},Nº {n},N° {n}
 ALBUM_LEFT,Faltam {n} cartas para completar o álbum!,{n} more cards to complete the album!,¡Faltan {n} cartas para completar el álbum!,Encore {n} cartes pour compléter l'album !
 ALBUM_DONE,Álbum completo! Parabéns!,Album complete! Well done!,¡Álbum completo! ¡Felicidades!,Album complet ! Bravo !
 ITEM_BROKEN,Quebrou: {name}! Toque nele para consertar.,{name} broke! Tap it to fix.,¡Se rompió: {name}! Tócalo para arreglarlo.,{name} est cassé ! Touche-le pour le réparer.
 ITEM_FIXED,Consertado!,Fixed!,¡Arreglado!,Réparé !
 BTN_REPAIR,Consertar,Fix,Arreglar,Réparer
-BROKEN_TEXT,Quebrado: parou de funcionar.,Broken: it stopped working.,Roto: dejó de funcionar.,Cassé : il ne marche plus.
+BROKEN_TEXT,Quebrou e parou de funcionar. Conserte para usar de novo.,It broke and stopped working. Fix it to use it again.,Se rompió y dejó de funcionar. Arréglalo para volver a usarlo.,C'est cassé et ça ne marche plus. Répare-le pour l'utiliser.
 TUTO_WAIT_ENERGY,Falta energia. Espere a barra amarela encher um pouco!,Not enough energy. Wait for the yellow bar to fill a bit!,Falta energía. ¡Espera a que la barra amarilla se llene un poco!,Pas assez d'énergie. Attends que la barre jaune se remplisse un peu !
-NEED_BIGGER_BAR,A barra de energia ainda é pequena. Melhore a Casa do Mike!,The energy bar is still small. Upgrade Mike's house!,¡La barra de energía aún es pequeña. Mejora la casa de Mike!,La barre d'énergie est encore petite. Améliore la maison de Mike !
-INFO_SHELF,Uma estante para mostrar o que você achou em Marte: plantas da estufa e pedras das expedições. Toque nela e escolha!,A shelf to show off what you found on Mars: greenhouse plants and rocks from your trips. Tap it and choose!,Un estante para mostrar lo que encontraste en Marte: plantas del invernadero y rocas de las expediciones. ¡Tócalo y elige!,Une étagère pour montrer ce que tu as trouvé sur Mars : plantes de la serre et roches des expéditions. Touche-la et choisis !
+NEED_BIGGER_BAR,A barra de energia ainda é pequena. Melhore a Casa do Mike!,The energy bar is still small. Upgrade Mike's House!,La barra de energía aún es pequeña. ¡Mejora la Casa de Mike!,La barre d'énergie est encore petite. Améliore la Maison de Mike !
+COST_ENERGY,gasta {n} de energia,uses {n} energy,gasta {n} de energía,coûte {n} d'énergie
+SHELF_ADD,Escolher,Choose,Elegir,Choisir

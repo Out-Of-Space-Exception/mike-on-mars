@@ -11,4 +11,4 @@ O que ficou para depois e de quem depende:
 | Sons `passos`, `aurora` e `vento-poeira` | Conteúdo | TAREFAS.md, "Pedidos entre duplas" |
 | Testar o cartão-postal (baixar a foto) num celular de verdade | Dev | — |
 
-Tudo o mais do passo 05 está no jogo e no teste automático (`jogo/test/teste_tempestade.tscn`, 33 verificações).
+Tudo o mais do passo 05 está no jogo e no teste automático (`jogo/test/game_test.tscn`, 33 verificações).

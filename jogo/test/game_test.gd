@@ -1,6 +1,6 @@
 extends Node
 ## Teste rápido (sem tela): roda o jogo de verdade e confere as regras principais.
-## Uso: godot --headless --path jogo res://test/teste_tempestade.tscn
+## Uso: godot --headless --path jogo res://test/game_test.tscn
 
 var falhas := 0
 var hud: Node
@@ -76,6 +76,7 @@ func _tempestade() -> void:
 
 func _expedicao() -> void:
 	State.oxygen = 100.0
+	State.last_empty = true   # no random empty trip (10%) in these checks
 	ok(State.start_explore(), "o Mike sai em expedição")
 	ok(not State.start_explore(), "não sai duas vezes ao mesmo tempo")
 	_ticks(State.EXPLORE_SOLS)
@@ -103,6 +104,7 @@ func _construir_e_plantar() -> void:
 	ok(State.harvest(Vector2i(6, 6)) == "radish", "colhe o rabanete")
 	State.oxygen = 100.0
 	var raros_antes: int = int(State.inventory.get("radish", 0))
+	State.last_empty = true   # no random empty trip (10%) in these checks
 	State.start_explore()
 	ok(State.snack == "radish" and int(State.inventory.get("radish", 0)) == raros_antes - 1, "a colheita vira lanche da expedição")
 	_ticks(State.EXPLORE_SOLS)
@@ -369,6 +371,7 @@ func _tutorial() -> void:
 	hud._tut_update()
 	ok(State.tutorial == 3 and hud._tut_label.text == tr("TUTO_EXPLORE"), "plantou: o Mike pede para explorar")
 	State.oxygen = 100.0
+	State.last_empty = true   # no random empty trip (10%) in these checks
 	State.start_explore()
 	_ticks(State.EXPLORE_SOLS)
 	hud._tut_update()
@@ -403,6 +406,7 @@ func _regras_novas() -> void:
 	State.shield = 10.0
 	ok(State.explore_block_reason() == "LOCK_SHIELD", "com o escudo baixo, não dá para sair")
 	State.shield = 100.0
+	State.last_empty = true   # no random empty trip (10%) in these checks
 	ok(State.start_explore(), "com lanche, oxigênio e escudo, ele sai")
 	ok(not State.build("solar", Vector2i(3, 3)) and State.build_block_reason("solar") == "LOCK_EXPLORING", "com o Mike fora, não dá para construir")
 	_ticks(State.EXPLORE_SOLS)
@@ -535,28 +539,28 @@ func _estante(base: Node) -> void:
 	ok(State.build("shelf", Vector2i(3, 3)), "construiu a estante")
 	ok(State.build_block_reason("shelf") == "NEED_MAX", "só dá para ter 1 estante")
 	ok(State.upgrade_cost(Vector2i(3, 3)) < 0, "a estante não tem nível")
-	var E := preload("res://scenes/estante.gd")
-	ok(E.vagas_liberadas() == 3, "casa nível 2: 3 vagas")
-	var todos: Array = E._todos()
+	var E := preload("res://scenes/shelf.gd")
+	ok(E.open_slots() == 3, "casa nível 2: 3 vagas")
+	var todos: Array = E._all_items()
 	ok(not ("rock:hematita" in todos) and "rock:enxofre" in todos and "plant:lettuce" in todos and "plant:potato" in todos, "a estante só mostra o que dá para ter no álbum")
-	ok(not E._tem("rock:enxofre"), "pedra sem a carta: ainda trancada")
+	ok(not E._owned("rock:enxofre"), "pedra sem a carta: ainda trancada")
 	State.add_card(9)
-	ok(E._tem("rock:enxofre"), "ganhou a carta do enxofre: dá para expor")
+	ok(E._owned("rock:enxofre"), "ganhou a carta do enxofre: dá para expor")
 	State.add_card(4)
-	State.items["3,3"]["expo"] = ["rock:enxofre", "plant:potato", "", "rock:enxofre", "", ""]
+	State.items["3,3"]["display"] = ["rock:enxofre", "plant:potato", "", "rock:enxofre", "", ""]
 	State.changed.emit()
 	var node: Node3D = base._nodes.get("3,3")
 	var v1: Node = node.find_child("vaga-1", true, false) if node else null
 	var v2: Node = node.find_child("vaga-2", true, false) if node else null
 	var v4: Node = node.find_child("vaga-4", true, false) if node else null
-	ok(v1 != null and v1.get_node_or_null("Expo") != null, "a pedra aparece na vaga 1 da estante")
-	ok(v2 != null and v2.get_node_or_null("Expo") != null, "a batata (feita no código) aparece na vaga 2")
-	ok(v4 != null and v4.get_node_or_null("Expo") == null, "a vaga 4 fica trancada com a casa no nível 2")
-	hud._estante.abrir("3,3")
-	ok(hud._estante.visible and hud._estante._grade.get_child_count() == 6, "Ver estante: abre com as 6 vagas")
-	hud._estante._escolher(2)
-	ok(hud._estante._lista.get_child_count() > 3, "tocar numa vaga mostra a lista")
-	hud._estante._colocar("rock:enxofre")
-	ok(State.items["3,3"].expo[2] == "rock:enxofre" and State.items["3,3"].expo[0] == "", "a pedra muda de vaga (aparece uma vez só)")
-	hud._estante._voltar()
-	ok(not hud._estante.visible, "o X fecha a estante")
+	ok(v1 != null and v1.get_node_or_null("Display") != null, "a pedra aparece na vaga 1 da estante")
+	ok(v2 != null and v2.get_node_or_null("Display") != null, "a batata (feita no código) aparece na vaga 2")
+	ok(v4 != null and v4.get_node_or_null("Display") == null, "a vaga 4 fica trancada com a casa no nível 2")
+	hud._shelf.open("3,3")
+	ok(hud._shelf.visible and hud._shelf._slots_grid.get_child_count() == 6, "Ver estante: abre com as 6 vagas")
+	hud._shelf._pick(2)
+	ok(hud._shelf._list.get_child_count() > 3, "tocar numa vaga mostra a lista")
+	hud._shelf._place("rock:enxofre")
+	ok(State.items["3,3"].display[2] == "rock:enxofre" and State.items["3,3"].display[0] == "", "a pedra muda de vaga (aparece uma vez só)")
+	hud._shelf._back()
+	ok(not hud._shelf.visible, "o X fecha a estante")
