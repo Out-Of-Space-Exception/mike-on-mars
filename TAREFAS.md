@@ -26,7 +26,7 @@
 - [ ] 17h · [Slides](conteudo/04-slides/PASSO.md)
 - [ ] 17h30 · [Traduções](conteudo/05-traducoes/PASSO.md)
 - [ ] 18h30 · [Texto da página do projeto](conteudo/06-pagina-do-projeto/PASSO.md)
-- [ ] 19h · [Roteiro do vídeo](conteudo/07-roteiro-do-video/PASSO.md)
+- [x] 19h · [Roteiro do vídeo](conteudo/07-roteiro-do-video/PASSO.md)
 - [ ] 19h30 · [Cenas e créditos](conteudo/08-cenas-e-creditos/PASSO.md)
 - [ ] 20h · [Teste no celular](conteudo/09-teste-no-celular/PASSO.md)
 

@@ -1,0 +1,32 @@
+[
+  {
+    "scene": 1,
+    "original_seconds": 3.408,
+    "speed_adjustment": 1
+  },
+  {
+    "scene": 2,
+    "original_seconds": 5.136,
+    "speed_adjustment": 1.081
+  },
+  {
+    "scene": 3,
+    "original_seconds": 4.104,
+    "speed_adjustment": 1
+  },
+  {
+    "scene": 4,
+    "original_seconds": 4.776,
+    "speed_adjustment": 1.005
+  },
+  {
+    "scene": 5,
+    "original_seconds": 4.872,
+    "speed_adjustment": 1.026
+  },
+  {
+    "scene": 6,
+    "original_seconds": 3.744,
+    "speed_adjustment": 1
+  }
+]
