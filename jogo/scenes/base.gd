@@ -28,7 +28,12 @@ const INGENUITY_COLORS := {
 var camera: Camera3D
 var mike: Node3D
 var _mike_anim: AnimationPlayer
-var _mike_skins := {}       # "casual" / "suit" -> [modelo, AnimationPlayer]
+var _mike_skins := {}       # "casual" / "suit" -> [modelo, AnimationPlayer, martelo]
+var build_fx := false       # o HUD liga ao construir: a construção nova passa pela obra (Mike martelando)
+# Obra do design/03 (construcao.gd, da Thais): bloquinhos caem e quicam, e a construção brota do chão.
+const OBRA_COLORS := [Color("D96941"), Color("F2D091"), Color("E8B23A"), Color("73242A")]
+const OBRA_WORK := 1.3          # segundos martelando depois que o Mike chega
+const PLACE_ONLY := ["flag", "pot"]   # coisas pequenas: o Mike só se abaixa e coloca
 var _walking_out := false
 var _env: Environment
 var _sun: DirectionalLight3D
@@ -45,7 +50,19 @@ var _time := 0.0
 var _type_scale := {}       # escala de cada construção com níveis (a mesma em todos os níveis)
 var whole_grid := false     # o HUD liga ao construir ou mover: a câmera mostra a grade inteira
 var _cam_goal := Vector3(INF, INF, INF)
-var _cam_tween: Tween
+# A câmera nunca pula: os dedos mudam o "alvo" e ela desliza até lá, amortecida.
+const CAM_SMOOTH := 9.0
+const TURN_DEADZONE := 0.09     # radianos que os dois dedos precisam girar antes de o mundo girar
+const ZOOM_DEADZONE := 0.05     # 5% de pinça antes de dar zoom
+var _yaw_goal := deg_to_rad(45.0)
+var _pos_goal := Vector3.ZERO
+var _size_goal := CAM_START
+var _cam_snap := true           # a 1ª vez, vai direto (sem deslizar)
+var _multi := false             # dois dedos na tela: só solta quando todos saírem
+var _turn_sum := 0.0
+var _zoom_sum := 1.0
+var _turning := false
+var _zooming := false
 var _rig: Node3D
 var orbit := true:           # o HUD desliga quando a criança toca em Jogar
 	set(v):
@@ -119,9 +136,25 @@ func _process(delta: float) -> void:
 	_time += delta
 	# Na tela inicial, a câmera dá uma volta devagar pela base.
 	if orbit and not _manual_cam:
-		_rig.rotate_y(delta * 0.08)
+		_yaw_goal += delta * 0.08
+	# No computador: Q/E ou as setas giram; + e - dão zoom.
+	var spin := float(Input.is_key_pressed(KEY_E) or Input.is_key_pressed(KEY_RIGHT)) - float(Input.is_key_pressed(KEY_Q) or Input.is_key_pressed(KEY_LEFT))
+	if spin != 0.0:
+		_turn(spin * delta * 1.6)
+	var zoom_key := float(Input.is_key_pressed(KEY_MINUS)) - float(Input.is_key_pressed(KEY_EQUAL) or Input.is_key_pressed(KEY_PLUS))
+	if zoom_key != 0.0:
+		_zoom(1.0 + zoom_key * delta * 1.2)
+	var ease_k := 1.0 - exp(-delta * CAM_SMOOTH)
+	_rig.rotation.y = lerp_angle(_rig.rotation.y, _yaw_goal, ease_k)
+	_rig.position = _rig.position.lerp(_pos_goal, ease_k)
+	camera.size = lerpf(camera.size, _size_goal, ease_k)
 	_fit_sky()
 	_step_mike(delta)
+	var show_names := camera.size < 14.5
+	for k in _nodes:
+		var label: Label3D = _nodes[k].get_node_or_null("Label")
+		if label:
+			label.visible = show_names
 	if _pet == null:
 		return
 	# O Ingenuity voa atrás do Mike, balançando, com as hélices girando em sentidos opostos.
@@ -173,8 +206,12 @@ func _frame_camera() -> void:
 		return
 	if orbit:
 		_cam_goal = Vector3(0.0, 0.0, CAM_START)
-		_rig.position = Vector3.ZERO
-		camera.size = CAM_START
+		_pos_goal = Vector3.ZERO
+		_size_goal = CAM_START
+		if _cam_snap:
+			_cam_snap = false
+			_rig.position = _pos_goal
+			camera.size = _size_goal
 		return
 	var area := State.zone()
 	var lo := area.position
@@ -201,11 +238,12 @@ func _frame_camera() -> void:
 	if goal.is_equal_approx(_cam_goal):
 		return
 	_cam_goal = goal
-	if _cam_tween:
-		_cam_tween.kill()
-	_cam_tween = create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	_cam_tween.tween_property(_rig, "position", center, 0.6)
-	_cam_tween.tween_property(camera, "size", size, 0.6)
+	_pos_goal = center
+	_size_goal = size
+	if _cam_snap:
+		_cam_snap = false
+		_rig.position = center
+		camera.size = size
 
 
 # ───────────── Dedos na tela: arrastar mexe, pinça dá zoom, dois dedos girando giram o mundo ─────────────
@@ -223,7 +261,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			if _dragging:
 				_pan(event.position - event.relative, event.position)
 		elif event.button_mask & MOUSE_BUTTON_MASK_RIGHT:
-			_turn(-event.relative.x * 0.01)
+			_turn(-event.relative.x * 0.008)
 
 
 func _on_touch(event: InputEventScreenTouch) -> void:
@@ -232,33 +270,54 @@ func _on_touch(event: InputEventScreenTouch) -> void:
 		if _touches.size() == 1:
 			_press_pos = event.position
 			_dragging = false
+		else:
+			_multi = true
+			_turn_sum = 0.0
+			_zoom_sum = 1.0
+			_turning = false
+			_zooming = false
 		return
 	var was_single := _touches.size() == 1
 	_touches.erase(event.index)
-	if was_single and not _dragging:
+	if was_single and not _dragging and not _multi:
 		_tap(event.position)
 	if _touches.is_empty():
 		_dragging = false
+		_multi = false
 
 
 func _on_drag(event: InputEventScreenDrag) -> void:
 	var before: Vector2 = _touches.get(event.index, event.position - event.relative)
 	_touches[event.index] = event.position
 	if _touches.size() == 1:
+		# Depois de usar dois dedos, o dedo que sobrou não arrasta (evita o tranco).
+		if _multi:
+			return
 		if not _dragging and event.position.distance_to(_press_pos) > DRAG_START:
 			_dragging = true
 		if _dragging:
 			_pan(before, event.position)
 		return
 	# Dois dedos: a distância entre eles dá o zoom, o ângulo entre eles gira o mundo.
+	# Cada um só começa depois de uma folguinha, para o tremido dos dedos não mexer a tela.
 	_dragging = true
 	var ids := _touches.keys()
 	var a: Vector2 = _touches[ids[0]]
 	var b: Vector2 = _touches[ids[1]]
 	var a0: Vector2 = before if ids[0] == event.index else a
 	var b0: Vector2 = before if ids[1] == event.index else b
-	_zoom((a0 - b0).length() / maxf((a - b).length(), 1.0))
-	_turn((b - a).angle() - (b0 - a0).angle())
+	var factor := (a0 - b0).length() / maxf((a - b).length(), 1.0)
+	var angle := wrapf((b - a).angle() - (b0 - a0).angle(), -PI, PI)
+	_zoom_sum *= factor
+	_turn_sum += angle
+	if not _zooming and absf(_zoom_sum - 1.0) > ZOOM_DEADZONE:
+		_zooming = true
+	if not _turning and absf(_turn_sum) > TURN_DEADZONE:
+		_turning = true
+	if _zooming:
+		_zoom(factor)
+	if _turning:
+		_turn(angle)
 
 
 func _on_mouse_button(event: InputEventMouseButton) -> void:
@@ -269,6 +328,13 @@ func _on_mouse_button(event: InputEventMouseButton) -> void:
 		MOUSE_BUTTON_WHEEL_DOWN:
 			if event.pressed:
 				_zoom(1.1)
+		# Rolagem para o lado (touchpad do notebook) gira o mundo.
+		MOUSE_BUTTON_WHEEL_LEFT:
+			if event.pressed:
+				_turn(0.06 * maxf(event.factor, 1.0))
+		MOUSE_BUTTON_WHEEL_RIGHT:
+			if event.pressed:
+				_turn(-0.06 * maxf(event.factor, 1.0))
 		MOUSE_BUTTON_LEFT:
 			if event.pressed:
 				_press_pos = event.position
@@ -331,24 +397,22 @@ func _pan(from: Vector2, to: Vector2) -> void:
 		return
 	_take_camera()
 	var limit := Vector3(State.GRID_W * CELL / 2.0 + CELL * 2.0, 0.0, State.GRID_H * CELL / 2.0 + CELL * 2.0)
-	_rig.position = (_rig.position + p0 - p1).clamp(-limit, limit)
+	_pos_goal = (_pos_goal + p0 - p1).clamp(-limit, limit)
 
 
 func _zoom(factor: float) -> void:
 	_take_camera()
-	camera.size = clampf(camera.size * factor, ZOOM_MIN, ZOOM_MAX)
+	_size_goal = clampf(_size_goal * factor, ZOOM_MIN, ZOOM_MAX)
 
 
 ## O mundo gira para o mesmo lado que os dedos.
 func _turn(angle: float) -> void:
 	_take_camera()
-	_rig.rotate_y(angle)
+	_yaw_goal += angle
 
 
 func _take_camera() -> void:
 	_manual_cam = true
-	if _cam_tween:
-		_cam_tween.kill()
 	_cam_goal = Vector3(INF, INF, INF)
 
 
@@ -559,6 +623,83 @@ func _far_point() -> Vector3:
 	return Vector3(back.x, 0.0, back.z).normalized() * (_flat_r + PLANET * 0.95)
 
 
+## Obra: o Mike vai até lá e martela; bloquinhos coloridos caem e quicam; no fim somem e a construção brota.
+## Coisas pequenas (bandeira, vaso): o Mike se abaixa e coloca, e ela salta do chão.
+func _obra(node: Node3D, type: String, c: Vector2i, width: int, rot: int) -> void:
+	var small := type in PLACE_ONLY
+	node.visible = false
+	walk_to(c, func() -> void: _play_mike("colocar" if small else "construir"))
+	var walk_time := 0.0
+	for i in range(1, _path.size()):
+		walk_time += _path[i - 1].distance_to(_path[i])
+	walk_time /= _speed
+	var total := walk_time + (0.45 if small else OBRA_WORK)
+	var site := Node3D.new()
+	add_child(site)
+	site.position = node.position
+	if not small:
+		var block := BoxMesh.new()
+		block.size = Vector3.ONE * 0.35
+		var spread := Vector2(CELL * 0.6 * width, CELL * 0.6)
+		if rot % 2 == 1:
+			spread = Vector2(spread.y, spread.x)
+		for i in 12:
+			var b := MeshInstance3D.new()
+			b.mesh = block
+			b.material_override = _mat(OBRA_COLORS[i % OBRA_COLORS.size()])
+			var col := i % 4
+			var row := i / 4
+			var rest := Vector3((col % 2 - 0.5) * spread.x * 0.5, 0.175 + row * 0.35, (col / 2 - 0.5) * spread.y * 0.5)
+			b.position = rest + Vector3(0.0, 1.2, 0.0)
+			b.rotation.y = randf_range(-0.3, 0.3)
+			b.scale = Vector3.ZERO
+			site.add_child(b)
+			var t := create_tween()
+			t.tween_interval(total * 0.85 * float(i) / 12.0)
+			t.tween_callback(func() -> void: b.scale = Vector3.ONE)
+			t.tween_property(b, "position:y", rest.y, 0.35).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+	await get_tree().create_timer(total).timeout
+	for b in site.get_children():
+		create_tween().tween_property(b, "scale", Vector3.ZERO, 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+	if not small:
+		await get_tree().create_timer(0.2).timeout
+	if is_instance_valid(node):
+		node.visible = true
+		node.scale = Vector3(1.0, 0.01, 1.0) if not small else Vector3.ONE * 0.01
+		var rise := create_tween()
+		if small:
+			rise.tween_property(node, "scale", Vector3.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		else:
+			rise.tween_property(node, "scale", Vector3.ONE, 0.45).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+		_dust_puff(site, 10 if small else 24)
+	if _path_i >= _path.size():
+		_play_mike("idle")
+	get_tree().create_timer(1.0).timeout.connect(site.queue_free)
+
+
+## Poeirinha cor de creme subindo do chão (do construcao.gd do Design).
+func _dust_puff(parent: Node3D, amount: int) -> void:
+	var p := CPUParticles3D.new()
+	p.one_shot = true
+	p.amount = amount
+	p.lifetime = 0.6
+	p.explosiveness = 1.0
+	p.direction = Vector3.UP
+	p.spread = 80.0
+	p.initial_velocity_min = 1.0
+	p.initial_velocity_max = 2.5
+	p.gravity = Vector3(0, -2, 0)
+	p.scale_amount_min = 0.15
+	p.scale_amount_max = 0.3
+	var m := SphereMesh.new()
+	m.radius = 0.15
+	m.height = 0.3
+	m.material = _mat(Color("F2D091"))
+	p.mesh = m
+	parent.add_child(p)
+	p.emitting = true
+
+
 ## O Mike pula de alegria (quando colhe, por exemplo).
 func jump() -> void:
 	if _mike_anim and _mike_anim.has_animation("jump"):
@@ -727,6 +868,7 @@ func _bend_terrain(terrain: Node3D) -> void:
 
 
 var _terrain_floor := 0.0
+var _planet_bottom: MeshInstance3D   # a metade de baixo do planetinha (para ele ser uma bola, sem corte)
 
 
 func _rebend() -> void:
@@ -762,6 +904,39 @@ func _rebend() -> void:
 			bent.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 			bent.surface_set_material(s, src[3][s])
 		mi.mesh = bent
+	_build_planet_bottom(rim, floor_y - planet_drop(rim))
+
+
+## Embaixo do chão, meia esfera com a mesma textura: de qualquer ângulo, o planetinha é uma bola.
+func _build_planet_bottom(radius: float, top_y: float) -> void:
+	if _planet_bottom == null:
+		_planet_bottom = MeshInstance3D.new()
+		var mat := StandardMaterial3D.new()
+		mat.albedo_color = Color(0.86, 0.72, 0.64)
+		var tex: Texture2D = null
+		if not _terrain_src.is_empty():
+			var m: Material = _terrain_src[0][3][0]
+			if m is BaseMaterial3D:
+				tex = (m as BaseMaterial3D).albedo_texture
+		if tex:
+			mat.albedo_texture = tex
+			mat.uv1_triplanar = true
+			mat.uv1_scale = Vector3.ONE * 0.1
+		else:
+			mat.albedo_color = Palette.GROUND
+		mat.roughness = 1.0
+		_planet_bottom.material_override = mat
+		_planet_bottom.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		_planet_bottom.rotation_degrees.x = 180.0
+		add_child(_planet_bottom)
+	var bowl := SphereMesh.new()
+	bowl.is_hemisphere = true
+	bowl.radius = radius
+	bowl.height = radius
+	bowl.radial_segments = 48
+	bowl.rings = 16
+	_planet_bottom.mesh = bowl
+	_planet_bottom.position = Vector3(0.0, top_y + 0.02, 0.0)
 
 
 ## Altura do terreno no meio do mapa (onde fica a base), para a grade ficar rente ao chão.
@@ -834,7 +1009,10 @@ func _build_mike() -> void:
 			player.play("idle")
 		else:
 			player = null
-		_mike_skins[skin[0]] = [model, player]
+		var hammer := model.find_child("Martelo", true, false) as Node3D
+		if hammer:
+			hammer.visible = false
+		_mike_skins[skin[0]] = [model, player, hammer]
 	if _mike_skins.has("casual"):
 		_set_suit(false)
 		return
@@ -864,7 +1042,14 @@ func _set_suit(on: bool) -> void:
 
 
 func _play_mike(anim_name: String) -> void:
+	# O martelo só aparece enquanto o Mike constrói.
+	for k in _mike_skins:
+		var hammer: Node3D = _mike_skins[k][2]
+		if hammer:
+			hammer.visible = anim_name == "construir"
 	if _mike_anim and _mike_anim.has_animation(anim_name):
+		if anim_name == "construir":
+			_mike_anim.get_animation(anim_name).loop_mode = Animation.LOOP_LINEAR
 		_mike_anim.play(anim_name, 0.15)
 
 
@@ -880,11 +1065,15 @@ func _sync_items() -> void:
 	for k in State.items:
 		var it: Dictionary = State.items[k]
 		var level := int(it.level)
+		var obra := false
 		if not _nodes.has(k):
 			var n := _make_item(it.type, level)
 			add_child(n)
 			_nodes[k] = n
-			if _built_once:
+			if _built_once and build_fx:
+				build_fx = false
+				obra = true
+			elif _built_once:
 				n.scale = Vector3.ONE * 0.3
 				create_tween().tween_property(n, "scale", Vector3.ONE, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		var node: Node3D = _nodes[k]
@@ -899,6 +1088,8 @@ func _sync_items() -> void:
 		var label: Label3D = node.get_node("Label")
 		label.text = tr(State.item_name(it))
 		_update_plant(node, it)
+		if obra:
+			_obra(node, it.type, State.parse_key(k), w, rot)
 	var flat: float = FLAT_BY_LEVEL[clampi(State.house_level(), 1, State.MAX_LEVEL)]
 	if flat != _flat_r:
 		_flat_r = flat

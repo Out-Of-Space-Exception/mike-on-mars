@@ -29,7 +29,11 @@ var _sol_label: Label
 var _hint: Label
 var _toast: PanelContainer
 var _toast_label: Label
+var _toast_style: StyleBoxFlat
 var _toast_tween: Tween
+var _toast_down := false
+var _mike_line := 0
+var _mike_said_at := -100.0
 var _buttons := {}            # "build", "explore", "album", "photo" -> Button
 var _build_menu: PanelContainer
 var _build_grid: GridContainer
@@ -55,8 +59,21 @@ var _card_rarity: Label
 var _card_name: Label
 var _card_fact: Label
 var _card_photo: TextureRect
+var _card_frame: TextureRect
+var _info_construcao: Control
+# Tutorial do primeiro minuto: recado fixo do Mike no topo + seta dourada em cima do que tocar.
+var _tut_card: PanelContainer
+var _tut_label: Label
+var _tut_skip: Button
+var _tut_arrow: TextureRect
+var _tut_target := Vector2.INF
+var _tut_done_at := -1.0
+var _pc_hint_shown := false
+const CARD_W := 560.0          # a carta com a moldura do Design (1066 x 1280) nesta largura
+const FRAME := {"comum": "comum", "raro": "raro", "épico": "epico", "lendário": "lendario"}
 var _card_source := ""
 var _card_queue: Array[int] = []
+var _card_new: Array[bool] = []    # "Carta nova!" só quando a criança acabou de ganhar
 var _tube: PanelContainer
 var _tube_node: Node3D
 var _tube_glass: StandardMaterial3D
@@ -92,7 +109,12 @@ func _ready() -> void:
 	_build_messages()
 	_build_album()
 	_build_popups()
+	# Painel de informação da construção (Design 05): abre ao tocar num item do menu Construir.
+	_info_construcao = preload("res://scenes/info_construcao.gd").new()
+	_root.add_child(_info_construcao)
+	_info_construcao.construir.connect(_on_build_item)
 	_build_postcard()
+	_build_tutorial()
 	_build_start()
 	State.changed.connect(_refresh)
 	State.storm_started.connect(_show_storm)
@@ -118,9 +140,13 @@ func _on_play() -> void:
 	_root.visible = true
 	base.orbit = false
 	State.start()
+	_tut_update()
+	if not DisplayServer.is_touchscreen_available() and not _pc_hint_shown:
+		_pc_hint_shown = true
+		get_tree().create_timer(1.5 if State.tutorial >= State.TUTORIAL_DONE else 12.0).timeout.connect(func() -> void: _show_toast(tr("HINT_PC")))
 	var away: Dictionary = State.away
 	if int(away.get("sols", 0)) >= 4:
-		var text := tr("AWAY_SOLS").format({"n": away.sols})
+		var text := _sols(tr("AWAY_SOLS").format({"n": away.sols}))
 		if int(away.get("plants", 0)) > 0:
 			text += "\n" + tr("AWAY_PLANTS").format({"n": away.plants})
 		_show_info(tr("AWAY_TITLE"), text, Callable())
@@ -141,10 +167,16 @@ func _resume_pending() -> void:
 
 
 ## O Mike reage quando a criança toca nele (pesquisa, item 17).
+## Ele sempre pula; fala no máximo uma vez a cada 8 segundos, e cada vez uma frase diferente.
 func on_mike_tapped() -> void:
 	base.jump()
 	Sfx.play("bem-vindo")
-	_show_toast(tr("MIKE_%d" % randi_range(1, 4)))
+	var now := Time.get_ticks_msec() / 1000.0
+	if now - _mike_said_at < 8.0:
+		return
+	_mike_said_at = now
+	_mike_line = _mike_line % 4 + 1
+	_show_toast(tr("MIKE_%d" % _mike_line))
 
 
 func _on_lang() -> void:
@@ -196,9 +228,10 @@ func on_cell_tapped(c: Vector2i) -> void:
 		return
 	match mode:
 		Mode.BUILD:
+			base.build_fx = true
 			if c != base.OUTSIDE and State.build(build_type, c):
 				Sfx.play("construir")
-				base.walk_to(c)
+			base.build_fx = false
 			_set_mode(Mode.NONE)
 		Mode.MOVE:
 			if c != base.OUTSIDE and State.move(selected, c):
@@ -217,6 +250,7 @@ func on_cell_tapped(c: Vector2i) -> void:
 
 func _set_mode(m: Mode) -> void:
 	mode = m
+	_tut_update.call_deferred()
 	match m:
 		Mode.BUILD:
 			base.highlight(State.free_cells())
@@ -235,6 +269,7 @@ func _on_build() -> void:
 		_set_mode(Mode.NONE)
 	_build_menu.visible = not _build_menu.visible
 	_refresh_build_menu()
+	_tut_update()
 
 
 func _on_build_item(type: String) -> void:
@@ -303,6 +338,7 @@ func _open_panel(c: Vector2i) -> void:
 	_panel.visible = true
 	_build_menu.visible = false
 	_refresh_panel()
+	_tut_update()
 
 
 func _close_panel() -> void:
@@ -405,7 +441,7 @@ func _on_harvest() -> void:
 
 # ───────────── Eventos ─────────────
 func _show_storm(event: Dictionary) -> void:
-	var lines := [tr("EV_SOLAR_REAL").format({"date": event.get("date", "")})]
+	var lines := [tr("EV_SOLAR_REAL").format({"date": _nice_date(str(event.get("date", "")))})]
 	if event.get("curiosity", false):
 		lines.append(tr("EV_SOLAR_CURIOSITY"))
 	lines.append(tr("EV_SOLAR_Q"))
@@ -495,6 +531,7 @@ func _show_tube() -> void:
 	_tube_label.text = tr("TUBE_TAP")
 	_tube.visible = true
 	_update_dim()
+	_tut_update()
 	Sfx.play("tubo-abrir")
 	# O tubo gira devagar e dá tremidinhas, como se a amostra quisesse sair.
 	if _tube_tween:
@@ -517,35 +554,40 @@ func _on_tube_tap() -> void:
 
 
 # ───────────── Carta ─────────────
-func _queue_card(id: int, _is_new: bool = true) -> void:
+func _queue_card(id: int, is_new: bool = true) -> void:
 	_card_queue.append(id)
+	_card_new.append(is_new)
 	if not _card.visible:
 		_show_next_card()
 
 
 func _show_next_card() -> void:
 	if _card_queue.is_empty():
+		_card_new.clear()
 		_card.visible = false
 		_update_dim()
 		return
 	var id: int = _card_queue.pop_front()
+	var is_new_card: bool = _card_new.pop_front() if not _card_new.is_empty() else false
 	var info := State.card_info(id)
 	var rarity: String = info.get("rarity", "comum")
 	var color: Color = Palette.RARITY.get(rarity, Palette.TEXT)
-	_card_style.border_color = color
-	_card_title.text = tr("CARD_NEW") if State.cards.get(str(id), 0) == 1 else ""
+	_card_title.text = tr("CARD_NEW") if is_new_card and int(State.cards.get(str(id), 0)) <= 1 else ""
+	var frame := "res://ui/frames/moldura-carta-%s.png" % FRAME.get(rarity, "comum")
+	if ResourceLoader.exists(frame):
+		_card_frame.texture = load(frame)
 	_card_rarity.text = tr(Palette.RARITY_KEY.get(rarity, "RARITY_COMMON"))
 	_card_rarity.add_theme_color_override("font_color", color.darkened(0.3))
-	_card_name.text = tr("CARD_%d_NAME" % id)
+	_card_name.text = tr("CARD_%d_NAME" % id).to_upper()
+	var n := _card_name.text.length()
+	_card_name.add_theme_font_size_override("font_size", 30 if n <= 16 else (25 if n <= 24 else 20))
 	_card_fact.text = "%s %s" % [tr("CARD_REAL"), tr("CARD_%d_FACT" % id)]
 	_card_source = str(info.get("source", ""))
 	var source_btn: Button = _card.find_child("Source", true, false)
 	source_btn.text = tr("BTN_SOURCE")
 	source_btn.visible = _card_source != ""
 	var photo := "res://ui/cards/%s" % info.get("photo_file", "")
-	_card_photo.visible = str(info.get("photo_file", "")) != "" and ResourceLoader.exists(photo)
-	if _card_photo.visible:
-		_card_photo.texture = load(photo)
+	_card_photo.texture = load(photo) if str(info.get("photo_file", "")) != "" and ResourceLoader.exists(photo) else null
 	_card.visible = true
 	_update_dim()
 	Sfx.play(REVEAL_SOUND.get(rarity, "revelar-comum"))
@@ -583,6 +625,14 @@ func _refresh_album() -> void:
 		b.add_theme_color_override("font_disabled_color", Palette.TEXT.darkened(0.3))
 		if owned:
 			b.text = tr("CARD_%d_NAME" % id)
+			var photo := "res://ui/cards/%s" % info.get("photo_file", "")
+			if str(info.get("photo_file", "")) != "" and ResourceLoader.exists(photo):
+				b.icon = load(photo)
+				b.expand_icon = true
+				b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+				b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+				b.add_theme_font_size_override("font_size", 18)
+				b.custom_minimum_size = Vector2(150, 190)
 			b.pressed.connect(_queue_card.bind(id, false))
 		else:
 			b.text = "?"
@@ -616,7 +666,7 @@ func _refresh() -> void:
 	_buttons.album.text = tr("BTN_ALBUM")
 	_buttons.photo.text = tr("BTN_PHOTO")
 	if State.exploring():
-		_buttons.explore.text = tr("EXPLORING").format({"n": State.explore_left})
+		_buttons.explore.text = _sols(tr("EXPLORING").format({"n": State.explore_left}))
 	elif State.tube_card != 0:
 		_buttons.explore.text = tr("TUBE_READY")
 	else:
@@ -624,6 +674,7 @@ func _refresh() -> void:
 	_buttons.explore.modulate = Color(1, 1, 1, 0.55) if State.explore_block_reason() != "" and State.tube_card == 0 and not State.exploring() else Color.WHITE
 	_buttons.build.modulate = Color(1, 1, 1, 0.55) if State.base_locked_reason() != "" else Color.WHITE
 	_hint.text = _status_text()
+	_tut_update()
 	_refresh_inventory()
 	if _panel.visible:
 		_refresh_panel()
@@ -631,13 +682,35 @@ func _refresh() -> void:
 		_refresh_build_menu()
 
 
+## "1 sóis" vira "1 sol" (e "1 sols", "1 soles" também).
+func _sols(text: String) -> String:
+	var re := RegEx.new()
+	re.compile("(^|[^0-9/])1 (sóis|sols|soles)")
+	return re.sub(text, "${1}1 sol", true)
+
+
+## Data da NASA (2024-05-20) do jeito que a criança lê: 20/05/2024 (em inglês, May 20, 2024).
+func _nice_date(iso: String) -> String:
+	var p := iso.split("-")
+	if p.size() != 3:
+		return iso
+	if State.locale.begins_with("en"):
+		var months := ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+		return "%s %d, %s" % [months[clampi(int(p[1]) - 1, 0, 11)], int(p[2]), p[0]]
+	return "%s/%s/%s" % [p[2], p[1], p[0]]
+
+
 func _status_text() -> String:
+	return _sols(_status_raw())
+
+
+func _status_raw() -> String:
 	if State.nosignal_left > 0:
 		return tr("NOSIGNAL_LEFT").format({"n": State.nosignal_left})
 	if State.storm_active():
 		return tr("STORM_SHIELDED" if State.storm_shielded else "STORM_INSIDE").format({"n": State.storm_left})
 	if mode == Mode.BUILD:
-		return tr("TUT_BUILD")
+		return "" if State.tutorial < State.TUTORIAL_DONE else tr("TUT_BUILD")
 	if mode == Mode.MOVE:
 		return tr("MOVE_HINT")
 	if State.oxygen <= 0.0:
@@ -648,6 +721,8 @@ func _status_text() -> String:
 		return tr("COLD_LEFT").format({"n": State.cold_left})
 	if State.dust_left > 0:
 		return tr("DUST_LEFT").format({"n": State.dust_left})
+	if State.tutorial < State.TUTORIAL_DONE:
+		return ""
 	if State.items.size() <= 1:
 		return tr("TUT_BUILD")
 	if State.cards.size() <= 3 and not State.exploring() and State.tube_card == 0:
@@ -733,32 +808,214 @@ func _refresh_build_menu() -> void:
 		b.add_theme_font_size_override("font_size", 22)
 		b.text = tr(def.name) + ("\n-%d" % def.cost if def.cost > 0 else "")
 		b.modulate = Color.WHITE if State.build_block_reason(type) == "" else Color(1, 1, 1, 0.5)
-		b.pressed.connect(_on_build_item.bind(type))
+		if type in _info_construcao.COM_INFO:
+			b.pressed.connect(_open_build_info.bind(type))
+		else:
+			b.pressed.connect(_on_build_item.bind(type))
 		_build_grid.add_child(b)
+
+
+func _open_build_info(type: String) -> void:
+	Sfx.play("toque-botao")
+	_info_construcao.abrir(type)
+	_tut_update()
 
 
 func _update_dim() -> void:
 	_dim.visible = _choice.visible or _info.visible or _card.visible or _tube.visible or _nasa.visible
 
 
-## Aviso curto num "bilhetinho" de papel inclinado. Quando é bloqueio (falta algo), ele treme de leve.
+## Recado do Mike no topo da tela, como notificação de celular: desce, fica um pouco e sobe.
+## Quando é bloqueio (falta algo), a borda fica vermelha e o recado treme de leve.
 func _show_toast(text: String, shake := false) -> void:
 	_toast_label.text = text
-	_toast.modulate.a = 1.0
+	move_child(_toast, get_child_count() - 1)   # sempre por cima de tudo
+	_toast_style.border_color = Palette.ALERT if shake else Palette.GOLD
+	var w := get_viewport().get_visible_rect().size.x
+	_toast.custom_minimum_size.x = w - 32.0
 	_toast.reset_size()
-	_toast.pivot_offset = _toast.size / 2.0
-	_toast.position = (get_viewport().get_visible_rect().size - _toast.size) / 2.0
+	_toast.position.x = 16.0
+	_toast.modulate.a = 1.0
 	if _toast_tween:
 		_toast_tween.kill()
 	_toast_tween = create_tween()
-	_toast.scale = Vector2(0.85, 0.85)
-	_toast_tween.tween_property(_toast, "scale", Vector2.ONE, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	if not _toast_down:
+		_toast.position.y = -_toast.size.y - 30.0
+		_toast_tween.tween_property(_toast, "position:y", _toast_top(), 0.32).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_toast_down = true
 	if shake:
-		var x := _toast.position.x
 		for d in [14.0, -12.0, 8.0, -4.0, 0.0]:
-			_toast_tween.tween_property(_toast, "position:x", x + d, 0.05)
-	_toast_tween.tween_interval(1.6)
-	_toast_tween.tween_property(_toast, "modulate:a", 0.0, 0.4)
+			_toast_tween.tween_property(_toast, "position:x", 16.0 + d, 0.05)
+	_toast_tween.tween_interval(2.6)
+	_toast_tween.tween_callback(func() -> void: _toast_down = false)
+	_toast_tween.tween_property(_toast, "position:y", -_toast.size.y - 30.0, 0.28).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+
+
+func _toast_top() -> float:
+	return 18.0 + (_tut_card.size.y + 12.0 if _tut_card and _tut_card.visible else 0.0)
+
+
+# ───────────── Tutorial do primeiro minuto ─────────────
+func _build_tutorial() -> void:
+	_tut_card = PanelContainer.new()
+	var box := Palette.paper(Palette.GOLD)
+	box.set_corner_radius_all(30)
+	box.set_border_width_all(5)
+	box.shadow_offset = Vector2(0, 8)
+	box.content_margin_left = 18
+	box.content_margin_right = 18
+	box.content_margin_top = 14
+	box.content_margin_bottom = 14
+	_tut_card.add_theme_stylebox_override("panel", box)
+	_tut_card.visible = false
+	_tut_card.position = Vector2(16, 18)
+	add_child(_tut_card)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 14)
+	_tut_card.add_child(row)
+	var face := TextureRect.new()
+	var head := AtlasTexture.new()
+	head.atlas = load("res://ui/icons/mike.png")
+	head.region = Rect2(300, 230, 290, 290)
+	face.texture = head
+	face.custom_minimum_size = Vector2(84, 84)
+	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	face.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(face)
+	_tut_label = Label.new()
+	_tut_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_tut_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_tut_label.add_theme_font_size_override("font_size", 31)
+	_tut_label.add_theme_color_override("font_color", Palette.INK)
+	row.add_child(_tut_label)
+	var skip := Button.new()
+	_tut_skip = skip
+	skip.flat = true
+	skip.add_theme_font_size_override("font_size", 22)
+	skip.add_theme_color_override("font_color", Palette.INK.lightened(0.35))
+	skip.size_flags_vertical = Control.SIZE_SHRINK_END
+	skip.pressed.connect(func() -> void:
+		State.tutorial = State.TUTORIAL_DONE
+		_tut_update())
+	row.add_child(skip)
+	_tut_arrow = TextureRect.new()
+	_tut_arrow.texture = load("res://ui/icons/seta.svg")
+	_tut_arrow.custom_minimum_size = Vector2(72, 90)
+	_tut_arrow.size = Vector2(72, 90)
+	_tut_arrow.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_tut_arrow.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_tut_arrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tut_arrow.visible = false
+	add_child(_tut_arrow)
+
+
+## Avança o tutorial pelo que a criança já fez e escolhe o recado do passo de agora.
+## Passos: 0 painel solar · 1 estufa · 2 plantar · 3 explorar · 4 abrir o tubo · 5 parabéns.
+func _tut_update() -> void:
+	var s := State.tutorial
+	if s >= State.TUTORIAL_DONE or _start.visible:
+		_tut_card.visible = false
+		_tut_arrow.visible = false
+		return
+	if s == 0 and State.count_items("solar") > 0:
+		s = 1
+	if s == 1 and State.count_items("greenhouse") > 0:
+		s = 2
+	if s == 2 and State._has_growing_plant():
+		s = 3
+	if s == 3 and (State.exploring() or State.tube_card != 0):
+		s = 4
+	if s == 4 and not State.exploring() and State.tube_card == 0:
+		s = 5
+	if s != State.tutorial:
+		State.tutorial = s
+		Sfx.play("toque-botao")
+	var text := ""
+	match s:
+		0, 1:
+			var type := "solar" if s == 0 else "greenhouse"
+			if mode == Mode.BUILD:
+				text = tr("TUTO_PLACE")
+			elif _info_construcao.visible:
+				text = tr("TUTO_CONFIRM")
+			elif _build_menu.visible:
+				text = tr("TUTO_PICK").format({"name": tr(State.ITEMS[type].name)})
+			else:
+				text = tr("TUTO_HELLO" if s == 0 else "TUTO_GREENHOUSE")
+		2:
+			text = tr("TUTO_PICK").format({"name": tr("P_LETTUCE")}) if _panel.visible else tr("TUTO_PLANT")
+		3:
+			text = tr("TUTO_EXPLORE")
+		4:
+			text = tr("TUTO_TUBE") if _tube.visible else _sols(tr("TUTO_WAIT").format({"n": maxi(State.explore_left, 1)}))
+		5:
+			text = tr("TUTO_DONE")
+			if _tut_done_at < 0.0:
+				_tut_done_at = Time.get_ticks_msec() / 1000.0
+	_tut_label.text = text
+	_tut_skip.text = tr("TUTO_SKIP")
+	_tut_skip.visible = s < 5
+	_tut_card.custom_minimum_size.x = get_viewport().get_visible_rect().size.x - 32.0
+	_tut_card.reset_size()
+	if not _tut_card.visible:
+		_tut_card.visible = true
+		_tut_card.position.y = -_tut_card.size.y - 30.0
+		create_tween().tween_property(_tut_card, "position:y", 18.0, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
+## Onde a seta aponta agora (o meio de cima do botão, ou um ponto da base), ou INF para esconder.
+func _tut_point() -> Vector2:
+	if not _tut_card.visible or _choice.visible or _info.visible or _card.visible or _nasa.visible or _album.visible:
+		return Vector2.INF
+	var top := func(c: Control) -> Vector2:
+		var r := c.get_global_rect()
+		return Vector2(r.get_center().x, r.position.y)
+	match State.tutorial:
+		0, 1:
+			var type := "solar" if State.tutorial == 0 else "greenhouse"
+			if mode == Mode.BUILD:
+				return Vector2.INF
+			if _info_construcao.visible:
+				return top.call(_info_construcao._btn_construir)
+			if _build_menu.visible:
+				for b in _build_grid.get_children():
+					if b is Button and not b.is_queued_for_deletion() and (b as Button).text.begins_with(tr(State.ITEMS[type].name)):
+						return top.call(b)
+				return Vector2.INF
+			return top.call(_buttons.build)
+		2:
+			if _panel.visible:
+				for b in _panel_buttons.get_children():
+					if b is Button and not b.is_queued_for_deletion():
+						return top.call(b)
+				return Vector2.INF
+			for k in State.items:
+				if State.items[k].type == "greenhouse":
+					var node: Node3D = base._nodes.get(k)
+					if node:
+						return base.camera.unproject_position(node.global_position + Vector3(0.0, 1.6, 0.0))
+		3:
+			return top.call(_buttons.explore)
+		4:
+			if _tube.visible:
+				var r := _tube.get_global_rect()
+				return Vector2(r.get_center().x, r.position.y + 40.0)
+	return Vector2.INF
+
+
+func _process(_delta: float) -> void:
+	if _tut_card == null:
+		return
+	if State.tutorial == 5 and _tut_done_at > 0.0 and Time.get_ticks_msec() / 1000.0 - _tut_done_at > 5.0:
+		State.tutorial = State.TUTORIAL_DONE
+		_tut_update()
+	var p := _tut_point()
+	_tut_arrow.visible = p != Vector2.INF
+	if _tut_arrow.visible:
+		move_child(_tut_arrow, get_child_count() - 1)
+		var bob := sin(Time.get_ticks_msec() / 1000.0 * 7.0) * 10.0
+		_tut_arrow.position = p - Vector2(_tut_arrow.size.x / 2.0, _tut_arrow.size.y + 6.0 + bob)
 
 
 ## Todo botão responde na hora: afunda quando aperta e quica quando solta (pesquisa, item 16).
@@ -911,19 +1168,47 @@ func _build_bottom() -> void:
 
 func _build_messages() -> void:
 	_toast = PanelContainer.new()
-	_toast.add_theme_stylebox_override("panel", Palette.paper(Palette.GOLD))
-	_toast.rotation_degrees = -3.0
-	_toast.custom_minimum_size = Vector2(0, 0)
+	_toast_style = Palette.paper(Palette.GOLD)
+	_toast_style.set_corner_radius_all(30)
+	_toast_style.set_border_width_all(4)
+	_toast_style.shadow_offset = Vector2(0, 8)
+	_toast_style.content_margin_left = 18
+	_toast_style.content_margin_right = 24
+	_toast_style.content_margin_top = 14
+	_toast_style.content_margin_bottom = 16
+	_toast.add_theme_stylebox_override("panel", _toast_style)
 	_toast.modulate.a = 0.0
+	_toast.position.y = -400.0
 	_toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_toast)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 16)
+	_toast.add_child(row)
+	# O rostinho do Mike, como a foto de quem mandou a mensagem.
+	var face := TextureRect.new()
+	var head := AtlasTexture.new()
+	head.atlas = load("res://ui/icons/mike.png")
+	head.region = Rect2(300, 230, 290, 290)
+	face.texture = head
+	face.custom_minimum_size = Vector2(76, 76)
+	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	face.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(face)
+	var col := VBoxContainer.new()
+	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	col.add_theme_constant_override("separation", 0)
+	row.add_child(col)
+	var from := Label.new()
+	from.text = "Mike"
+	from.add_theme_font_size_override("font_size", 22)
+	from.add_theme_color_override("font_color", Palette.INK.lightened(0.35))
+	col.add_child(from)
 	_toast_label = Label.new()
-	_toast_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_toast_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_toast_label.custom_minimum_size = Vector2(460, 0)
-	_toast_label.add_theme_font_size_override("font_size", 34)
+	_toast_label.add_theme_font_size_override("font_size", 30)
 	_toast_label.add_theme_color_override("font_color", Palette.INK)
-	_toast.add_child(_toast_label)
+	col.add_child(_toast_label)
 
 
 func _build_album() -> void:
@@ -993,30 +1278,58 @@ func _build_popups() -> void:
 	_popup_button(ibox, _on_info_ok).text = "OK"
 
 	# Carta: papel creme com a borda na cor da raridade, um pouco torta, como uma carta de verdade.
-	_card = _popup(600, "paper")
-	_card.rotation_degrees = -2.0
-	_card_style = Palette.paper()
+	# A carta é a moldura do Design 05 (uma por raridade) com a foto da NASA por baixo,
+	# o nome no título e o fato embaixo, nos retângulos do design/05-telas/moldura-carta.md.
+	_card = _popup(int(CARD_W))
+	_card_style = StyleBoxFlat.new()
+	_card_style.bg_color = Color(0, 0, 0, 0)
 	_card.add_theme_stylebox_override("panel", _card_style)
 	var kbox: VBoxContainer = _card.get_child(0)
-	_card_title = _wrap_label("", 26)
-	_card_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	_card_title.add_theme_color_override("font_color", Palette.INK.lightened(0.25))
+	kbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	_card_title = _title_label(40)
+	_card_title.add_theme_color_override("font_color", Palette.GOLD)
+	_card_title.add_theme_color_override("font_outline_color", Palette.BG)
+	_card_title.add_theme_constant_override("outline_size", 12)
 	kbox.add_child(_card_title)
+	var k := CARD_W / 1066.0
+	var face := Control.new()
+	face.custom_minimum_size = Vector2(CARD_W, 1280.0 * k)
+	face.rotation_degrees = -2.0
+	face.resized.connect(func() -> void: face.pivot_offset = face.size / 2.0)
+	kbox.add_child(face)
 	_card_photo = TextureRect.new()
-	_card_photo.custom_minimum_size = Vector2(0, 300)
+	_card_photo.position = Vector2(60, 236) * k
+	_card_photo.size = Vector2(944, 614) * k
 	_card_photo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_card_photo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	kbox.add_child(_card_photo)
-	_card_name = _title_label(46)
-	_card_name.add_theme_color_override("font_color", Palette.INK)
-	kbox.add_child(_card_name)
+	_card_photo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_card_photo.clip_contents = true
+	face.add_child(_card_photo)
+	_card_frame = TextureRect.new()
+	_card_frame.size = face.custom_minimum_size
+	_card_frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_card_frame.stretch_mode = TextureRect.STRETCH_SCALE
+	face.add_child(_card_frame)
+	_card_name = Label.new()
+	_card_name.position = Vector2(107, 92) * k
+	_card_name.size = Vector2(855, 108) * k
+	_card_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_card_name.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_card_name.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_card_name.add_theme_color_override("font_color", Palette.BG)
+	face.add_child(_card_name)
+	_card_fact = Label.new()
+	_card_fact.position = Vector2(84, 866) * k
+	_card_fact.size = Vector2(906, 268) * k
+	_card_fact.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_card_fact.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_card_fact.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_card_fact.add_theme_font_size_override("font_size", 21)
+	_card_fact.add_theme_color_override("font_color", Color("3a261c"))
+	face.add_child(_card_fact)
 	_card_rarity = _wrap_label("", 28)
-	_card_rarity.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_card_rarity.add_theme_color_override("font_outline_color", Palette.BG)
+	_card_rarity.add_theme_constant_override("outline_size", 10)
 	kbox.add_child(_card_rarity)
-	_card_fact = _wrap_label("", 30)
-	_card_fact.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	_card_fact.add_theme_color_override("font_color", Palette.INK)
-	kbox.add_child(_card_fact)
 	var crow := HBoxContainer.new()
 	crow.add_theme_constant_override("separation", 12)
 	kbox.add_child(crow)
@@ -1035,6 +1348,10 @@ func _build_popups() -> void:
 	view.stretch = true
 	view.custom_minimum_size = Vector2(320, 400)
 	view.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	view.mouse_filter = Control.MOUSE_FILTER_STOP
+	view.gui_input.connect(func(e: InputEvent) -> void:
+		if (e is InputEventMouseButton and e.pressed) or (e is InputEventScreenTouch and e.pressed):
+			_on_tube_tap())
 	tbox.add_child(view)
 	var vp := SubViewport.new()
 	vp.transparent_bg = true

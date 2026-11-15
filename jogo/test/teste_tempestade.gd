@@ -12,6 +12,7 @@ func _ready() -> void:
 	await get_tree().process_frame
 	hud = main.get_node("Hud")
 	State.new_game()
+	State.tutorial = State.TUTORIAL_DONE
 	_tempestade()
 	_expedicao()
 	_construir_e_plantar()
@@ -22,6 +23,7 @@ func _ready() -> void:
 	_girar_energia_oxigenio()
 	_area_da_casa()
 	_caminho_do_mike(main.get_node("Base"))
+	_tutorial()
 	print("RESULTADO: ", "TUDO OK" if falhas == 0 else "%d FALHA(S)" % falhas)
 	get_tree().quit(falhas)
 
@@ -79,6 +81,7 @@ func _construir_e_plantar() -> void:
 
 
 func _eventos() -> void:
+	State.plant(Vector2i(4, 5), "lettuce")   # a noite congelante só vem com planta crescendo
 	_forcar_evento("cold")
 	ok(State.pending_event == "cold" and hud._choice.visible, "noite congelante pede uma escolha")
 	State.energy = 100.0
@@ -161,6 +164,7 @@ func _ingenuity(base: Node3D) -> void:
 
 func _niveis_e_album() -> void:
 	State.new_game()
+	State.tutorial = State.TUTORIAL_DONE
 	State.energy = 100.0
 	var casa := Vector2i(2, 3)
 	ok(State.upgrade_block_reason(casa) == "", "a casa pode ir para o nível 2 (tem espaço ao lado)")
@@ -195,6 +199,7 @@ func _niveis_e_album() -> void:
 
 func _girar_energia_oxigenio() -> void:
 	State.new_game()
+	State.tutorial = State.TUTORIAL_DONE
 	State.energy = 100.0
 	var casa := Vector2i(2, 3)
 	State.upgrade(casa)
@@ -207,6 +212,7 @@ func _girar_energia_oxigenio() -> void:
 	ok(State.rotate_block_reason(casa) == "NEED_SPACE", "não gira se a fileira nova não couber")
 	# Sem energia: a bateria de emergência da casa ajuda devagar.
 	State.new_game()
+	State.tutorial = State.TUTORIAL_DONE
 	State.energy = 0.0
 	State.oxygen = 50.0
 	State._tick()
@@ -227,6 +233,7 @@ func _girar_energia_oxigenio() -> void:
 
 func _area_da_casa() -> void:
 	State.new_game()
+	State.tutorial = State.TUTORIAL_DONE
 	State.energy = 100.0
 	ok(State.free_cells().size() == 15, "casa no nível 1: a base tem 4 x 4 casas (15 livres)")
 	ok(not State.build("solar", Vector2i(0, 0)), "não dá para construir fora da área aberta")
@@ -251,6 +258,7 @@ func _area_da_casa() -> void:
 
 func _caminho_do_mike(base: Node3D) -> void:
 	State.new_game()
+	State.tutorial = State.TUTORIAL_DONE
 	State.energy = 100.0
 	State.upgrade(Vector2i(2, 3))
 	State.energy = 100.0
@@ -295,3 +303,40 @@ func _caminho_do_mike(base: Node3D) -> void:
 	base._set_suit(false)
 	var anims: PackedStringArray = base._mike_anim.get_animation_list() if base._mike_anim else PackedStringArray()
 	ok("run" in anims and "idle" in anims, "o Mike tem as animações idle e run: %s" % ", ".join(anims))
+
+
+func _tutorial() -> void:
+	State.new_game()
+	ok(State.tutorial == 0, "jogo novo começa com o tutorial")
+	State.next_storm_sol = State.sol + 1
+	State._tick()
+	ok(State.pending_event == "" and not State.paused, "durante o tutorial não vem tempestade")
+	hud._start.visible = false   # como se a criança tivesse tocado em Jogar
+	for janela in [hud._card, hud._choice, hud._info, hud._nasa, hud._album]:
+		janela.visible = false
+	hud._card_queue.clear()
+	hud._tut_update()
+	ok(hud._tut_card.visible and hud._tut_label.text == tr("TUTO_HELLO"), "o Mike dá o 1º recado: tocar em Construir")
+	ok(hud._tut_point() != Vector2.INF, "a seta aponta para o botão Construir")
+	State.energy = 100.0
+	State.build("solar", Vector2i(1, 2))
+	hud._tut_update()
+	ok(State.tutorial == 1, "construiu o painel: passo da estufa")
+	State.energy = 100.0
+	State.build("greenhouse", Vector2i(3, 2))
+	State.plant(Vector2i(3, 2), "lettuce")
+	hud._tut_update()
+	ok(State.tutorial == 3 and hud._tut_label.text == tr("TUTO_EXPLORE"), "plantou: o Mike pede para explorar")
+	State.oxygen = 100.0
+	State.start_explore()
+	_ticks(State.EXPLORE_SOLS)
+	hud._tut_update()
+	ok(State.tutorial == 4 and State.tube_card != 0, "voltou com o tubo: passo de abrir")
+	State.open_tube()
+	hud._tut_update()
+	ok(State.tutorial == 5, "abriu o tubo: parabéns")
+	hud._tut_skip.pressed.emit()
+	ok(State.tutorial == State.TUTORIAL_DONE and not hud._tut_card.visible, "o tutorial termina e o recado some")
+	hud._card.visible = false
+	hud._card_queue.clear()
+	ok(hud._sols(tr("COLD_LEFT").format({"n": 1})).ends_with("1 sol"), "1 sol (não \"1 sóis\")")

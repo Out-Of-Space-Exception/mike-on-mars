@@ -7,8 +7,8 @@
   "place": "Gale",
   "number": "33 dias para crescer",
   "source": "https://www.nasa.gov/mission_pages/station/research/news/veggie",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://www.nasa.gov/image-article/tending-your-garden-space/",
+  "photo_file": "01-alface.png"
  },
  {
   "id": 2,
@@ -18,8 +18,8 @@
   "place": "Gale",
   "number": "27 dias",
   "source": "https://www.nasa.gov/missions/station/astronauts-harvest-radish-crop-on-international-space-station/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://www.nasa.gov/image-article/radish-bulbs-are-pictured-inside-stations-advanced-plant-habitat/",
+  "photo_file": "02-rabanete.png"
  },
  {
   "id": 3,
@@ -29,8 +29,8 @@
   "place": "Gale",
   "number": "",
   "source": "https://www.nasa.gov/exploration-research-and-technology/growing-plants-in-space/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://images.nasa.gov/details/iss075e0250227",
+  "photo_file": "03-couve.png"
  },
  {
   "id": 4,
@@ -40,8 +40,8 @@
   "place": "Gale",
   "number": "o dobro",
   "source": "https://www.nasa.gov/science-research/nasa-plant-researchers-explore-question-of-deep-space-food-crops/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://images.nasa.gov/details/KSC-95pc1197",
+  "photo_file": "04-batata.png"
  },
  {
   "id": 5,
@@ -51,8 +51,8 @@
   "place": "Gale",
   "number": "16/01/2016",
   "source": "https://www.nasa.gov/image-article/first-flower-grown-space-stations-veggie-facility/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://www.nasa.gov/image-article/a-bloom-in-space/",
+  "photo_file": "05-zinia.png"
  },
  {
   "id": 6,
@@ -62,8 +62,8 @@
   "place": "Gale",
   "number": "~4 meses",
   "source": "https://www.nasa.gov/image-article/fresh-chiles-spice-up-taco-night/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://www.nasa.gov/missions/station/nasas-second-pepper-harvest-sets-record-on-space-station/",
+  "photo_file": "06-pimenta-hatch.png"
  },
  {
   "id": 9,
@@ -73,8 +73,8 @@
   "place": "Gale",
   "number": "30/05/2024",
   "source": "https://www.nasa.gov/missions/mars-science-laboratory/curiosity-rover/nasas-curiosity-rover-discovers-a-surprise-in-a-martian-rock/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://science.nasa.gov/resource/curiosity-views-sulfur-crystals-within-a-crushed-rock/",
+  "photo_file": "09-enxofre.png"
  },
  {
   "id": 11,
@@ -84,8 +84,8 @@
   "place": "Gale",
   "number": "45%",
   "source": "https://www.nasa.gov/wp-content/uploads/2024/01/mars-surface-power-generation-challenges-and-considerations.pdf",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://science.nasa.gov/resource/insights-dusty-solar-panel/",
+  "photo_file": "11-painel-solar.png"
  },
  {
   "id": 12,
@@ -95,8 +95,8 @@
   "place": "Gale",
   "number": "",
   "source": "https://science.nasa.gov/planetary-science/programs/radioisotope-power-systems/faq/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://science.nasa.gov/resource/installing-the-mmrtg-power-source/",
+  "photo_file": "12-rtg.png"
  },
  {
   "id": 13,
@@ -106,8 +106,8 @@
   "place": "Gale",
   "number": "122 g",
   "source": "https://www.nasa.gov/missions/mars-2020-perseverance/perseverance-rover/nasas-oxygen-generating-experiment-moxie-completes-mars-mission/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://science.nasa.gov/photojournal/moxie-all-tucked-in/",
+  "photo_file": "13-moxie.png"
  },
  {
   "id": 14,
@@ -117,8 +117,8 @@
   "place": "Gale",
   "number": "até 10 kW",
   "source": "https://www.nasa.gov/news-release/demonstration-proves-nuclear-fission-system-can-provide-space-exploration-power/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://www.nasa.gov/image-article/kilopower-13/",
+  "photo_file": "14-kilopower.png"
  },
  {
   "id": 15,
@@ -128,8 +128,8 @@
   "place": "Gale",
   "number": "72 voos",
   "source": "https://www.nasa.gov/news-release/after-three-years-on-mars-nasas-ingenuity-helicopter-mission-ends/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://science.nasa.gov/photojournal/ingenuity-deployed-on-mars/",
+  "photo_file": "15-ingenuity.png"
  },
  {
   "id": 16,
@@ -139,8 +139,8 @@
   "place": "Gale",
   "number": "",
   "source": "https://www.nasa.gov/solar-system/planets/mars/nasa-watches-mars-light-up-during-epic-solar-storm",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://science.nasa.gov/photojournal/curiositys-selfie-at-mont-mercou/",
+  "photo_file": "16-curiosity.png"
  },
  {
   "id": 19,
@@ -150,8 +150,8 @@
   "place": "Gale",
   "number": "24 h 39 min",
   "source": "https://www.nasa.gov/wp-content/uploads/2024/01/mars-surface-power-generation-challenges-and-considerations.pdf",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://science.nasa.gov/resource/sunrise-on-mars-viking-2/",
+  "photo_file": "19-sol.png"
  },
  {
   "id": 20,
@@ -161,8 +161,8 @@
   "place": "Gale",
   "number": "−70 °C",
   "source": "https://science.nasa.gov/resource/steady-temperatures-at-mars-gale-crater",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://science.nasa.gov/photojournal/curiosity-looks-downslope-from-the-sulfate-unit/",
+  "photo_file": "20-frio-da-gale.png"
  },
  {
   "id": 21,
@@ -172,8 +172,8 @@
   "place": "Gale",
   "number": "5.000 → 500 Wh por sol",
   "source": "https://science.nasa.gov/resource/insights-power-generation-after-landing-and-spring-2022/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://science.nasa.gov/photojournal/melas-dust-storm/",
+  "photo_file": "21-tempestade-de-poeira.png"
  },
  {
   "id": 22,
@@ -183,8 +183,8 @@
   "place": "Gale",
   "number": "",
   "source": "https://www.jpl.nasa.gov/news/spirit-gets-energy-boost-from-cleaner-solar-panels/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://www.jpl.nasa.gov/images/pia21457-a-dust-devil-on-hilly-terrain/",
+  "photo_file": "22-redemoinho-de-poeira.png"
  },
  {
   "id": 23,
@@ -194,8 +194,8 @@
   "place": "Gale",
   "number": "30 raios-X",
   "source": "https://www.nasa.gov/solar-system/planets/mars/nasa-watches-mars-light-up-during-epic-solar-storm",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://science.nasa.gov/resource/curiosity-sees-streaks-and-specks-during-2024-solar-storm/",
+  "photo_file": "23-tempestade-solar.png"
  },
  {
   "id": 24,
@@ -205,8 +205,8 @@
   "place": "Gale",
   "number": "",
   "source": "https://www.jpl.nasa.gov/images/pia00530-frost-on-utopia-planitia/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://science.nasa.gov/photojournal/ice-on-mars/",
+  "photo_file": "24-geada.png"
  },
  {
   "id": 25,
@@ -216,8 +216,8 @@
   "place": "Gale",
   "number": "",
   "source": "https://science.nasa.gov/solar-system/planets/mars/nasa-observes-first-visible-light-auroras-at-mars/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://science.nasa.gov/solar-system/planets/mars/nasa-observes-first-visible-light-auroras-at-mars/",
+  "photo_file": "25-aurora.png"
  },
  {
   "id": 26,
@@ -227,8 +227,8 @@
   "place": "Gale",
   "number": "fotos de 13/12/2012",
   "source": "https://science.nasa.gov/resource/veins-in-sheepbed-outcrop/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://science.nasa.gov/resource/veins-in-sheepbed-outcrop/",
+  "photo_file": "26-veios-brancos.png"
  },
  {
   "id": 27,
@@ -238,8 +238,8 @@
   "place": "Gale",
   "number": "1ª análise de raios X em Marte (30/10/2012)",
   "source": "https://www.jpl.nasa.gov/news/nasa-rovers-first-soil-studies-help-fingerprint-martian-minerals/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://www.jpl.nasa.gov/images/pia16174-wind-blown-martian-sand/",
+  "photo_file": "27-olivina.png"
  },
  {
   "id": 28,
@@ -249,8 +249,8 @@
   "place": "Gale",
   "number": "até ~1 m por ano",
   "source": "https://science.nasa.gov/resource/high-dune-is-first-martian-dune-studied-up-close-2",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://science.nasa.gov/resource/high-dune-is-first-martian-dune-studied-up-close-2/",
+  "photo_file": "28-dunas-bagnold.png"
  },
  {
   "id": 29,
@@ -260,8 +260,8 @@
   "place": "Gale",
   "number": "5 km",
   "source": "https://www.jpl.nasa.gov/news/cracks-in-ancient-martian-mud-surprise-nasas-curiosity-rover-team/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://www.jpl.nasa.gov/images/pia16769-mount-sharp-panorama-in-raw-colors/",
+  "photo_file": "29-monte-sharp.png"
  },
  {
   "id": 30,
@@ -271,8 +271,8 @@
   "place": "Gale",
   "number": "3,8 a 3,3 bilhões de anos",
   "source": "https://www.jpl.nasa.gov/news/nasas-curiosity-rover-team-confirms-ancient-lakes-on-mars/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://science.nasa.gov/photojournal/strata-at-base-of-mount-sharp/",
+  "photo_file": "30-lagos-antigos.png"
  },
  {
   "id": 31,
@@ -282,8 +282,8 @@
   "place": "Gale",
   "number": "notícia de 09/08/2023",
   "source": "https://www.jpl.nasa.gov/news/cracks-in-ancient-martian-mud-surprise-nasas-curiosity-rover-team/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://www.jpl.nasa.gov/news/cracks-in-ancient-martian-mud-surprise-nasas-curiosity-rover-team/",
+  "photo_file": "31-rachaduras-de-lama.png"
  },
  {
   "id": 32,
@@ -293,8 +293,8 @@
   "place": "Gale",
   "number": "notícia de 27/06/2016",
   "source": "https://www.jpl.nasa.gov/news/nasa-rover-findings-point-to-a-more-earth-like-martian-past/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://www.jpl.nasa.gov/images/pia20752-nasas-curiosity-at-site-of-clues-about-ancient-oxygen/",
+  "photo_file": "32-oxido-de-manganes.png"
  },
  {
   "id": 33,
@@ -304,8 +304,8 @@
   "place": "Gale",
   "number": "~0,1% da rocha",
   "source": "https://www.jpl.nasa.gov/news/mars-rock-ingredient-stew-seen-as-plus-for-habitability/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://www.jpl.nasa.gov/images/pia21251-boron-in-calcium-sulfate-vein-at-catabola-mars/",
+  "photo_file": "33-boro.png"
  },
  {
   "id": 34,
@@ -315,8 +315,8 @@
   "place": "Gale",
   "number": "12/03/2013",
   "source": "https://www.jpl.nasa.gov/news/nasa-rover-finds-conditions-once-suited-for-ancient-life-on-mars/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://www.jpl.nasa.gov/images/pia16726-curiositys-first-sample-drilling/",
+  "photo_file": "34-rocha-john-klein.png"
  },
  {
   "id": 35,
@@ -326,8 +326,8 @@
   "place": "Gale",
   "number": "~2 m",
   "source": "https://www.jpl.nasa.gov/images/pia18387-curiosity-finds-iron-meteorite-on-mars/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://www.jpl.nasa.gov/images/pia18387-curiosity-finds-iron-meteorite-on-mars/",
+  "photo_file": "35-meteorito-lebanon.png"
  },
  {
   "id": 36,
@@ -337,8 +337,8 @@
   "place": "Gale",
   "number": "10 a 12 carbonos",
   "source": "https://science.nasa.gov/missions/mars-science-laboratory/nasas-curiosity-rover-detects-largest-organic-molecules-found-on-mars/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://science.nasa.gov/resource/cumberland-target-drilled-by-curiosity/",
+  "photo_file": "36-moleculas-organicas.png"
  },
  {
   "id": 37,
@@ -348,8 +348,8 @@
   "place": "Gale",
   "number": "3 voltas por dia",
   "source": "https://science.nasa.gov/mars/moons/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://science.nasa.gov/photojournal/phobos-from-5800-kilometers-color/",
+  "photo_file": "37-fobos-e-deimos.png"
  },
  {
   "id": 38,
@@ -359,8 +359,8 @@
   "place": "Gale",
   "number": "foto de 15/04/2015",
   "source": "https://www.jpl.nasa.gov/images/pia19400-sunset-in-mars-gale-crater/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://www.jpl.nasa.gov/images/pia19400-sunset-in-mars-gale-crater/",
+  "photo_file": "38-por-do-sol-azul.png"
  },
  {
   "id": 39,
@@ -370,8 +370,8 @@
   "place": "Gale",
   "number": "31/01/2014",
   "source": "https://science.nasa.gov/resource/bright-evening-star-seen-from-mars-is-earth/",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://science.nasa.gov/resource/bright-evening-star-seen-from-mars-is-earth/",
+  "photo_file": "39-terra-vista-de-marte.png"
  },
  {
   "id": 40,
@@ -381,7 +381,7 @@
   "place": "Gale",
   "number": "12 tomates (2023)",
   "source": "https://www.nasa.gov/missions/station/nasa-teams-persevere-through-plant-challenges-in-space",
-  "photo": "",
-  "photo_file": ""
+  "photo": "https://www.nasa.gov/missions/station/nasa-teams-persevere-through-plant-challenges-in-space/",
+  "photo_file": "40-tomate-anao.png"
  }
 ]

@@ -65,8 +65,8 @@ const EARTH_SEEN_CHANCE := 0.02     # por sol, com antena: carta "Terra vista de
 const CARD_BLUE_SUNSET := 38
 const CARD_EARTH_SEEN := 39
 # Tempestade solar (dados reais do DONKI em res://data/donki.json)
-const FIRST_STORM_SOL := 20         # a 1ª chega cedo, para a criança (e o jurado) ver logo
-const STORM_EVERY := Vector2i(30, 50)
+const FIRST_STORM_SOL := 45         # a 1ª chega depois do tutorial, para a criança (e o jurado) ver logo
+const STORM_EVERY := Vector2i(70, 100)
 const STORM_SOLS := 5               # quanto tempo dura
 const STORM_SHIELD_COST := 30.0     # levantar o escudo gasta energia
 const STORM_RADIATION := 30.0       # sem escudo, a radiação come a barra de escudo
@@ -74,8 +74,8 @@ const AURORA_CHANCE := 0.10         # aguentou com escudo: chance da lendária "
 const CARD_STORM := 23              # carta "Tempestade solar de 2024" (1ª tempestade)
 const CARD_AURORA := 25
 # Outros eventos (sorteados; todo evento tem lado ruim e lado bom)
-const EVENT_FIRST_SOL := 40
-const EVENT_EVERY := Vector2i(25, 40)
+const EVENT_FIRST_SOL := 90
+const EVENT_EVERY := Vector2i(60, 90)
 const DUST_SOLS := 15               # painéis sujos
 const DUST_FACTOR := 0.3            # painel sujo produz 30%
 const COLD_SOLS := 5
@@ -124,6 +124,8 @@ var cold_heated := false
 var nosignal_left := 0
 var nosignal_plan := ""
 var explore_left := 0            # sóis que faltam para o Mike voltar
+var tutorial := 0               # passo do tutorial do primeiro minuto (TUTORIAL_DONE = terminou)
+const TUTORIAL_DONE := 99
 var tube_card := 0               # carta dentro do tubo que ainda não foi aberto (0 = nenhum)
 var away := {}                   # o que aconteceu com o jogo fechado: {"sols", "plants"}
 
@@ -266,6 +268,7 @@ func new_game() -> void:
 	nosignal_plan = ""
 	explore_left = 0
 	tube_card = 0
+	tutorial = 0
 	for k in START_ITEMS:
 		items[k] = _new_item(START_ITEMS[k])
 	changed.emit()
@@ -712,6 +715,9 @@ func event_active() -> bool:
 func _start_event() -> void:
 	next_event_sol = sol + randi_range(EVENT_EVERY.x, EVENT_EVERY.y)
 	var options := ["dust", "cold", "nosignal"]
+	# A noite congelante só vem quando tem planta crescendo na estufa (senão a pergunta não faz sentido).
+	if not _has_growing_plant():
+		options.erase("cold")
 	if dust_left > 0:
 		options = ["devil"]      # painel sujo? o próximo evento é o redemoinho que limpa
 	var type: String = options.pick_random()
@@ -723,6 +729,13 @@ func _start_event() -> void:
 		_reward_once(CARD_DEVIL)
 	_pause_for(type)
 	event_started.emit(type)
+
+
+func _has_growing_plant() -> bool:
+	for k in items:
+		if items[k].type == "greenhouse" and str(items[k].get("plant", "")) != "":
+			return true
+	return false
 
 
 ## A criança tocou "OK" num aviso (poeira, redemoinho).
@@ -790,6 +803,10 @@ func _resume() -> void:
 
 # ───────────── O tempo passa: 1 sol ─────────────
 func _tick() -> void:
+	# Durante o tutorial, nada de tempestade nem evento: a criança aprende em paz.
+	if tutorial < TUTORIAL_DONE:
+		next_storm_sol = maxi(next_storm_sol, sol + 12)
+		next_event_sol = maxi(next_event_sol, sol + 12)
 	var d_energy := 0.0
 	var d_oxygen := 0.0
 	var greenhouse_off := nosignal_left > 0 and nosignal_plan == "save"
@@ -903,7 +920,7 @@ func _ready_plants() -> int:
 const _SAVED := ["energy", "oxygen", "shield", "sol", "items", "cards", "harvests", "inventory", "locale", "paused",
 	"pending_event", "next_storm_sol", "storms_seen", "storm_left", "storm_shielded", "storm_event",
 	"next_event_sol", "dust_left", "cold_left", "cold_heated", "nosignal_left", "nosignal_plan",
-	"explore_left", "tube_card"]
+	"explore_left", "tube_card", "tutorial"]
 
 
 func save_game() -> void:
@@ -935,6 +952,9 @@ func load_game() -> bool:
 				set(k, data[k])
 	for k in items:
 		items[k].level = int(items[k].level)
+	# Save de antes do tutorial: quem já construiu algo não precisa dele.
+	if not data.has("tutorial"):
+		tutorial = TUTORIAL_DONE if items.size() > 1 else 0
 	# Save antigo (de antes dos eventos novos) com tempestade esperando a escolha.
 	if paused and pending_event == "":
 		pending_event = "storm" if not storm_event.is_empty() else ""

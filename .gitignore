@@ -12,3 +12,8 @@ ferramentas/.donki-cache/
 jogo/models/**/*.jpg
 jogo/models/**/*_colormap.png
 jogo/models/**/*-tex.png
+
+# cópias feitas pelo ferramentas/sincronizar.mjs (o original fica em conteudo/ e design/)
+jogo/ui/cards/*.png
+jogo/ui/frames/*.png
+jogo/ui/info-construcao/*.png

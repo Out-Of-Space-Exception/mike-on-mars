@@ -73,8 +73,20 @@ LEVEL,Nível {n},Level {n},Nivel {n},Niveau {n}
 NEED_ENERGY,Falta energia.,Not enough energy.,Falta energía.,Pas assez d'énergie.
 MOVE_HINT,Toque no lugar novo.,Tap the new spot.,Toca el nuevo lugar.,Touche le nouvel endroit.
 TUT_PLANT,Toque na estufa para plantar.,Tap the greenhouse to plant.,Toca el invernadero para plantar.,Touche la serre pour planter.
+TUTO_HELLO,Oi! Eu sou o Mike. Vamos fazer energia? Toque em Construir.,Hi! I'm Mike. Let's make energy! Tap Build.,¡Hola! Soy Mike. ¿Hacemos energía? Toca Construir.,Salut ! Je suis Mike. On fait de l'énergie ? Touche Construire.
+TUTO_PICK,Escolha: {name}.,Pick: {name}.,Elige: {name}.,Choisis : {name}.
+TUTO_CONFIRM,Agora toque em Construir.,Now tap Build.,Ahora toca Construir.,"Maintenant, touche Construire."
+TUTO_PLACE,Toque num quadrado claro para construir.,Tap a light square to build.,Toca un cuadrado claro para construir.,Touche une case claire pour construire.
+TUTO_GREENHOUSE,"Boa! Agora uma Estufa, para plantar comida. Toque em Construir.","Nice! Now a Greenhouse, to grow food. Tap Build.","¡Bien! Ahora un Invernadero, para cultivar comida. Toca Construir.","Bravo ! Maintenant une Serre, pour faire pousser à manger. Touche Construire."
+TUTO_PLANT,Toque na Estufa para plantar uma alface.,Tap the Greenhouse to plant lettuce.,Toca el Invernadero para plantar lechuga.,Touche la Serre pour planter une laitue.
+TUTO_EXPLORE,"Enquanto ela cresce, toque em Explorar. Eu trago um tubo de amostra!","While it grows, tap Explore. I'll bring back a sample tube!","Mientras crece, toca Explorar. ¡Traigo un tubo de muestra!","Pendant qu'elle pousse, touche Explorer. Je rapporte un tube d'échantillon !"
+TUTO_WAIT,Estou explorando a cratera! Volto em {n} sóis.,I'm exploring the crater! Back in {n} sols.,¡Estoy explorando el cráter! Vuelvo en {n} soles.,J'explore le cratère ! Je reviens dans {n} sols.
+TUTO_TUBE,Voltei! Toque no tubo para abrir sua carta.,I'm back! Tap the tube to open your card.,¡Volví! Toca el tubo para abrir tu carta.,Je suis rentré ! Touche le tube pour ouvrir ta carte.
+TUTO_DONE,Muito bem! Cuide das 3 barras e complete o álbum.,Great job! Keep the 3 bars up and fill the album.,¡Muy bien! Cuida las 3 barras y completa el álbum.,Bravo ! Garde les 3 barres pleines et remplis l'album.
+TUTO_SKIP,Pular,Skip,Saltar,Passer
+HINT_PC,No computador: arraste com o botão direito do mouse para girar (ou use Q e E). A rodinha dá zoom.,On a computer: drag with the right mouse button to turn (or use Q and E). The wheel zooms.,En la computadora: arrastra con el botón derecho para girar (o usa Q y E). La rueda hace zoom.,Sur ordinateur : fais glisser avec le bouton droit pour tourner (ou Q et E). La molette zoome.
 PLANT_GROWING,{plant} · {n}/{max} sóis,{plant} · {n}/{max} sols,{plant} · {n}/{max} soles,{plant} · {n}/{max} sols
-PLANT_READY,{plant} pronta para colher!,{plant} is ready to harvest!,¡{plant}: lista para cosechar!,{plant} : prête à récolter !
+PLANT_READY,Pronto para colher: {plant}!,Ready to harvest: {plant}!,¡Listo para cosechar: {plant}!,Prêt à récolter : {plant} !
 EV_SOLAR_CURIOSITY,O robô Curiosity mediu esta aqui na Gale!,The Curiosity rover measured this one here in Gale!,¡El rover Curiosity midió esta aquí en Gale!,"Le rover Curiosity a mesuré celle-ci ici, à Gale !"
 STORM_SHIELDED,Escudo ligado · {n} sóis,Shield on · {n} sols,Escudo activado · {n} soles,Bouclier activé · {n} sols
 STORM_INSIDE,Mike em casa · {n} sóis,Mike stays inside · {n} sols,Mike adentro · {n} soles,Mike à l'intérieur · {n} sols

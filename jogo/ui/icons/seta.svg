@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="120" viewBox="0 0 96 120">
+  <!-- Seta do tutorial: aponta para baixo, dourada com borda vinho (cores do design/02) -->
+  <path d="M30 6h36v54h22L48 112 8 60h22z" fill="#e8b23a" stroke="#73242a" stroke-width="7" stroke-linejoin="round"/>
+</svg>

@@ -29,6 +29,9 @@ const add = (key, porIdioma) => {
   linhas.push([key, ...LANGS.map(l => porIdioma[l] || en)].map(esc).join(','));
 };
 for (const t of textos) add(t.keys, t);
+// Textos que vêm junto com uma tela do Design (ex.: painel de informação da construção)
+const textosDesign = join(RAIZ, 'design/05-telas/info-construcao/textos.csv');
+if (existsSync(textosDesign)) for (const t of objetos(parse(readFileSync(textosDesign, 'utf8')))) add(t.keys, t);
 for (const c of cartas) {
   add(`CARD_${c.id}_NAME`, {pt_BR: c.nome_pt, en: c.nome_en, es: c.nome_es, fr: c.nome_fr});
   add(`CARD_${c.id}_FACT`, {pt_BR: c.fato_pt, en: c.fato_en, es: c.fato_es, fr: c.fato_fr});
@@ -53,7 +56,15 @@ const copiar = (de, para) => {
   return n;
 };
 const sons = copiar('conteudo/01-sons/sons', 'jogo/sounds');
-const fotos = copiar('conteudo/02-cartas/fotos', 'jogo/ui/cards');
+// Fotos: só as das cartas que estão no jogo
+const ids = new Set(dados.map(d => String(d.id).padStart(2, '0')));
+let fotos = 0;
+if (existsSync(join(RAIZ, 'conteudo/02-cartas/fotos'))) {
+  mkdirSync(join(RAIZ, 'jogo/ui/cards'), {recursive: true});
+  for (const f of readdirSync(join(RAIZ, 'conteudo/02-cartas/fotos'))) {
+    if (/\.(jpg|png)$/i.test(f) && ids.has(f.slice(0, 2))) { copyFileSync(join(RAIZ, 'conteudo/02-cartas/fotos', f), join(RAIZ, 'jogo/ui/cards', f)); fotos++; }
+  }
+}
 
 // 4. O Mike do design/01 (o mike.glb já traz as animações idle, run e jump)
 mkdirSync(join(RAIZ, 'jogo/models/mike'), {recursive: true});
@@ -104,6 +115,15 @@ if (existsSync(tamanhosCsv)) {
   }
 }
 writeFileSync(join(RAIZ, 'jogo/data/itens.json'), JSON.stringify({files: itens, heights: alturas}, null, 1) + '\n');
+
+// 7b. Molduras das cartas e imagens do painel de informação da construção (design/05)
+mkdirSync(join(RAIZ, 'jogo/ui/frames'), {recursive: true});
+for (const f of readdirSync(join(RAIZ, 'design/05-telas'))) if (/^moldura-carta-.*\.png$/.test(f)) copyFileSync(join(RAIZ, 'design/05-telas', f), join(RAIZ, 'jogo/ui/frames', f));
+const info = join(RAIZ, 'design/05-telas/info-construcao');
+if (existsSync(info)) {
+  mkdirSync(join(RAIZ, 'jogo/ui/info-construcao'), {recursive: true});
+  for (const f of readdirSync(info)) if (/^(item-.*|placa-titulo|ornamento-luas|ic-carta)\.png$/.test(f)) copyFileSync(join(info, f), join(RAIZ, 'jogo/ui/info-construcao', f));
+}
 
 // 8. Ícones do design/05
 const icones = join(RAIZ, 'design/05-telas/telas-godot');
