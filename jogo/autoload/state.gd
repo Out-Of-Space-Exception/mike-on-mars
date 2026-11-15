@@ -159,6 +159,7 @@ var cards := {}     # "id" -> quantas vezes ganhou
 var harvests := 0
 var inventory := {}  # plant -> how many the child has harvested
 var locale := ""
+var lang_chosen := false   # true only after the child picks a language with the flag button
 var paused := false              # the game pauses when the child needs to choose
 var pending_event := ""          # event waiting for the child's choice or "OK"
 var next_storm_sol := FIRST_STORM_SOL
@@ -219,7 +220,8 @@ func _ready() -> void:
 		new_game()
 	# The game always starts in English (Space Apps judges read in English). The child can still
 	# pick another language with the flag button, and that choice is saved.
-	if locale == "":
+	# Old saves picked the phone language by themselves: they go back to English too, unless the child chose it.
+	if locale == "" or not lang_chosen:
 		locale = "en"
 	TranslationServer.set_locale(locale)
 	_catch_up(saved_at)
@@ -805,6 +807,7 @@ func _unlocked_decor() -> Array:
 
 func set_locale(l: String) -> void:
 	locale = l
+	lang_chosen = true
 	TranslationServer.set_locale(l)
 	_after_action()
 
@@ -1343,7 +1346,7 @@ func _ready_plants() -> int:
 
 
 # ───────────── Save and load ─────────────
-const _SAVED := ["energy", "oxygen", "shield", "sol", "items", "cards", "harvests", "inventory", "locale", "paused",
+const _SAVED := ["energy", "oxygen", "shield", "sol", "items", "cards", "harvests", "inventory", "locale", "lang_chosen", "paused",
 	"pending_event", "next_storm_sol", "storms_seen", "storm_left", "storm_shielded", "storm_event",
 	"next_event_sol", "dust_left", "cold_left", "cold_heated", "nosignal_left", "nosignal_plan",
 	"explore_left", "tube_card", "tutorial", "music_on", "sounds_on", "snack", "last_empty", "seen_cards", "next_break_sol",
