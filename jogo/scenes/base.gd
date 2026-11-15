@@ -205,11 +205,11 @@ func _frame_camera() -> void:
 	if _manual_cam and not whole_grid:
 		return
 	if orbit:
-		# Tela inicial: o planetinha inteiro, uma bola com a base em cima, e o céu em volta.
-		var whole := (_flat_r + PLANET) * 2.25
-		_cam_goal = Vector3(0.0, 0.0, whole)
-		_pos_goal = Vector3(0.0, -(_flat_r + PLANET) * 0.35, 0.0)
-		_size_goal = whole
+		# Tela inicial: o topo de Marte com a base, como no jogo, só que um pouco mais longe.
+		var far := _zoom_max()
+		_cam_goal = Vector3(0.0, 0.0, far)
+		_pos_goal = Vector3.ZERO
+		_size_goal = far
 		if _cam_snap:
 			_cam_snap = false
 			_rig.position = _pos_goal
@@ -404,7 +404,14 @@ func _pan(from: Vector2, to: Vector2) -> void:
 
 func _zoom(factor: float) -> void:
 	_take_camera()
-	_size_goal = clampf(_size_goal * factor, ZOOM_MIN, ZOOM_MAX)
+	_size_goal = clampf(_size_goal * factor, ZOOM_MIN, _zoom_max())
+
+
+## O mais longe que a câmera vai: a tela mostra só o topo de Marte (uns 40 m de altura de tela),
+## nunca o planeta inteiro. Em pé (celular) isso dá menos largura que deitado (computador).
+func _zoom_max() -> float:
+	var vp := get_viewport().get_visible_rect().size
+	return clampf(40.0 / maxf(vp.y / maxf(vp.x, 1.0), 0.3), CAM_MAX, ZOOM_MAX)
 
 
 ## O mundo gira para o mesmo lado que os dedos.
@@ -428,6 +435,8 @@ func _ground_point(p: Vector2) -> Vector3:
 
 ## O Mike anda até a frente da casa tocada (o lado virado para a câmera), dando a volta nas construções.
 func walk_to(c: Vector2i, then := Callable()) -> void:
+	if _walking_out or State.exploring():
+		return   # o Mike está na expedição: ele não volta por causa de um toque na base
 	var front := _rig.global_transform.basis.z
 	front = Vector3(front.x, 0.0, front.z).normalized()
 	_go(cell_center(c) + front * CELL * 0.62, WALK_SPEED, then, cell_center(c))
@@ -605,7 +614,7 @@ func _sync_nav() -> void:
 			if Vector2(q.x, q.z).length() > edge:
 				_nav.set_point_solid(Vector2i(x, y), true)
 	# Construíram em cima do Mike? Ele sai para o lado.
-	if _path_i >= _path.size() and mike and _nav_solid(mike.position):
+	if _path_i >= _path.size() and mike and not _walking_out and not State.exploring() and _nav_solid(mike.position):
 		_go(_nav_point(_free_near(_nav_id(mike.position))))
 
 
@@ -772,6 +781,7 @@ func _walk_out() -> void:
 
 ## Volta da expedição: aparece lá no fundo e anda até a frente da casa, com o tubo.
 func _walk_back(_card_id: int) -> void:
+	_walking_out = false
 	var far := _far_point()
 	mike.position = Vector3(far.x, _ground_y(far), far.z)
 	_set_suit(true)

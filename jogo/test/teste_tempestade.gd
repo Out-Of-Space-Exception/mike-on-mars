@@ -24,6 +24,15 @@ func _ready() -> void:
 	_area_da_casa()
 	_caminho_do_mike(main.get_node("Base"))
 	_tutorial()
+	# O recado do tutorial tem o tamanho do texto (antes crescia até a tela inteira e não voltava).
+	State.restart_tutorial()
+	hud._start.visible = false
+	hud._tut_update()
+	for i in 4:
+		await get_tree().process_frame
+	ok(hud._tut_card.visible and hud._tut_card.size.y < 260.0, "o recado do tutorial é pequeno (%d px de altura)" % hud._tut_card.size.y)
+	ok(hud._tut_card.position.y >= hud._bars_bottom() - 1.0, "o recado fica abaixo das barras, não por cima")
+	State.finish_tutorial()
 	print("RESULTADO: ", "TUDO OK" if falhas == 0 else "%d FALHA(S)" % falhas)
 	get_tree().quit(falhas)
 
@@ -77,6 +86,13 @@ func _construir_e_plantar() -> void:
 	State.energy = 100.0
 	_ticks(State.PLANTS.radish.sols)
 	ok(State.harvest(Vector2i(4, 5)) == "radish", "colhe o rabanete")
+	State.oxygen = 100.0
+	var raros_antes: int = int(State.inventory.get("radish", 0))
+	State.start_explore()
+	ok(State.snack == "radish" and int(State.inventory.get("radish", 0)) == raros_antes - 1, "a colheita vira lanche da expedição")
+	_ticks(State.EXPLORE_SOLS)
+	ok(State.snack == "" and State.tube_card != 0, "o lanche é usado no sorteio do tubo")
+	State.open_tube()
 	ok("kale" in State.unlocked_plants(), "a 1ª colheita destrava a couve")
 
 
@@ -285,6 +301,7 @@ func _caminho_do_mike(base: Node3D) -> void:
 			curva = false
 	ok(curva, "sem quina reta: cada virada do caminho é suave")
 	# Construir em cima do Mike: ele sai andando para um lugar livre.
+	base._walking_out = false
 	base.mike.position = base.cell_center(Vector2i(4, 4))
 	base._path = PackedVector3Array()
 	base._path_i = 0

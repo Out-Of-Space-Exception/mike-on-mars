@@ -25,6 +25,7 @@ var _root: Control
 var _bars := {}
 var _bar_labels := {}
 var _bar_fill := {}
+var _bar_box: Control
 var _bar_nums := {}           # o número de agora dentro da barra
 var _bar_rates := {}          # quanto ganha ou perde por sol
 var _sol_label: Label
@@ -429,10 +430,13 @@ func _refresh_panel() -> void:
 				var plant_def: Dictionary = State.PLANTS[p]
 				var pb := _add_panel_button("%s (%d)" % [tr(plant_def.name), plant_def.sols], _on_plant.bind(p), true)
 				pb.reparent(seeds)
-				pb.add_theme_font_size_override("font_size", 24)
-				pb.icon = _plant_icon(p)   # Design: a planta antes do nome, mais visual
+				pb.custom_minimum_size = Vector2(0, 128)
+				pb.add_theme_font_size_override("font_size", 23)
+				pb.icon = _plant_icon(p)   # Design: a planta junto do nome, mais visual
 				pb.expand_icon = true
-				pb.add_theme_constant_override("icon_max_width", 56)
+				pb.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+				pb.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+				pb.add_theme_constant_override("icon_max_width", 64)
 		elif State.plant_ready(selected):
 			_panel_info.visible = true
 			_panel_info.text = tr("PLANT_READY").format({"plant": tr(State.PLANTS[it.plant].name)})
@@ -753,7 +757,7 @@ func _refresh() -> void:
 		rl.text = ("%+d/sol" % roundi(r)) if absf(r) >= 1.0 else ("%+.1f/sol" % r)
 		rl.add_theme_color_override("font_color", Color("9be27a") if r > 0.0 else Color("ff9a8a"))
 		_bar_labels[bar].text = tr(BAR_KEYS[bar])
-		_bar_fill[bar].bg_color = Palette.ALERT if value < State.LOW else Palette.BAR[bar]
+		_bars[bar].color = Palette.ALERT if value < State.LOW else Palette.BAR[bar]
 	_sol_label.text = "%s  •  %s" % [tr("HUD_SOL").format({"n": State.sol}), tr("HUD_PLACE")]
 	_start_lang.text = LANG_NAMES.get(State.locale, "EN")
 	_start_lang.icon = _icon("flag_" + State.locale)
@@ -853,9 +857,15 @@ func _refresh_inventory() -> void:
 			var label := Label.new()
 			label.add_theme_font_size_override("font_size", 26)
 			row.add_child(label)
+			chip.mouse_filter = Control.MOUSE_FILTER_STOP
+			chip.gui_input.connect(func(e: InputEvent) -> void:
+				if (e is InputEventMouseButton and e.pressed) or (e is InputEventScreenTouch and e.pressed):
+					_show_toast(tr("SNACK_HINT")))
 			_inventory.add_child(chip)
 			_inv_labels[p] = label
 		_inv_labels[p].text = "× %d" % int(State.inventory[p])
+	for p in _inv_labels:
+		(_inv_labels[p] as Label).get_parent().get_parent().visible = int(State.inventory.get(p, 0)) > 0
 
 
 ## Desenha o modelo da planta uma vez numa telinha separada e usa a imagem como ícone.
@@ -932,46 +942,60 @@ func _update_dim() -> void:
 func _show_toast(text: String, shake := false) -> void:
 	_toast_label.text = text
 	move_child(_toast, get_child_count() - 1)   # sempre por cima de tudo
-	_toast_label.custom_minimum_size.x = get_viewport().get_visible_rect().size.x - 32.0 - 42.0 - 76.0 - 16.0
+	_toast_label.custom_minimum_size.x = get_viewport().get_visible_rect().size.x - 32.0 - 30.0 - 56.0 - 16.0
 	_toast_style.border_color = Palette.ALERT if shake else Palette.GOLD
 	var w := get_viewport().get_visible_rect().size.x
 	_toast.custom_minimum_size.x = w - 32.0
 	_toast.reset_size()
 	_toast.position.x = 16.0
-	_toast.modulate.a = 1.0
 	if _toast_tween:
 		_toast_tween.kill()
 	_toast_tween = create_tween()
+	# Aparece logo abaixo das barras (nunca por cima delas): desce um pouquinho e some sozinho.
+	var y := _toast_top()
 	if not _toast_down:
-		_toast.position.y = -_toast.size.y - 30.0
-		_toast_tween.tween_property(_toast, "position:y", _toast_top(), 0.32).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		_toast.position.y = y - 24.0
+		_toast.modulate.a = 0.0
+		_toast_tween.set_parallel()
+		_toast_tween.tween_property(_toast, "position:y", y, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		_toast_tween.tween_property(_toast, "modulate:a", 1.0, 0.2)
+		_toast_tween.chain()
+	else:
+		_toast.position.y = y
+		_toast.modulate.a = 1.0
 	_toast_down = true
 	if shake:
 		for d in [14.0, -12.0, 8.0, -4.0, 0.0]:
 			_toast_tween.tween_property(_toast, "position:x", 16.0 + d, 0.05)
-	_toast_tween.tween_interval(2.6)
+	_toast_tween.tween_interval(2.4)
 	_toast_tween.tween_callback(func() -> void: _toast_down = false)
-	_toast_tween.tween_property(_toast, "position:y", -_toast.size.y - 30.0, 0.28).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	_toast_tween.tween_property(_toast, "modulate:a", 0.0, 0.3)
+
+
+func _bars_bottom() -> float:
+	return (_bar_box.get_global_rect().end.y + 10.0) if _bar_box else 18.0
 
 
 func _toast_top() -> float:
-	return 18.0 + (_tut_card.size.y + 12.0 if _tut_card and _tut_card.visible else 0.0)
+	return _bars_bottom() + (_tut_card.size.y + 8.0 if _tut_card and _tut_card.visible else 0.0)
 
 
 # ───────────── Tutorial do primeiro minuto ─────────────
 func _build_tutorial() -> void:
 	_tut_card = PanelContainer.new()
 	var box := Palette.paper(Palette.GOLD)
-	box.set_corner_radius_all(30)
-	box.set_border_width_all(5)
-	box.shadow_offset = Vector2(0, 8)
-	box.content_margin_left = 18
-	box.content_margin_right = 18
-	box.content_margin_top = 14
-	box.content_margin_bottom = 14
+	box.set_corner_radius_all(24)
+	box.set_border_width_all(4)
+	box.shadow_offset = Vector2(0, 6)
+	box.content_margin_left = 12
+	box.content_margin_right = 14
+	box.content_margin_top = 8
+	box.content_margin_bottom = 10
 	_tut_card.add_theme_stylebox_override("panel", box)
 	_tut_card.visible = false
 	_tut_card.position = Vector2(16, 18)
+	_tut_card.theme = _root.theme
+	_tut_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_tut_card)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 14)
@@ -981,7 +1005,7 @@ func _build_tutorial() -> void:
 	head.atlas = load("res://ui/icons/mike.png")
 	head.region = Rect2(300, 230, 290, 290)
 	face.texture = head
-	face.custom_minimum_size = Vector2(84, 84)
+	face.custom_minimum_size = Vector2(60, 60)
 	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	face.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -989,7 +1013,7 @@ func _build_tutorial() -> void:
 	_tut_label = Label.new()
 	_tut_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_tut_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_tut_label.add_theme_font_size_override("font_size", 31)
+	_tut_label.add_theme_font_size_override("font_size", 27)
 	_tut_label.add_theme_color_override("font_color", Palette.INK)
 	row.add_child(_tut_label)
 	var skip := Button.new()
@@ -999,7 +1023,7 @@ func _build_tutorial() -> void:
 	skip.add_theme_color_override("font_color", Palette.INK.lightened(0.35))
 	skip.size_flags_vertical = Control.SIZE_SHRINK_END
 	skip.pressed.connect(func() -> void:
-		State.tutorial = State.TUTORIAL_DONE
+		State.finish_tutorial()
 		_tut_update())
 	row.add_child(skip)
 	_tut_arrow = TextureRect.new()
@@ -1061,13 +1085,14 @@ func _tut_update() -> void:
 	_tut_skip.visible = s < 5
 	var w := get_viewport().get_visible_rect().size.x - 32.0
 	_tut_card.custom_minimum_size.x = w
-	_tut_label.custom_minimum_size.x = w - 36.0 - 84.0 - 28.0 - (_tut_skip.get_minimum_size().x + 14.0 if s < 5 else 0.0)
+	_tut_label.custom_minimum_size.x = w - 26.0 - 60.0 - 28.0 - (_tut_skip.get_minimum_size().x + 14.0 if s < 5 else 0.0)
 	_tut_card.size = Vector2(w, 0.0)
 	_tut_card.reset_size()
 	if not _tut_card.visible:
 		_tut_card.visible = true
-		_tut_card.position.y = -_tut_card.size.y - 30.0
-		create_tween().tween_property(_tut_card, "position:y", 18.0, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		_tut_card.modulate.a = 0.0
+		_tut_card.position.y = _bars_bottom()
+		create_tween().tween_property(_tut_card, "modulate:a", 1.0, 0.3)
 
 
 ## Onde a seta aponta agora (o meio de cima do botão, ou um ponto da base), ou INF para esconder.
@@ -1114,8 +1139,14 @@ func _process(delta: float) -> void:
 	if _tut_card == null:
 		return
 	_place_panel(delta)
+	for p in [_tut_card, _toast]:
+		var want: float = p.get_combined_minimum_size().y
+		if p.visible and absf(p.size.y - want) > 1.0:
+			p.size.y = want
+	if _tut_card.visible:
+		_tut_card.position.y = _bars_bottom()
 	if State.tutorial == 5 and _tut_done_at > 0.0 and Time.get_ticks_msec() / 1000.0 - _tut_done_at > 5.0:
-		State.tutorial = State.TUTORIAL_DONE
+		State.finish_tutorial()
 		_tut_update()
 	var p := _tut_point()
 	_tut_arrow.visible = p != Vector2.INF
@@ -1239,7 +1270,11 @@ func _build_settings() -> void:
 	_set_tutorial = _key_button(func() -> void:
 		_settings.visible = false
 		_update_dim()
-		State.tutorial = 0
+		_choice.visible = false
+		_info.visible = false
+		State.restart_tutorial()
+		_tut_done_at = -1.0
+		_update_dim()
 		_tut_update(), true)
 	sbox.add_child(_set_tutorial)
 	_set_nasa = _key_button(func() -> void:
@@ -1317,41 +1352,39 @@ func _build_top() -> void:
 	top.add_theme_constant_override("separation", 14)
 	_root.add_child(top)
 
-	var panel := Plate.new()
-	top.add_child(panel)
+	# As 3 barras são tubos de vidro soltos na tela (sem chapa escura atrás): a base aparece mais.
 	var rows := VBoxContainer.new()
-	rows.add_theme_constant_override("separation", 10)
-	panel.add_child(rows)
+	rows.add_theme_constant_override("separation", 4)
+	rows.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	top.add_child(rows)
+	_bar_box = rows
 	for bar in BAR_KEYS:
 		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 14)
+		row.add_theme_constant_override("separation", 8)
+		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		rows.add_child(row)
 		var icon := TextureRect.new()
-		icon.custom_minimum_size = Vector2(54, 54)
+		icon.custom_minimum_size = Vector2(52, 52)
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon.texture = _icon(bar)
 		row.add_child(icon)
-		var label := Label.new()
-		label.custom_minimum_size = Vector2(150, 0)
-		label.add_theme_font_size_override("font_size", 28)
+		var label := Label.new()   # o nome fica guardado (some da tela: o ícone já diz o que é)
+		label.visible = false
 		row.add_child(label)
-		var pb := ProgressBar.new()
-		pb.max_value = State.BAR_MAX
-		pb.show_percentage = false
-		pb.custom_minimum_size = Vector2(0, 36)
+		var pb := TubeBar.new()
+		pb.custom_minimum_size = Vector2(0, 38)
 		pb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		pb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		var fill := Palette.bar_fill(Palette.BAR[bar])
-		pb.add_theme_stylebox_override("fill", fill)
+		pb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		pb.color = Palette.BAR[bar]
 		row.add_child(pb)
 		_bars[bar] = pb
 		_bar_labels[bar] = label
-		_bar_fill[bar] = fill
 		# Dentro da barra: quanto tem agora (à esquerda) e quanto muda por sol (à direita).
 		var num := Label.new()
 		num.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		num.offset_left = 12
+		num.offset_left = 16
 		num.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		num.add_theme_font_size_override("font_size", 24)
 		num.add_theme_color_override("font_color", Color.WHITE)
@@ -1360,7 +1393,7 @@ func _build_top() -> void:
 		pb.add_child(num)
 		var rate := Label.new()
 		rate.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		rate.offset_right = -10
+		rate.offset_right = -16
 		rate.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		rate.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		rate.add_theme_font_size_override("font_size", 20)
@@ -1538,13 +1571,13 @@ func _build_bottom() -> void:
 func _build_messages() -> void:
 	_toast = PanelContainer.new()
 	_toast_style = Palette.paper(Palette.GOLD)
-	_toast_style.set_corner_radius_all(30)
-	_toast_style.set_border_width_all(4)
-	_toast_style.shadow_offset = Vector2(0, 8)
-	_toast_style.content_margin_left = 18
-	_toast_style.content_margin_right = 24
-	_toast_style.content_margin_top = 14
-	_toast_style.content_margin_bottom = 16
+	_toast_style.set_corner_radius_all(24)
+	_toast_style.set_border_width_all(3)
+	_toast_style.shadow_offset = Vector2(0, 6)
+	_toast_style.content_margin_left = 12
+	_toast_style.content_margin_right = 18
+	_toast_style.content_margin_top = 8
+	_toast_style.content_margin_bottom = 10
 	_toast.add_theme_stylebox_override("panel", _toast_style)
 	_toast.modulate.a = 0.0
 	_toast.position.y = -400.0
@@ -1559,7 +1592,7 @@ func _build_messages() -> void:
 	head.atlas = load("res://ui/icons/mike.png")
 	head.region = Rect2(300, 230, 290, 290)
 	face.texture = head
-	face.custom_minimum_size = Vector2(76, 76)
+	face.custom_minimum_size = Vector2(56, 56)
 	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	face.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -1570,12 +1603,12 @@ func _build_messages() -> void:
 	row.add_child(col)
 	var from := Label.new()
 	from.text = "Mike"
-	from.add_theme_font_size_override("font_size", 22)
+	from.add_theme_font_size_override("font_size", 18)
 	from.add_theme_color_override("font_color", Palette.INK.lightened(0.35))
 	col.add_child(from)
 	_toast_label = Label.new()
 	_toast_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_toast_label.add_theme_font_size_override("font_size", 30)
+	_toast_label.add_theme_font_size_override("font_size", 25)
 	_toast_label.add_theme_color_override("font_color", Palette.INK)
 	col.add_child(_toast_label)
 

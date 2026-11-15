@@ -92,6 +92,7 @@ const EXPLORE_SOLS := 4             # fica fora 4 sóis (~10 s)
 const EXPLORE_OXYGEN := 20.0        # o traje gasta oxigênio
 const EXPLORE_RADIATION := 5.0      # lá fora a radiação come um pouco do escudo
 const TUBE_ODDS := {"comum": 60, "raro": 27, "épico": 10, "lendário": 3}   # em %
+const SNACK_ODDS := {"comum": 35, "raro": 38, "épico": 20, "lendário": 7}  # com lanche da estufa na mochila
 # Crescer com o jogo fechado
 const OFFLINE_MIN_SECONDS := 30
 const OFFLINE_MAX_SOLS := 2000      # ~1h20 de jogo; depois disso para de contar
@@ -124,6 +125,7 @@ var cold_heated := false
 var nosignal_left := 0
 var nosignal_plan := ""
 var explore_left := 0            # sóis que faltam para o Mike voltar
+var snack := ""                 # o lanche (uma colheita) que o Mike levou na expedição de agora
 var music_on := true
 var sounds_on := true
 var tutorial := 0               # passo do tutorial do primeiro minuto (TUTORIAL_DONE = terminou)
@@ -232,6 +234,25 @@ func card_hint(id: int) -> String:
 
 ## No tutorial, o tempo fica parado enquanto o Mike espera a criança (sem pressa, sem barra caindo).
 ## Ele só anda quando o Mike sai para explorar, para ele poder voltar com o tubo.
+## Recomeçar o tutorial (configurações): fecha o aviso que estiver esperando e adia tempestade e eventos.
+func restart_tutorial() -> void:
+	tutorial = 0
+	if paused and pending_event != "":
+		paused = false
+		pending_event = ""
+	next_storm_sol = maxi(next_storm_sol, sol + 30)
+	next_event_sol = maxi(next_event_sol, sol + 40)
+	_after_action()
+
+
+## Fim do tutorial: a primeira tempestade vem com calma, um tempinho depois.
+func finish_tutorial() -> void:
+	tutorial = TUTORIAL_DONE
+	next_storm_sol = maxi(next_storm_sol, sol + 30)
+	next_event_sol = maxi(next_event_sol, sol + 45)
+	_after_action()
+
+
 func tutorial_holds_time() -> bool:
 	return tutorial < TUTORIAL_DONE and not exploring()
 
@@ -616,6 +637,16 @@ func start_explore() -> bool:
 	oxygen -= EXPLORE_OXYGEN
 	shield = maxf(0.0, shield - EXPLORE_RADIATION)
 	explore_left = EXPLORE_SOLS
+	# A colheita vira lanche: o Mike leva um na mochila e volta com mais chance de carta rara.
+	snack = ""
+	var best := ""
+	for p in inventory:
+		if int(inventory[p]) > 0 and (best == "" or int(inventory[p]) > int(inventory[best])):
+			best = p
+	if best != "":
+		inventory[best] = int(inventory[best]) - 1
+		snack = best
+		event_message.emit("SNACK_PACKED", tr(PLANTS[best].name))
 	explore_started.emit()
 	_after_action()
 	return true
@@ -650,8 +681,10 @@ func _draw_tube() -> int:
 		return 0
 	var roll := randi_range(1, 100)
 	var rarity := "comum"
-	for r in TUBE_ODDS:
-		roll -= TUBE_ODDS[r]
+	var odds: Dictionary = SNACK_ODDS if snack != "" else TUBE_ODDS
+	snack = ""
+	for r in odds:
+		roll -= odds[r]
 		if roll <= 0:
 			rarity = r
 			break
@@ -884,6 +917,8 @@ func _tick() -> void:
 			storm_left -= 1
 			if storm_left == 0:
 				_end_storm()
+		elif tutorial < TUTORIAL_DONE:
+			pass   # durante o tutorial, nada de tempestade nem evento
 		elif sol >= next_storm_sol and not event_active():
 			_start_storm()
 		elif sol >= next_event_sol and not event_active() and not storm_active():
@@ -963,7 +998,7 @@ func _ready_plants() -> int:
 const _SAVED := ["energy", "oxygen", "shield", "sol", "items", "cards", "harvests", "inventory", "locale", "paused",
 	"pending_event", "next_storm_sol", "storms_seen", "storm_left", "storm_shielded", "storm_event",
 	"next_event_sol", "dust_left", "cold_left", "cold_heated", "nosignal_left", "nosignal_plan",
-	"explore_left", "tube_card", "tutorial", "music_on", "sounds_on"]
+	"explore_left", "tube_card", "tutorial", "music_on", "sounds_on", "snack"]
 
 
 func save_game() -> void:

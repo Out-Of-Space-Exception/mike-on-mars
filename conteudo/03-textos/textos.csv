@@ -161,3 +161,5 @@ SET_SOUNDS,Sons,Sounds,Sonidos,Sons
 SET_ON,ligada,on,encendida,activée
 SET_OFF,desligada,off,apagada,désactivée
 SET_TUTORIAL,Ver o tutorial de novo,See the tutorial again,Ver el tutorial otra vez,Revoir le tutoriel
+SNACK_PACKED,O Mike levou {name} de lanche: mais chance de carta rara!,Mike packed {name} as a snack: better chance of a rare card!,Mike llevó {name} de merienda: ¡más chance de carta rara!,Mike a pris {name} en goûter : plus de chances d'avoir une carte rare !
+SNACK_HINT,Colheita vira lanche: o Mike leva um em cada expedição e acha cartas mais raras.,Harvests become snacks: Mike takes one on each expedition and finds rarer cards.,Las cosechas son meriendas: Mike lleva una en cada expedición y encuentra cartas más raras.,Les récoltes deviennent des goûters : Mike en prend un à chaque expédition et trouve des cartes plus rares.
