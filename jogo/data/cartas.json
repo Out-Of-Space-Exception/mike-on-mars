@@ -383,5 +383,16 @@
   "source": "https://www.nasa.gov/missions/station/nasa-teams-persevere-through-plant-challenges-in-space",
   "photo": "https://www.nasa.gov/missions/station/nasa-teams-persevere-through-plant-challenges-in-space/",
   "photo_file": "40-tomate-anao.png"
+ },
+ {
+  "id": 41,
+  "category": "minerals",
+  "rarity": "common",
+  "how": "tube",
+  "place": "Gale",
+  "number": "~40 cm de comprimento; foto do sol 59 (5/10/2012)",
+  "source": "https://science.nasa.gov/resource/a-martian-rock-called-rocknest-3/",
+  "photo": "https://science.nasa.gov/resource/a-martian-rock-called-rocknest-3/",
+  "photo_file": "41-rocknest-3.png"
  }
 ]
