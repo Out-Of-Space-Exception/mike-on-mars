@@ -101,6 +101,7 @@ var _tile_lock_mat: StandardMaterial3D
 const FLAT_BY_LEVEL := {1: 6.0, 2: 9.0, 3: 10.5}   # metros do meio até onde o chão é plano
 const PLANET := 14.0            # raio da curva depois do plano (grande: o planeta fica redondo como uma bola)
 var _flat_r := 6.0
+const JOIN := 0.7071            # o terreno termina onde a curva chega a 45° (sen 45°)
 var _terrain_src: Array = []    # [MeshInstance3D, transform, [arrays de cada superfície], [materiais]]
 const SKY_SHADER := """
 shader_type spatial;
@@ -631,7 +632,7 @@ func planet_drop(d: float) -> float:
 ## Ponto lá do outro lado do planeta (atrás da curva, longe da câmera): por onde o Mike some na expedição.
 func _far_point() -> Vector3:
 	var back := -_rig.global_transform.basis.z
-	return Vector3(back.x, 0.0, back.z).normalized() * (_flat_r + PLANET * 0.95)
+	return Vector3(back.x, 0.0, back.z).normalized() * (_flat_r + PLANET * (JOIN - 0.05))
 
 
 ## Obra: o Mike vai até lá e martela; bloquinhos coloridos caem e quicam; no fim somem e a construção brota.
@@ -894,7 +895,8 @@ var _planet_bottom: MeshInstance3D   # a metade de baixo do planetinha (para ele
 
 
 func _rebend() -> void:
-	var rim := _flat_r + PLANET * 0.97
+	# O terreno vai só até onde a curva tem 45° (ainda suave); dali para baixo é a esfera lisa do corpo.
+	var rim := _flat_r + PLANET * JOIN
 	var floor_y := _terrain_floor
 	for src in _terrain_src:
 		var mi: MeshInstance3D = src[0]
@@ -909,8 +911,9 @@ func _rebend() -> void:
 				var w := xf * verts[i]
 				var flat := Vector2(w.x, w.z)
 				var d := flat.length()
-				if d > rim:
-					flat = flat / d * rim
+				# A última faixa de pontos vai exatamente para o círculo da borda: a silhueta fica lisa, sem escadinha.
+				if d > rim - 1.3:
+					flat = flat / maxf(d, 0.001) * rim
 					w = Vector3(flat.x, floor_y, flat.y)
 					d = rim
 				else:
@@ -932,12 +935,13 @@ func _rebend() -> void:
 	_build_planet_bottom(rim, floor_y - planet_drop(rim))
 
 
-## Embaixo do chão, meia esfera com a mesma textura: de qualquer ângulo, o planetinha é uma bola.
-func _build_planet_bottom(radius: float, top_y: float) -> void:
+## O corpo do planeta: uma esfera lisa (feita aqui, em anéis) que continua a curva do terreno a partir
+## dos 45° até o polo de baixo, com a mesma textura. Vista de qualquer lado, a borda é redonda, sem escadinha.
+func _build_planet_bottom(join_r: float, join_y: float) -> void:
 	if _planet_bottom == null:
 		_planet_bottom = MeshInstance3D.new()
 		var mat := StandardMaterial3D.new()
-		mat.albedo_color = Color(0.86, 0.72, 0.64)
+		mat.albedo_color = Color(0.9, 0.78, 0.7)
 		var tex: Texture2D = null
 		if not _terrain_src.is_empty():
 			var m: Material = _terrain_src[0][3][0]
@@ -950,20 +954,29 @@ func _build_planet_bottom(radius: float, top_y: float) -> void:
 		else:
 			mat.albedo_color = Palette.GROUND
 		mat.roughness = 1.0
+		mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 		_planet_bottom.material_override = mat
 		_planet_bottom.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		_planet_bottom.rotation_degrees.x = 180.0
 		add_child(_planet_bottom)
-	var bowl := SphereMesh.new()
-	bowl.is_hemisphere = true
-	bowl.radius = radius
-	bowl.height = radius
-	bowl.radial_segments = 48
-	bowl.rings = 16
-	_planet_bottom.mesh = bowl
-	_planet_bottom.position = Vector3(0.0, top_y + 0.02, 0.0)
-	# Um pouco mais funda que larga: vista de cima, em ângulo, a silhueta fica redonda como uma bola.
-	_planet_bottom.scale = Vector3(1.0, 1.3, 1.0)
+	# Esfera que passa pela borda do terreno com a mesma inclinação (45°): raio = borda / sen 45°.
+	var rb := join_r / sin(PI / 4.0)
+	var center := Vector3(0.0, join_y - join_r, 0.0)
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var rings := 28
+	var segs := 72
+	for i in rings:
+		var t0 := lerpf(PI / 4.0, PI, float(i) / rings)
+		var t1 := lerpf(PI / 4.0, PI, float(i + 1) / rings)
+		for j in segs:
+			var p0 := TAU * j / segs
+			var p1 := TAU * (j + 1) / segs
+			var quad := [Vector2(t0, p0), Vector2(t1, p0), Vector2(t1, p1), Vector2(t0, p0), Vector2(t1, p1), Vector2(t0, p1)]
+			for q in quad:
+				var n := Vector3(sin(q.x) * cos(q.y), cos(q.x), sin(q.x) * sin(q.y))
+				st.set_normal(n)
+				st.add_vertex(center + n * rb)
+	_planet_bottom.mesh = st.commit()
 
 
 ## Altura do terreno no meio do mapa (onde fica a base), para a grade ficar rente ao chão.

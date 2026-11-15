@@ -240,6 +240,9 @@ func restart_tutorial() -> void:
 	if paused and pending_event != "":
 		paused = false
 		pending_event = ""
+	# O que estava acontecendo (sem sinal, noite fria) acaba: o tutorial precisa da base livre.
+	nosignal_left = 0
+	cold_left = 0
 	next_storm_sol = maxi(next_storm_sol, sol + 30)
 	next_event_sol = maxi(next_event_sol, sol + 40)
 	_after_action()
