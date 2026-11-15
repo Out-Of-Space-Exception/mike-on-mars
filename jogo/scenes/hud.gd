@@ -2100,17 +2100,30 @@ func _build_top() -> void:
 		_bar_nums[bar] = num
 		_bar_rates[bar] = rate
 
-	# The "Sol N · Gale Crater" is a plate in the corner, slightly crooked (nothing all centered).
+	# "Sol N · Gale Crater" centered under the bar tubes (the icons on the left and the "+4/sol" chips
+	# on the right stay out of the count): two side spacers as wide as what is beside the tube.
 	var pill := PanelContainer.new()
-	pill.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	pill.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	pill.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var pill_row := HBoxContainer.new()
 	pill_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pill_row.add_theme_constant_override("separation", 0)
 	top.add_child(pill_row)
+	var pad_left := Control.new()
+	pad_left.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pill_row.add_child(pad_left)
 	pill_row.add_child(pill)
+	var pad_right := Control.new()
+	pad_right.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pill_row.add_child(pad_right)
+	var tube: Control = _bars.energy
+	tube.resized.connect(func() -> void:
+		pad_left.custom_minimum_size.x = tube.position.x
+		pad_right.custom_minimum_size.x = maxf(0.0, (tube.get_parent() as Control).size.x - tube.position.x - tube.size.x))
 
 	_sol_label = Label.new()
+	_sol_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_sol_label.add_theme_font_override("font", Palette.font(700))
 	_sol_label.add_theme_font_size_override("font_size", 24)
 	_sol_label.add_theme_color_override("font_color", Palette.TEXT)
