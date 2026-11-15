@@ -94,7 +94,7 @@ PLAN_PLANT,Continuar plantando,Keep planting,Seguir plantando,Continuer à plant
 EV_COLD_TEXT,"Na Cratera Gale, a noite chega a quase 70 °C abaixo de zero!","In Gale Crater, nights drop to almost 70 °C below zero!","¡En el cráter Gale, la noche llega a casi 70 °C bajo cero!","Dans le cratère Gale, la nuit descend presque à 70 °C sous zéro !"
 EV_COLD_A,"Sim, aquecer","Yes, heat it","Sí, calentar","Oui, chauffer"
 EV_COLD_B,"Não, deixar esfriar","No, let it cool","No, dejar que se enfríe","Non, laisser refroidir"
-COLD_LEFT,Noite fria por mais {n} sóis,Cold nights for {n} more sols,Noches frías por {n} soles más,Nuits froides encore {n} sols
+COLD_LEFT,Noite fria por mais {n} sóis,Cold nights left: {n} sols,Noches frías por {n} soles más,Nuits froides encore {n} sols
 DUST_LEFT,Painéis sujos por mais {n} sóis,Dirty panels for {n} more sols,Paneles sucios por {n} soles más,Panneaux sales encore {n} sols
 BTN_NASA,Dados da NASA,NASA data,Datos NASA,Données NASA
 BTN_SOURCE,Fonte,Source,Fuente,Source

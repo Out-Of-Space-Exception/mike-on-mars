@@ -98,10 +98,15 @@ func _build_and_plant() -> void:
 	State.energy = 100.0
 	State.build("greenhouse", Vector2i(6, 6))
 	ok(State.unlocked_plants().size() == 2, "starts with lettuce and radish")
+	ok(int(State.seeds.get("lettuce", 0)) == 5 and int(State.seeds.get("radish", 0)) == 0, "starts with 5 lettuce seeds only")
+	ok(not State.plant(Vector2i(6, 6), "radish"), "without seeds, the radish cannot be planted")
+	State.seeds["radish"] = 1   # as if it came in a package from Earth
 	ok(State.plant(Vector2i(6, 6), "radish"), "plants a radish")
+	ok(int(State.seeds.radish) == 0, "planting uses 1 seed")
 	State.energy = 100.0
 	_ticks(State.PLANTS.radish.sols)
 	ok(State.harvest(Vector2i(6, 6)) == "radish", "harvests the radish")
+	ok(int(State.seeds.radish) >= State.HARVEST_SEEDS.x and int(State.seeds.radish) <= State.HARVEST_SEEDS.y, "the harvest gives back 1 to 3 seeds")
 	State.oxygen = 100.0
 	var radishes_before: int = int(State.inventory.get("radish", 0))
 	State.last_empty = true   # no random empty trip (10%) in these checks
@@ -124,8 +129,12 @@ func _events() -> void:
 	_force_event("nosignal")
 	hud._on_choice(0)
 	ok(State.base_locked_reason() == "LOCK_NOSIGNAL" and not State.build("rtg", Vector2i(3, 5)), "no signal: the base cannot be touched")
+	var packages_before: int = State.packages
 	_ticks(State.NOSIGNAL_SOLS)
-	ok(State.cards.has("4"), "when the signal comes back, the package brings the Potato card")
+	ok(State.packages == packages_before + 1, "when the signal comes back, the antenna gets a package with seeds")
+	while State.packages < State.PACKAGE_CARDS_BY:
+		State._send_package("PACKAGE_ARRIVED")
+	ok(State.cards.has("4") and State.cards.has("40"), "the potato and tomato cards come by the 5th package")
 	_force_event("dust")
 	ok(State.dust_left > 0 and hud._info.visible, "dust storm dirties the panels and warns")
 	ok(State.next_event_sol - State.sol < State.DUST_SOLS, "after the dust, the dust devil comes while the panel is still dirty")
@@ -225,6 +234,7 @@ func _levels_and_album() -> void:
 	ok(without_hint == 0, "all %d cards say how to get them" % State.cards_total())
 	State.energy = 100.0
 	State.build("greenhouse", Vector2i(2, 7))
+	State.seeds["radish"] = 1
 	State.plant(Vector2i(2, 7), "radish")
 	_ticks(30)
 	State.harvest(Vector2i(2, 7))
