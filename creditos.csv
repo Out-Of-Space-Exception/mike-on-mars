@@ -43,3 +43,4 @@ ia,Claude (Anthropic): escreveu com a dupla o texto dos 7 slides (slides.md) a p
 ia,Claude (Anthropic): traduziu para espanhol e francês os textos do jogo (textos.csv),conteudo/03-textos/textos.csv,Anthropic,-,https://claude.ai,Conteúdo
 ia,Claude (Anthropic): escreveu com a dupla o texto da página do projeto (pagina.md) a partir do CONTEXTO.md + cartas.csv + creditos.csv,conteudo/06-pagina-do-projeto,Anthropic,-,https://claude.ai,Conteúdo
 ia,Claude (Anthropic): animação construir do Mike (mike-construir.py) e efeito de obra com bloquinhos (construcao.gd),design/01-mike e design/03-itens-do-jogo/construcao,Anthropic,-,https://claude.ai,Design
+ia,Claude (Anthropic): painel de informação da construção (telas + info_construcao.gd + textos),design/05-telas/info-construcao,Anthropic,-,https://claude.ai,Design
