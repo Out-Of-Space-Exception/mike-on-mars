@@ -42,3 +42,4 @@ ia,Claude (Anthropic): procurou e conferiu nas páginas da NASA as fontes de 12 
 ia,Claude (Anthropic): escreveu com a dupla o texto dos 7 slides (slides.md) a partir do CONTEXTO.md e do cartas.csv,conteudo/04-slides,Anthropic,-,https://claude.ai,Conteúdo
 ia,Claude (Anthropic): traduziu para espanhol e francês os textos do jogo (textos.csv),conteudo/03-textos/textos.csv,Anthropic,-,https://claude.ai,Conteúdo
 ia,Claude (Anthropic): escreveu com a dupla o texto da página do projeto (pagina.md) a partir do CONTEXTO.md + cartas.csv + creditos.csv,conteudo/06-pagina-do-projeto,Anthropic,-,https://claude.ai,Conteúdo
+ia,Claude (Anthropic): animação construir do Mike (mike-construir.py) e efeito de obra com bloquinhos (construcao.gd),design/01-mike e design/03-itens-do-jogo/construcao,Anthropic,-,https://claude.ai,Design

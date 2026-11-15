@@ -1,0 +1,48 @@
+## Animação "construir" (martelada com o braço direito), somada às animações que o .glb já tem. Uso: blender -b --python mike-construir.py -- <entrada.glb> <saida.glb> [previa_prefixo]
+import bpy, sys, math, mathutils as M
+a=sys.argv[sys.argv.index('--')+1:]; IN,OUT=a[0],a[1]; PREV=a[2] if len(a)>2 else None
+bpy.ops.wm.read_factory_settings(use_empty=True); bpy.ops.import_scene.gltf(filepath=IN)
+arm=[o for o in bpy.data.objects if o.type=='ARMATURE'][0]
+if 'Icosphere' in bpy.data.objects: bpy.data.objects.remove(bpy.data.objects['Icosphere'])
+bpy.context.view_layer.objects.active=arm; bpy.ops.object.mode_set(mode='POSE')
+arm.animation_data_create()
+for t in arm.animation_data.nla_tracks: t.mute=True
+arm.animation_data.action=None
+for pb in arm.pose.bones: pb.rotation_mode='QUATERNION'; pb.rotation_quaternion=(1,0,0,0); pb.location=(0,0,0)
+def glob(bone, R):          # world-axis rotation -> bone-local quaternion
+    b=arm.data.bones[bone]; rest=b.matrix_local.to_quaternion()
+    par=b.parent.matrix_local.to_quaternion() if b.parent else M.Quaternion()
+    return (rest.inverted() @ R @ rest)
+def aim(bone, d):
+    pb=arm.pose.bones[bone]; bpy.context.view_layer.update()
+    cur=pb.matrix.copy(); cd=cur.col[1].xyz.normalized(); R=cd.rotation_difference(M.Vector(d).normalized())
+    m=R.to_matrix().to_4x4() @ cur; m.translation=cur.translation; pb.matrix=m
+def key(f, poses):
+    for pb in arm.pose.bones: pb.rotation_quaternion=(1,0,0,0)
+    for bone,d in poses: aim(bone,d)
+    bpy.context.view_layer.update()
+    for bone,_ in poses: arm.pose.bones[bone].keyframe_insert("rotation_quaternion", frame=f)
+# frente do Mike = -Y, cima = +Z
+up  =[("Spine",(0,0.12,1)),("RightArm",(-0.3,0.1,1)),("RightForeArm",(-0.2,0.35,0.9)),("LeftArm",(0.3,-0.15,-1)),("LeftForeArm",(0.15,-0.7,-0.7))]
+down=[("Spine",(0,-0.28,1)),("RightArm",(-0.2,-0.9,-0.4)),("RightForeArm",(-0.15,-1,-0.05)),("LeftArm",(0.3,-0.15,-1)),("LeftForeArm",(0.15,-0.7,-0.7))]
+mid =[("Spine",(0,-0.05,1)),("RightArm",(-0.75,-0.5,0.45)),("RightForeArm",(-0.55,-0.8,0.2)),("LeftArm",(0.3,-0.15,-1)),("LeftForeArm",(0.15,-0.7,-0.7))]
+FR=24
+for f,p in ((1,up),(4,mid),(8,down),(11,down),(18,mid),(24,up)): key(f,p)
+act=arm.animation_data.action; act.name='construir'
+bpy.context.scene.frame_set(1); q1=arm.pose.bones['RightArm'].matrix.to_quaternion(); bpy.context.scene.frame_set(9); print('CHK', round(q1.rotation_difference(arm.pose.bones['RightArm'].matrix.to_quaternion()).angle,2))
+for fc in act.fcurves if hasattr(act,'fcurves') else []:
+    for k in fc.keyframe_points: k.interpolation='BEZIER'
+bpy.context.scene.frame_start, bpy.context.scene.frame_end = 1, FR
+track=arm.animation_data.nla_tracks.new(); track.name='construir'; track.strips.new('construir',1,act); track.mute=True
+bpy.ops.object.mode_set(mode='OBJECT')
+print("ACTIONS",[a.name for a in bpy.data.actions])
+bpy.ops.export_scene.gltf(filepath=OUT, export_format='GLB', export_animation_mode='ACTIONS')
+if PREV:
+    sc=bpy.context.scene; sc.render.engine='BLENDER_EEVEE'; sc.render.resolution_x=sc.render.resolution_y=500
+    sc.world=bpy.data.worlds.new('w'); sc.world.color=(0.69,0.36,0.15)
+    bpy.ops.object.light_add(type='SUN',rotation=(0.8,0.2,-0.6)); bpy.context.object.data.energy=4
+    bpy.ops.object.camera_add(location=(-6,-8,3.2)); cam=bpy.context.object; sc.camera=cam
+    e=bpy.data.objects.new('t',None); e.location=(0,0,1.9); sc.collection.objects.link(e); cam.constraints.new('TRACK_TO').target=e
+    print('ACT', arm.animation_data.action, getattr(arm.animation_data,'action_slot',None))
+    for f in (1,9): sc.frame_set(f); sc.render.filepath=f'{PREV}{f}.png'; bpy.ops.render.render(write_still=True)
+print('DONE')
