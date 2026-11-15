@@ -294,7 +294,10 @@ func _refresh_panel() -> void:
 		if it.plant == "":
 			for p in State.unlocked_plants():
 				var plant_def: Dictionary = State.PLANTS[p]
-				_add_panel_button("%s (%d)" % [tr(plant_def.name), plant_def.sols], _on_plant.bind(p))
+				var pb := _add_panel_button("%s (%d)" % [tr(plant_def.name), plant_def.sols], _on_plant.bind(p))
+				pb.icon = _plant_icon(p)   # Design: a planta antes do nome, mais visual
+				pb.expand_icon = true
+				pb.add_theme_constant_override("icon_max_width", 56)
 		elif State.plant_ready(selected):
 			_panel_info.visible = true
 			_panel_info.text = tr("PLANT_READY").format({"plant": tr(State.PLANTS[it.plant].name)})
