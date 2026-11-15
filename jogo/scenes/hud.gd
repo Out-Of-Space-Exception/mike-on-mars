@@ -817,7 +817,8 @@ func _show_next_card() -> void:
 	var info := State.card_info(id)
 	var rarity: String = info.get("rarity", "comum")
 	var color: Color = Palette.RARITY.get(rarity, Palette.TEXT)
-	_card_title.text = tr("CARD_NEW") if is_new_card and int(State.cards.get(str(id), 0)) <= 1 else ""
+	_card_title.text = ""          # o selo "NOVA!" na carta já diz isso
+	_card_title.visible = false
 	var frame := "res://ui/frames/moldura-carta-%s.png" % FRAME.get(rarity, "comum")
 	if ResourceLoader.exists(frame):
 		_card_frame.texture = load(frame)
@@ -865,7 +866,9 @@ func _show_next_card() -> void:
 	_card_rays.set_meta("color", color)
 	_card_rays.queue_redraw()
 	if festive:
-		_root.move_child(_card_rays, _card.get_index())
+		# Os raios ficam logo atrás da carta (nunca por cima dela).
+		if _card_rays.get_index() > _card.get_index():
+			_root.move_child(_card_rays, _card.get_index())
 		_card.scale = Vector2(0.15, 0.15)
 		_card.rotation_degrees = -200.0
 		var t := create_tween().set_parallel()
