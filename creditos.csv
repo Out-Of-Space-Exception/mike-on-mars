@@ -88,3 +88,13 @@ ia,Claude (Anthropic): animação construir do Mike (mike-construir.py) e efeito
 ia,Claude (Anthropic): painel de informação da construção (telas + info_construcao.gd + textos),design/05-telas/info-construcao,Anthropic,-,https://claude.ai,Design
 imagem,Kenney Flag Pack (bandeiras BR + US + ES + FR),jogo/ui/flags (menu de idiomas),Kenney,CC0,https://kenney.nl/assets/flag-pack,Design
 ia,Claude (Anthropic): menu de idiomas com bandeiras na tela inicial (hud.gd),jogo/scenes/hud.gd e design/05-telas/previa-idiomas.png,Anthropic,-,https://claude.ai,Design
+foto,Foto da carta Veios brancos (Sheepbed),design/05-telas/cartas-descobertas/foto-veios-brancos.png,NASA/JPL-Caltech/MSSS,imagem publica da NASA (com credito),https://images.nasa.gov/details/PIA16705,Design
+foto,Foto da carta Rocknest 3,design/05-telas/cartas-descobertas/foto-rocknest-3.png,NASA/JPL-Caltech/Malin Space Science Systems,imagem publica da NASA (com credito),https://images.nasa.gov/details/PIA16452,Design
+foto,Foto da carta Óxido de manganês (Windjana),design/05-telas/cartas-descobertas/foto-oxido-de-manganes.png,NASA/JPL-Caltech/MSSS,imagem publica da NASA (com credito),https://images.nasa.gov/details/PIA20752,Design
+foto,Foto da carta Rocha John Klein (pedras A B C),design/05-telas/cartas-descobertas/foto-rocha-john-klein.png,NASA/JPL-Caltech/MSSS,imagem publica da NASA (com credito),https://images.nasa.gov/details/PIA16568,Design
+foto,Foto da carta Meteorito Lebanon,design/05-telas/cartas-descobertas/foto-meteorito-lebanon.png,NASA/JPL-Caltech/LANL/CNES/IRAP/LPGNantes/CNRS/IAS/MSSS,imagem publica da NASA (com credito),https://images.nasa.gov/details/PIA18387,Design
+ia,Claude (Anthropic): modelou no Blender as pedras das descobertas (descobertas.py) e montou as 5 cartas com as molduras (montar-cartas.ps1),design/03-itens-do-jogo/descobertas + design/05-telas/cartas-descobertas,Anthropic,-,https://claude.ai,Design
+modelo,Furniture Kit (pacote 3D),estante de exposição (bookcaseClosedWide repintada),Kenney,CC0,https://kenney.nl/assets/furniture-kit,Design
+modelo,Space Station Kit (pacote 3D),estante de exposição (base structure-panel + telinha display-wall),Kenney,CC0,https://kenney.nl/assets/space-station-kit,Design
+ia,Claude (Anthropic): montou no Blender a estante de exposição (estante.py) e escreveu o script do zoom e das 6 vagas (estante.gd) com os textos em 4 idiomas,design/03-itens-do-jogo/estante + design/05-telas/estante,Anthropic,-,https://claude.ai,Design
+ia,Claude (Anthropic): ícone do app (Mike astronauta em 2D renderizado no Blender + Marte desenhado em 2D),design/06-logo-e-icone/icone.png,Anthropic,-,https://claude.ai,Design
