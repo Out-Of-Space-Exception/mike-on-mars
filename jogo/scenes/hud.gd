@@ -1696,12 +1696,12 @@ func _style_key(b: Button, enabled: bool) -> void:
 		b.add_theme_stylebox_override(s, Palette.key(color))
 	b.add_theme_stylebox_override("pressed", Palette.key(color, true))
 	var ink: Color = Palette.TEXT if not enabled else (Palette.INK if color == Palette.GOLD else Palette.INK_DEEP)
-	var lb: Label = b.get_meta("label", null)
+	var lb: Label = b.get_meta("label") if b.has_meta("label") else null
 	if lb:
 		lb.add_theme_color_override("font_color", ink)
 	for c in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
 		b.add_theme_color_override(c, ink)
-	var ic: TextureRect = b.get_meta("icon", null)
+	var ic: TextureRect = b.get_meta("icon") if b.has_meta("icon") else null
 	if ic:
 		ic.modulate = Color.WHITE if enabled else Color(0.6, 0.6, 0.6)
 
