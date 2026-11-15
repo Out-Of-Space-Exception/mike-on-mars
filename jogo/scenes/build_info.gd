@@ -20,6 +20,9 @@ var _title: Label
 var _effects: HBoxContainer
 var _text: Label
 var _build_button: Button
+var _cost_box: HBoxContainer     # "-30" + energy icon, in the right corner of the Build button
+var _cost_label: Label
+var _cost_icon: TextureRect
 var _x: Button
 
 
@@ -105,6 +108,28 @@ func _ready() -> void:
 		close()
 		build_pressed.emit(t))
 	col.add_child(_build_button)
+	# Cost in the right corner of the button ("-30" + energy icon); the word "Build" stays centered (Design request).
+	_cost_box = HBoxContainer.new()
+	_cost_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_cost_box.alignment = BoxContainer.ALIGNMENT_END
+	_cost_box.add_theme_constant_override("separation", 4)
+	_cost_box.set_anchors_and_offsets_preset(Control.PRESET_RIGHT_WIDE)
+	_cost_box.offset_left = -150.0
+	_cost_box.offset_right = -18.0
+	_build_button.add_child(_cost_box)
+	_cost_label = Label.new()
+	_cost_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_cost_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_cost_label.add_theme_font_size_override("font_size", 28)
+	_cost_label.add_theme_color_override("font_color", Palette.INK)
+	_cost_box.add_child(_cost_label)
+	_cost_icon = TextureRect.new()
+	_cost_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_cost_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_cost_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_cost_icon.custom_minimum_size = Vector2(36, 36)
+	_cost_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_cost_box.add_child(_cost_icon)
 
 	# Red X in the top right corner (closing does not compete with building for space).
 	var close_button := Button.new()
@@ -160,8 +185,11 @@ func open(type: String) -> void:
 	if def.has("card") and not State.cards.has(str(def.card)):
 		_effect("card", 1.0)
 	_effects.visible = _effects.get_child_count() > 0
-	_build_button.text = "%s  %d" % [tr("INFO_BUILD"), def.cost] if def.cost > 0 else tr("INFO_BUILD")
-	_build_button.icon = icons.get("energy") if def.cost > 0 else null
+	_build_button.text = tr("INFO_BUILD")
+	_build_button.icon = null
+	_cost_box.visible = def.cost > 0
+	_cost_label.text = "-%d" % int(def.cost)
+	_cost_icon.texture = icons.get("energy")
 	# Blocked (not enough energy, for example): the button looks faded, and tapping it explains why.
 	_build_button.modulate = Color(1, 1, 1, 0.55) if State.build_block_reason(type) != "" else Color.WHITE
 	visible = true
