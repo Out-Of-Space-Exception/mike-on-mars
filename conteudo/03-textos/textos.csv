@@ -190,3 +190,9 @@ ALBUM_NEXT,Faltam {n} cartas para ganhar: {name},{n} more cards to win: {name},F
 ALBUM_PAGES_GOAL,Páginas completas: {n} de {total},Pages complete: {n} of {total},Páginas completas: {n} de {total},Pages complètes : {n} sur {total}
 ALBUM_PAGE_DONE,Página completa: {name}!,Page complete: {name}!,¡Página completa: {name}!,Page complète : {name} !
 CARD_NUMBER,Nº {n},No. {n},Nº {n},N° {n}
+ALBUM_LEFT,Faltam {n} cartas para completar o álbum!,{n} more cards to complete the album!,¡Faltan {n} cartas para completar el álbum!,Encore {n} cartes pour compléter l'album !
+ALBUM_DONE,Álbum completo! Parabéns!,Album complete! Well done!,¡Álbum completo! ¡Felicidades!,Album complet ! Bravo !
+ITEM_BROKEN,Quebrou: {name}! Toque nele para consertar.,{name} broke! Tap it to fix.,¡Se rompió: {name}! Tócalo para arreglarlo.,{name} est cassé ! Touche-le pour le réparer.
+ITEM_FIXED,Consertado!,Fixed!,¡Arreglado!,Réparé !
+BTN_REPAIR,Consertar,Fix,Arreglar,Réparer
+BROKEN_TEXT,Quebrado: parou de funcionar.,Broken: it stopped working.,Roto: dejó de funcionar.,Cassé : il ne marche plus.

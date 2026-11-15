@@ -26,6 +26,7 @@ func _ready() -> void:
 	_tutorial()
 	_regras_novas()
 	_batata_e_album()
+	_quebrar_e_consertar()
 	# O recado do tutorial tem o tamanho do texto (antes crescia até a tela inteira e não voltava).
 	State.restart_tutorial()
 	hud._start.visible = false
@@ -459,8 +460,27 @@ func _batata_e_album() -> void:
 	ok(State.unseen_count() >= 1, "carta ganha e ainda não vista conta como nova")
 	hud._start.visible = false
 	hud._on_album()
-	ok(hud._album.visible and hud._album_grid.get_child_count() == State.page_cards(hud._album_page).size(), "o álbum abre na página da carta nova")
+	ok(hud._album.visible and hud._album_grid.get_child_count() == State.cards_total(), "o álbum mostra todas as cartas juntas")
 	ok(State.seen_cards.has("1"), "depois de ver a página, a carta deixa de ser nova")
 	hud._album.visible = false
 	hud._card.visible = false
 	hud._card_queue.clear()
+
+
+func _quebrar_e_consertar() -> void:
+	State.new_game()
+	State.tutorial = State.TUTORIAL_DONE
+	State.energy = 100.0
+	ok(State.upgrade_cost(Vector2i(4, 4)) == 30, "melhorar a casa para o nível 2 custa 30")
+	State.build("solar", Vector2i(3, 3))
+	ok(State.upgrade_cost(Vector2i(3, 3)) == 30, "painel solar: nível 2 custa 3 vezes o preço (30)")
+	State.energy = 100.0
+	State.upgrade(Vector2i(4, 4))
+	State.energy = 100.0
+	State.upgrade(Vector2i(3, 3))
+	ok(State.upgrade_cost(Vector2i(3, 3)) == 80, "e o nível 3 custa 8 vezes (80)")
+	var k := State.break_something()
+	ok(k == "3,3" and State.item_at(Vector2i(3, 3)).get("broken", false), "algo quebra (nunca a casa)")
+	ok(is_zero_approx(float(State.item_rates(State.item_at(Vector2i(3, 3))).energy)), "quebrado não faz energia")
+	State.energy = 100.0
+	ok(State.repair(Vector2i(3, 3)) and not State.item_at(Vector2i(3, 3)).get("broken", false), "consertar faz voltar a funcionar")

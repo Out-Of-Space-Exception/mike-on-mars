@@ -370,11 +370,6 @@ func _on_album() -> void:
 	Sfx.play("abrir-menu")
 	_build_menu.visible = false
 	_close_panel()
-	for p in State.ALBUM_PAGES.size():
-		for id in State.page_cards(p):
-			if State.cards.has(str(id)) and not State.seen_cards.has(str(id)):
-				_album_page = p
-				break
 	_refresh_album()
 	_album.visible = true
 	State.save_game()
@@ -432,7 +427,7 @@ func _refresh_panel() -> void:
 		_close_panel()
 		return
 	# A cada sol só muda o "Alface · 12/33 sóis": os botões ficam como estão (antes piscavam).
-	var sig := "%s|%s|%d|%s|%s|%s|%s|%s|%s" % [selected, it.type, int(it.level), it.get("plant", ""), State.plant_ready(selected),
+	var sig := "%s|%s|%d|%s|%s|%s|%s|%s|%s|%s" % [selected, it.type, int(it.level), it.get("plant", ""), State.plant_ready(selected), it.get("broken", false),
 		State.base_locked_reason(), State.upgrade_block_reason(selected), State.unlocked_plants(), TranslationServer.get_locale()]
 	if sig == _panel_sig:
 		if it.type == "greenhouse" and str(it.get("plant", "")) != "" and not State.plant_ready(selected):
@@ -509,8 +504,18 @@ func _refresh_panel() -> void:
 				"plant": tr(State.PLANTS[it.plant].name), "n": int(it.growth), "max": State.PLANTS[it.plant].sols})
 	if State.base_locked_reason() != "":
 		return
-	# Melhorar é a ação principal (dourada, em cima); depois mover, girar e remover.
+	# Quebrada: a ação principal é consertar (e ela não melhora enquanto estiver quebrada).
 	var cost := State.upgrade_cost(selected)
+	if it.get("broken", false):
+		_panel_info.visible = true
+		_panel_info.text = tr("BROKEN_TEXT")
+		var fix := _add_panel_button("%s  -%d" % [tr("BTN_REPAIR"), State.repair_cost(selected)], _on_repair, true)
+		fix.icon = _icon("energy")
+		fix.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		fix.custom_minimum_size.y = 88
+		fix.set_meta("base_color", Palette.GOLD)
+		_style_key(fix, State.can_afford(State.repair_cost(selected)))
+		cost = -1
 	if cost >= 0:
 		var up := _add_panel_button("%s  -%d" % [tr("BTN_UPGRADE"), cost], _on_upgrade, true)
 		up.icon = _icon("energy")
@@ -615,6 +620,15 @@ func _on_remove() -> void:
 		tr("REMOVE_YES"), true, func() -> void:
 			selected = target
 			_do_remove(), tr("REMOVE_NO"), Callable())
+
+
+func _on_repair() -> void:
+	if State.repair(selected):
+		Sfx.play("melhorar")
+		_show_toast(tr("ITEM_FIXED"))
+	else:
+		_show_toast(tr("NEED_ENERGY"), true)
+		Sfx.play("travado")
 
 
 func _do_remove() -> void:
@@ -876,10 +890,6 @@ func _tube_smoke(color: Color) -> void:
 
 # ───────────── Carta ─────────────
 func _queue_card(id: int, is_new: bool = true) -> void:
-	if is_new:
-		for p in State.ALBUM_PAGES.size():
-			if id in State.page_cards(p) and State.page_owned(p) == State.page_cards(p).size():
-				_show_toast(tr("ALBUM_PAGE_DONE").format({"name": tr(State.ALBUM_PAGES[p][1])}))
 	_card_queue.append(id)
 	_card_new.append(is_new)
 	if not _card.visible:
@@ -980,9 +990,13 @@ func _refresh_album() -> void:
 			pages_done += 1
 	if not reward.is_empty():
 		_album_next.text = tr("ALBUM_NEXT").format({"n": reward.left, "name": tr(reward.name)})
+	elif State.cards.size() < total:
+		_album_next.text = tr("ALBUM_LEFT").format({"n": total - State.cards.size()})
 	else:
-		_album_next.text = tr("ALBUM_PAGES_GOAL").format({"n": pages_done, "total": State.ALBUM_PAGES.size()})
-	# Abas
+		_album_next.text = tr("ALBUM_DONE")
+	_album_tabs.visible = false
+	_album_page_title.visible = false
+	# Abas (guardadas para quando houver mais cartas; hoje o álbum mostra tudo junto)
 	for c in _album_tabs.get_children():
 		c.queue_free()
 	for p in State.ALBUM_PAGES.size():
@@ -1041,12 +1055,18 @@ func _refresh_album() -> void:
 	var page_owned := State.page_owned(_album_page)
 	var page_ids := State.page_cards(_album_page)
 	_album_page_title.text = "%s  ·  %d/%d%s" % [tr(State.ALBUM_PAGES[_album_page][1]), page_owned, page_ids.size(), "  ★" if page_owned == page_ids.size() else ""]
+	# Todas as cartas juntas, grandes: 2 colunas no celular e mais colunas em tela larga.
 	for c in _album_grid.get_children():
 		c.queue_free()
-	for id in page_ids:
-		_album_grid.add_child(_album_tile(id))
-	# Viu a página: as cartas novas dela deixam de ser novas (o selo some na próxima vez).
-	for id in page_ids:
+	var room := minf(get_viewport().get_visible_rect().size.x, 1400.0) - 64.0 - 24.0
+	var cols := maxi(2, int((room + 16.0) / 316.0))
+	_album_grid.columns = cols
+	var tile_w := minf((room - (cols - 1) * 16.0) / cols, 360.0)
+	var all_ids := State.card_ids()
+	for id in all_ids:
+		_album_grid.add_child(_album_tile(id, tile_w))
+	# Viu o álbum: as cartas novas deixam de ser novas (o selo some na próxima vez).
+	for id in all_ids:
 		if State.cards.has(str(id)):
 			State.seen_cards[str(id)] = true
 
@@ -2299,12 +2319,12 @@ func _page_icon(page: int) -> Texture2D:
 
 
 ## Figurinha do álbum: a carta em miniatura (moldura da raridade, foto, número e nome).
-func _album_tile(id: int) -> Control:
+func _album_tile(id: int, w := 192.0) -> Control:
 	var info := State.card_info(id)
 	var owned := State.cards.has(str(id))
 	var rarity: String = info.get("rarity", "comum")
-	var w := 192.0
 	var k := w / 1066.0
+	var f := w / 192.0          # as letras crescem junto com a carta
 	var b := Button.new()
 	b.custom_minimum_size = Vector2(w, 1280.0 * k)
 	b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
@@ -2339,7 +2359,7 @@ func _album_tile(id: int) -> Control:
 		q.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		q.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		q.add_theme_font_override("font", Palette.font(800))
-		q.add_theme_font_size_override("font_size", 64)
+		q.add_theme_font_size_override("font_size", int(64 * f))
 		q.add_theme_color_override("font_color", Palette.GOLD)
 		q.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		b.add_child(q)
@@ -2362,7 +2382,7 @@ func _album_tile(id: int) -> Control:
 	num.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	num.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	num.add_theme_font_override("font", Palette.font(800))
-	num.add_theme_font_size_override("font_size", 15)
+	num.add_theme_font_size_override("font_size", int(15 * f))
 	num.add_theme_color_override("font_color", Palette.BG)
 	num.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	b.add_child(num)
@@ -2374,7 +2394,7 @@ func _album_tile(id: int) -> Control:
 	name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	name_label.add_theme_font_override("font", Palette.font(700))
-	name_label.add_theme_font_size_override("font_size", 16)
+	name_label.add_theme_font_size_override("font_size", int(16 * f))
 	name_label.add_theme_color_override("font_color", Color("3a261c"))
 	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	b.add_child(name_label)
@@ -2395,7 +2415,7 @@ func _album_tile(id: int) -> Control:
 		var bt := Label.new()
 		bt.text = tr("CARD_NEW_BADGE")
 		bt.add_theme_font_override("font", Palette.font(800))
-		bt.add_theme_font_size_override("font_size", 16)
+		bt.add_theme_font_size_override("font_size", int(16 * f))
 		bt.add_theme_color_override("font_color", Color.WHITE)
 		badge.add_child(bt)
 		b.add_child(badge)

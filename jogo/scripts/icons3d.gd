@@ -312,6 +312,19 @@ static func trash() -> Node3D:
 	return root
 
 
+static func warning() -> Node3D:
+	var root := Node3D.new()
+	var tri := PackedVector2Array([Vector2(0.0, 0.55), Vector2(0.6, -0.48), Vector2(-0.6, -0.48)])
+	root.add_child(extrude(tri, 0.18, GOLD))
+	var bar := part(box(0.12, 0.42, 0.06), Color("3b1a1e"), Vector3(0.0, 0.05, 0.12))
+	bar.material_override.next_pass = null
+	root.add_child(bar)
+	var dot := part(ball(0.07), Color("3b1a1e"), Vector3(0.0, -0.3, 0.12))
+	dot.material_override.next_pass = null
+	root.add_child(dot)
+	return root
+
+
 static func sun() -> Node3D:
 	var root := Node3D.new()
 	root.add_child(part(ball(0.32), GOLD))

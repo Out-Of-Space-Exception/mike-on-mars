@@ -115,6 +115,7 @@ void fragment() {
 }
 """
 var _sky: MeshInstance3D
+var _warn_tex: Texture2D       # o aviso amarelo de "quebrado" (desenhado uma vez)
 var _sky_mat: ShaderMaterial
 
 
@@ -151,6 +152,11 @@ func _process(delta: float) -> void:
 	camera.size = lerpf(camera.size, _size_goal, ease_k)
 	_fit_sky()
 	_step_mike(delta)
+	# O aviso de quebrado sobe e desce devagar.
+	for k in _nodes:
+		var warn: Sprite3D = _nodes[k].get_node_or_null("Broken")
+		if warn and warn.visible:
+			warn.position.y = float(warn.get_meta("y", 2.0)) + sin(_time * 3.0) * 0.15
 	var show_names := camera.size < 14.5
 	for k in _nodes:
 		var label: Label3D = _nodes[k].get_node_or_null("Label")
@@ -375,6 +381,9 @@ func _item_under(o: Vector3, d: Vector3) -> Dictionary:
 	for k in _nodes:
 		var node: Node3D = _nodes[k]
 		var box: AABB = (node.global_transform * _merged_aabb(node)).grow(0.15)
+		var warn: Sprite3D = node.get_node_or_null("Broken")
+		if warn and warn.visible:
+			box = box.expand(warn.global_position + Vector3(0.0, 0.6, 0.0))
 		var point: Variant = box.intersects_ray(o, d)
 		if point == null:
 			continue
@@ -1162,6 +1171,7 @@ func _sync_items() -> void:
 		var label: Label3D = node.get_node("Label")
 		label.text = tr(State.item_name(it))
 		_update_plant(node, it)
+		_update_broken(node, it, label.position.y)
 		if obra:
 			_obra(node, it.type, State.parse_key(k), w, rot)
 	var flat: float = FLAT_BY_LEVEL[clampi(State.house_level(), 1, State.MAX_LEVEL)]
@@ -1350,6 +1360,25 @@ func _update_plant(node: Node3D, it: Dictionary) -> void:
 		p = clampf(it.growth / float(State.PLANTS[it.plant].sols), 0.0, 1.0)
 	holder.scale = Vector3.ONE * lerpf(0.25, 1.0, p)
 	ready_mark.visible = it.plant != "" and p >= 1.0
+
+
+## Quebrado: um aviso amarelo flutua em cima da construção (tocar nela abre o "Consertar").
+func _update_broken(node: Node3D, it: Dictionary, label_y: float) -> void:
+	var warn: Sprite3D = node.get_node_or_null("Broken")
+	var broken: bool = it.get("broken", false)
+	if broken and warn == null:
+		if _warn_tex == null:
+			_warn_tex = Icons3D.render(self, Icons3D.warning(), 128, 1.4)
+		warn = Sprite3D.new()
+		warn.name = "Broken"
+		warn.texture = _warn_tex
+		warn.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		warn.no_depth_test = true
+		warn.pixel_size = 0.009
+		warn.set_meta("y", label_y + 0.9)
+		node.add_child(warn)
+	if warn:
+		warn.visible = broken
 
 
 ## Batateira (feita em código, a Kenney não tem): um montinho de terra, folhas verdes em cima

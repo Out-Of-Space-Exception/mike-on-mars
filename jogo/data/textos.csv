@@ -190,6 +190,12 @@ ALBUM_NEXT,Faltam {n} cartas para ganhar: {name},{n} more cards to win: {name},F
 ALBUM_PAGES_GOAL,Páginas completas: {n} de {total},Pages complete: {n} of {total},Páginas completas: {n} de {total},Pages complètes : {n} sur {total}
 ALBUM_PAGE_DONE,Página completa: {name}!,Page complete: {name}!,¡Página completa: {name}!,Page complète : {name} !
 CARD_NUMBER,Nº {n},No. {n},Nº {n},N° {n}
+ALBUM_LEFT,Faltam {n} cartas para completar o álbum!,{n} more cards to complete the album!,¡Faltan {n} cartas para completar el álbum!,Encore {n} cartes pour compléter l'album !
+ALBUM_DONE,Álbum completo! Parabéns!,Album complete! Well done!,¡Álbum completo! ¡Felicidades!,Album complet ! Bravo !
+ITEM_BROKEN,Quebrou: {name}! Toque nele para consertar.,{name} broke! Tap it to fix.,¡Se rompió: {name}! Tócalo para arreglarlo.,{name} est cassé ! Touche-le pour le réparer.
+ITEM_FIXED,Consertado!,Fixed!,¡Arreglado!,Réparé !
+BTN_REPAIR,Consertar,Fix,Arreglar,Réparer
+BROKEN_TEXT,Quebrado: parou de funcionar.,Broken: it stopped working.,Roto: dejó de funcionar.,Cassé : il ne marche plus.
 INFO_GREENHOUSE,"As plantas crescem aqui. A luz gasta energia. Sem energia, elas crescem pela metade.","Plants grow here. The lights use energy. With no energy, they grow at half speed.","Aquí crecen las plantas. La luz gasta energía. Sin energía, crecen a la mitad.","Les plantes poussent ici. La lumière utilise de l'énergie. Sans énergie, elles poussent deux fois moins vite."
 INFO_SOLAR,"Na tempestade de poeira, a poeira cobre o painel e tapa a luz do Sol: ele faz só 30% por 15 sóis.","In a dust storm, dust covers the panel and blocks the sunlight: it makes only 30% for 15 sols.","En una tormenta de polvo, el polvo cubre el panel y tapa la luz del Sol: solo da 30% durante 15 soles.","Pendant une tempête de poussière, la poussière couvre le panneau et cache le Soleil : il ne fait que 30 % pendant 15 sols."
 INFO_RTG,"Pouca energia, mas não para nunca: nem de noite, nem na poeira. No nível 3 vira Kilopower: +4.","A little energy, but it never stops: not at night, not in dust. At level 3 it becomes Kilopower: +4.","Poca energía, pero nunca para: ni de noche, ni con polvo. En el nivel 3 se vuelve Kilopower: +4.","Peu d'énergie, mais elle ne s'arrête jamais : ni la nuit, ni dans la poussière. Au niveau 3, elle devient Kilopower : +4."

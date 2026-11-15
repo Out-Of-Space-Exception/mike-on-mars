@@ -26,7 +26,14 @@ const MAX_LEVEL := 3
 const ZONES := {1: Rect2i(3, 3, 4, 4), 2: Rect2i(2, 2, 7, 7), 3: Rect2i(0, 0, GRID_W, GRID_H)}
 const OLD_GRID_SHIFT := Vector2i(2, 1)   # saves da grade antiga (6x8) vão para o meio da nova
 const LEVEL_BONUS := 0.5            # +50% de produção por nível acima do 1
-const UPGRADE_COST := {1: 20, 2: 40}  # energia para subir do nível N para N+1
+const UPGRADE_MULT := {1: 3.0, 2: 8.0}   # melhorar custa o preço de construir x3 (nível 2) e x8 (nível 3)
+const UPGRADE_MAX := 95                  # teto: a barra de energia vai até 100
+const UPGRADE_BASE_FREE := 10.0          # para quem não custa nada para construir (a Casa do Mike)
+# Equipamento quebrado: de tempos em tempos (e às vezes depois de tempestade sem escudo) algo para de funcionar.
+const BREAK_EVERY := Vector2i(110, 170)  # sóis entre uma quebra e outra
+const BREAK_AFTER_STORM := 0.5           # sem escudo: chance de quebrar algo
+const REPAIR_FACTOR := 0.4               # consertar custa 40% do preço de construir (no mínimo 6)
+const BREAKABLE := ["greenhouse", "solar", "rtg", "moxie", "antenna"]
 const SHIELD_RECHARGE := 2.0        # por sol, se a energia estiver acima de LOW
 const OXYGEN_BREATH := 0.5          # o Mike respira: gasta oxigênio todo sol
 const PLANT_OXYGEN := 0.3           # cada planta crescendo na estufa faz um pouco de oxigênio
@@ -144,7 +151,8 @@ var nosignal_plan := ""
 var explore_left := 0            # sóis que faltam para o Mike voltar
 var storm_warned := false
 var last_empty := false
-var seen_cards := {}            # cartas que a criança já viu no álbum (as outras ganham o selo "NOVA")
+var seen_cards := {}
+var next_break_sol := 140       # quando algo vai quebrar de novo            # cartas que a criança já viu no álbum (as outras ganham o selo "NOVA")
 
 ## Páginas do álbum, pela coluna "categoria" do cartas.csv (Robôs entra junto com Tecnologia).
 const ALBUM_PAGES := [
@@ -372,6 +380,7 @@ func new_game() -> void:
 	tutorial = 0
 	snack = ""
 	seen_cards = {}
+	next_break_sol = sol + BREAK_EVERY.x + 30
 	inventory = START_INVENTORY.duplicate()
 	for k in START_ITEMS:
 		items[k] = _new_item(START_ITEMS[k])
@@ -579,7 +588,13 @@ func upgrade_cost(c: Vector2i) -> int:
 	var it := item_at(c)
 	if it.is_empty():
 		return -1
-	return UPGRADE_COST.get(int(it.level), -1)
+	var lv := int(it.level)
+	if lv >= MAX_LEVEL:
+		return -1
+	var base := float(ITEMS[it.type].cost)
+	if base <= 0.0:
+		base = UPGRADE_BASE_FREE
+	return mini(roundi(base * float(UPGRADE_MULT.get(lv, 8.0))), UPGRADE_MAX)
 
 
 ## Por que não dá para melhorar ("" = dá): falta energia ou falta espaço ao lado para o nível maior.
@@ -819,6 +834,8 @@ func choose_storm(raise_shield: bool) -> bool:
 				hurt = true
 		if hurt:
 			event_message.emit("STORM_PLANTS", "")
+		if tutorial >= TUTORIAL_DONE and randf() < BREAK_AFTER_STORM:
+			break_something()
 	storm_left = STORM_SOLS
 	_resume()
 	return true
@@ -965,6 +982,8 @@ func _tick() -> void:
 	for k in items:
 		var it: Dictionary = items[k]
 		var def: Dictionary = ITEMS[it.type]
+		if it.get("broken", false):
+			continue   # quebrado: não faz energia, nem oxigênio, e a planta para de crescer
 		var bonus := 1.0 + LEVEL_BONUS * (int(it.level) - 1)
 		var e: float = def.get("energy", 0.0)
 		if it.type == "solar" and dust_left > 0:
@@ -1031,6 +1050,9 @@ func _tick() -> void:
 		nosignal_left -= 1
 		if nosignal_left == 0:
 			_end_nosignal()
+	if not _offline and tutorial >= TUTORIAL_DONE and sol >= next_break_sol:
+		next_break_sol = sol + randi_range(BREAK_EVERY.x, BREAK_EVERY.y)
+		break_something()
 	if not _offline:
 		_time_cards()
 		if storm_left > 0:
@@ -1067,9 +1089,43 @@ func item_text(name_key: String) -> String:
 	return tr(desc) if tr(desc) != desc else ""
 
 
+## Quebra uma construção que funciona (nunca a casa nem enfeite). Devolve a casa âncora ou "".
+func break_something() -> String:
+	var options := []
+	for k in items:
+		if items[k].type in BREAKABLE and not items[k].get("broken", false):
+			options.append(k)
+	if options.is_empty():
+		return ""
+	var k: String = options.pick_random()
+	items[k].broken = true
+	event_message.emit("ITEM_BROKEN", tr(item_name(items[k])))
+	changed.emit()
+	return k
+
+
+func repair_cost(c: Vector2i) -> int:
+	var it := item_at(c)
+	if it.is_empty():
+		return 0
+	return maxi(6, roundi(float(ITEMS[it.type].cost) * REPAIR_FACTOR))
+
+
+func repair(c: Vector2i) -> bool:
+	var it := item_at(c)
+	if it.is_empty() or not it.get("broken", false) or not can_afford(repair_cost(c)):
+		return false
+	energy -= repair_cost(c)
+	it.broken = false
+	_after_action()
+	return true
+
+
 ## Quanto cada construção faz por sol agora (a mesma conta do _tick, sem mexer em nada).
 func item_rates(it: Dictionary) -> Dictionary:
 	var def: Dictionary = ITEMS[it.type]
+	if it.get("broken", false):
+		return {"energy": 0.0, "oxygen": 0.0, "shield": 0.0}
 	var lv := int(it.level)
 	var bonus := 1.0 + LEVEL_BONUS * (lv - 1)
 	var e: float = def.get("energy", 0.0)
@@ -1130,7 +1186,7 @@ func _ready_plants() -> int:
 const _SAVED := ["energy", "oxygen", "shield", "sol", "items", "cards", "harvests", "inventory", "locale", "paused",
 	"pending_event", "next_storm_sol", "storms_seen", "storm_left", "storm_shielded", "storm_event",
 	"next_event_sol", "dust_left", "cold_left", "cold_heated", "nosignal_left", "nosignal_plan",
-	"explore_left", "tube_card", "tutorial", "music_on", "sounds_on", "snack", "last_empty", "seen_cards"]
+	"explore_left", "tube_card", "tutorial", "music_on", "sounds_on", "snack", "last_empty", "seen_cards", "next_break_sol"]
 
 
 func save_game() -> void:
