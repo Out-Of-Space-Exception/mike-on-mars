@@ -2654,6 +2654,7 @@ func _build_popups() -> void:
 	_choice = _popup(640, "alert")
 	var cbox: VBoxContainer = _choice.get_child(0)
 	_choice_title = _title_label(40)
+	_choice_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER   # centered like the text below it
 	cbox.add_child(_choice_title)
 	_choice_lines = VBoxContainer.new()
 	_choice_lines.add_theme_constant_override("separation", 8)
