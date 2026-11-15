@@ -17,7 +17,7 @@ const INGENUITY := "res://models/nasa/ingenuity.glb"
 const INGENUITY_WIDTH := 1.3
 const CAM_MIN := 12.0            # câmera mais perto (base pequena)
 const CAM_START := 26.0          # na tela inicial: o planetinha inteiro, com o céu em volta
-const CAM_MAX := 19.5            # câmera mais longe (a grade inteira)
+const CAM_MAX := 30.0            # câmera mais longe (a grade inteira, 10 x 10)
 # Cores do Ingenuity (design/04): corpo branco, faixas azul e vermelha, detalhes dourados
 const INGENUITY_COLORS := {
 	"aluminum": Palette.SUIT, "grey_brushed": Palette.SUIT, "chopper_sp": Palette.SUIT, "foil_silver": Palette.SUIT,
@@ -98,9 +98,10 @@ var _tile_lock_mat: StandardMaterial3D
 
 # Planetinha: o chão é plano onde fica a base e faz a curva para baixo depois, como uma bola.
 # Ele cresce junto com a Casa do Mike (a área aberta sempre cabe no plano).
-const FLAT_BY_LEVEL := {1: 6.0, 2: 9.0, 3: 10.5}   # metros do meio até onde o chão é plano
+const FLAT_BY_LEVEL := {1: 6.0, 2: 10.5, 3: 14.5}   # metros do meio até onde o chão é plano (a área aberta cabe)
 const PLANET := 14.0            # raio da curva depois do plano (grande: o planeta fica redondo como uma bola)
 var _flat_r := 6.0
+const JOIN := 0.7071            # o terreno termina onde a curva chega a 45° (sen 45°)
 var _terrain_src: Array = []    # [MeshInstance3D, transform, [arrays de cada superfície], [materiais]]
 const SKY_SHADER := """
 shader_type spatial;
@@ -205,11 +206,11 @@ func _frame_camera() -> void:
 	if _manual_cam and not whole_grid:
 		return
 	if orbit:
-		# Tela inicial: o planetinha inteiro, uma bola com a base em cima, e o céu em volta.
-		var whole := (_flat_r + PLANET) * 2.25
-		_cam_goal = Vector3(0.0, 0.0, whole)
-		_pos_goal = Vector3(0.0, -(_flat_r + PLANET) * 0.35, 0.0)
-		_size_goal = whole
+		# Tela inicial: o topo de Marte com a base, como no jogo, só que um pouco mais longe.
+		var far := _zoom_max()
+		_cam_goal = Vector3(0.0, 0.0, far)
+		_pos_goal = Vector3.ZERO
+		_size_goal = far
 		if _cam_snap:
 			_cam_snap = false
 			_rig.position = _pos_goal
@@ -404,7 +405,14 @@ func _pan(from: Vector2, to: Vector2) -> void:
 
 func _zoom(factor: float) -> void:
 	_take_camera()
-	_size_goal = clampf(_size_goal * factor, ZOOM_MIN, ZOOM_MAX)
+	_size_goal = clampf(_size_goal * factor, ZOOM_MIN, _zoom_max())
+
+
+## O mais longe que a câmera vai: a tela mostra só o topo de Marte (uns 40 m de altura de tela),
+## nunca o planeta inteiro. Em pé (celular) isso dá menos largura que deitado (computador).
+func _zoom_max() -> float:
+	var vp := get_viewport().get_visible_rect().size
+	return clampf(40.0 / maxf(vp.y / maxf(vp.x, 1.0), 0.3), CAM_MAX, ZOOM_MAX)
 
 
 ## O mundo gira para o mesmo lado que os dedos.
@@ -428,6 +436,8 @@ func _ground_point(p: Vector2) -> Vector3:
 
 ## O Mike anda até a frente da casa tocada (o lado virado para a câmera), dando a volta nas construções.
 func walk_to(c: Vector2i, then := Callable()) -> void:
+	if _walking_out or State.exploring():
+		return   # o Mike está na expedição: ele não volta por causa de um toque na base
 	var front := _rig.global_transform.basis.z
 	front = Vector3(front.x, 0.0, front.z).normalized()
 	_go(cell_center(c) + front * CELL * 0.62, WALK_SPEED, then, cell_center(c))
@@ -605,7 +615,7 @@ func _sync_nav() -> void:
 			if Vector2(q.x, q.z).length() > edge:
 				_nav.set_point_solid(Vector2i(x, y), true)
 	# Construíram em cima do Mike? Ele sai para o lado.
-	if _path_i >= _path.size() and mike and _nav_solid(mike.position):
+	if _path_i >= _path.size() and mike and not _walking_out and not State.exploring() and _nav_solid(mike.position):
 		_go(_nav_point(_free_near(_nav_id(mike.position))))
 
 
@@ -622,7 +632,7 @@ func planet_drop(d: float) -> float:
 ## Ponto lá do outro lado do planeta (atrás da curva, longe da câmera): por onde o Mike some na expedição.
 func _far_point() -> Vector3:
 	var back := -_rig.global_transform.basis.z
-	return Vector3(back.x, 0.0, back.z).normalized() * (_flat_r + PLANET * 0.95)
+	return Vector3(back.x, 0.0, back.z).normalized() * (_flat_r + PLANET * (JOIN - 0.05))
 
 
 ## Obra: o Mike vai até lá e martela; bloquinhos coloridos caem e quicam; no fim somem e a construção brota.
@@ -772,6 +782,7 @@ func _walk_out() -> void:
 
 ## Volta da expedição: aparece lá no fundo e anda até a frente da casa, com o tubo.
 func _walk_back(_card_id: int) -> void:
+	_walking_out = false
 	var far := _far_point()
 	mike.position = Vector3(far.x, _ground_y(far), far.z)
 	_set_suit(true)
@@ -884,7 +895,8 @@ var _planet_bottom: MeshInstance3D   # a metade de baixo do planetinha (para ele
 
 
 func _rebend() -> void:
-	var rim := _flat_r + PLANET * 0.97
+	# O terreno vai só até onde a curva tem 45° (ainda suave); dali para baixo é a esfera lisa do corpo.
+	var rim := _flat_r + PLANET * JOIN
 	var floor_y := _terrain_floor
 	for src in _terrain_src:
 		var mi: MeshInstance3D = src[0]
@@ -899,10 +911,14 @@ func _rebend() -> void:
 				var w := xf * verts[i]
 				var flat := Vector2(w.x, w.z)
 				var d := flat.length()
-				if d > rim:
-					flat = flat / d * rim
+				# A última faixa de pontos vai exatamente para o círculo da borda: a silhueta fica lisa, sem escadinha.
+				if d > rim - 1.3:
+					flat = flat / maxf(d, 0.001) * rim
 					w = Vector3(flat.x, floor_y, flat.y)
 					d = rim
+				else:
+					# Perto da beirada os morros vão sumindo: a borda do planeta fica lisa, sem "dentes".
+					w.y = floor_y + (w.y - floor_y) * (1.0 - smoothstep(rim - 7.0, rim - 0.5, d))
 				w.y -= planet_drop(d)
 				verts[i] = inv * w
 				if i < normals.size() and d > _flat_r:
@@ -917,14 +933,18 @@ func _rebend() -> void:
 			bent.surface_set_material(s, src[3][s])
 		mi.mesh = bent
 	_build_planet_bottom(rim, floor_y - planet_drop(rim))
+	if _dome:
+		(_dome.mesh as SphereMesh).radius = _flat_r + 1.5
+		(_dome.mesh as SphereMesh).height = (_flat_r + 1.5) * 0.63
 
 
-## Embaixo do chão, meia esfera com a mesma textura: de qualquer ângulo, o planetinha é uma bola.
-func _build_planet_bottom(radius: float, top_y: float) -> void:
+## O corpo do planeta: uma esfera lisa (feita aqui, em anéis) que continua a curva do terreno a partir
+## dos 45° até o polo de baixo, com a mesma textura. Vista de qualquer lado, a borda é redonda, sem escadinha.
+func _build_planet_bottom(join_r: float, join_y: float) -> void:
 	if _planet_bottom == null:
 		_planet_bottom = MeshInstance3D.new()
 		var mat := StandardMaterial3D.new()
-		mat.albedo_color = Color(0.86, 0.72, 0.64)
+		mat.albedo_color = Color(0.9, 0.78, 0.7)
 		var tex: Texture2D = null
 		if not _terrain_src.is_empty():
 			var m: Material = _terrain_src[0][3][0]
@@ -937,20 +957,29 @@ func _build_planet_bottom(radius: float, top_y: float) -> void:
 		else:
 			mat.albedo_color = Palette.GROUND
 		mat.roughness = 1.0
+		mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 		_planet_bottom.material_override = mat
 		_planet_bottom.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		_planet_bottom.rotation_degrees.x = 180.0
 		add_child(_planet_bottom)
-	var bowl := SphereMesh.new()
-	bowl.is_hemisphere = true
-	bowl.radius = radius
-	bowl.height = radius
-	bowl.radial_segments = 48
-	bowl.rings = 16
-	_planet_bottom.mesh = bowl
-	_planet_bottom.position = Vector3(0.0, top_y + 0.02, 0.0)
-	# Um pouco mais funda que larga: vista de cima, em ângulo, a silhueta fica redonda como uma bola.
-	_planet_bottom.scale = Vector3(1.0, 1.3, 1.0)
+	# Esfera que passa pela borda do terreno com a mesma inclinação (45°): raio = borda / sen 45°.
+	var rb := join_r / sin(PI / 4.0)
+	var center := Vector3(0.0, join_y - join_r, 0.0)
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var rings := 28
+	var segs := 72
+	for i in rings:
+		var t0 := lerpf(PI / 4.0, PI, float(i) / rings)
+		var t1 := lerpf(PI / 4.0, PI, float(i + 1) / rings)
+		for j in segs:
+			var p0 := TAU * j / segs
+			var p1 := TAU * (j + 1) / segs
+			var quad := [Vector2(t0, p0), Vector2(t1, p0), Vector2(t1, p1), Vector2(t0, p0), Vector2(t1, p1), Vector2(t0, p1)]
+			for q in quad:
+				var n := Vector3(sin(q.x) * cos(q.y), cos(q.x), sin(q.x) * sin(q.y))
+				st.set_normal(n)
+				st.add_vertex(center + n * rb)
+	_planet_bottom.mesh = st.commit()
 
 
 ## Altura do terreno no meio do mapa (onde fica a base), para a grade ficar rente ao chão.
@@ -990,8 +1019,8 @@ func _build_dome() -> void:
 	_dome = MeshInstance3D.new()
 	var sph := SphereMesh.new()
 	sph.is_hemisphere = true
-	sph.radius = 9.5
-	sph.height = 6.0
+	sph.radius = _flat_r + 1.5   # o escudo cobre a base inteira (cresce com a casa)
+	sph.height = sph.radius * 0.63
 	_dome.mesh = sph
 	var m := StandardMaterial3D.new()
 	m.albedo_color = Palette.DOME
@@ -1008,7 +1037,7 @@ func _build_dome() -> void:
 func _build_mike() -> void:
 	mike = Node3D.new()
 	add_child(mike)
-	mike.position = cell_center(Vector2i(2, 4)) + Vector3(0.0, 0.0, CELL * 0.62)
+	mike.position = cell_center(Vector2i(4, 5)) + Vector3(0.0, 0.0, CELL * 0.62)
 	for skin in [["casual", MIKE_SCENE], ["suit", MIKE_SUIT]]:
 		if not ResourceLoader.exists(skin[1]):
 			continue
@@ -1190,8 +1219,9 @@ func _make_item(type: String, level: int) -> Node3D:
 	label.name = "Label"
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	label.no_depth_test = true
+	label.font = Palette.font(700)
 	label.font_size = 44
-	label.outline_size = 14
+	label.outline_size = 12
 	label.pixel_size = 0.012
 	label.modulate = Palette.TEXT
 	label.outline_modulate = Palette.BG
@@ -1207,6 +1237,7 @@ func _make_item(type: String, level: int) -> Node3D:
 		ready_mark.text = "!"
 		ready_mark.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 		ready_mark.no_depth_test = true
+		ready_mark.font = Palette.font(800)
 		ready_mark.font_size = 96
 		ready_mark.outline_size = 18
 		ready_mark.pixel_size = 0.012

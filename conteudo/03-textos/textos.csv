@@ -30,7 +30,7 @@ B_RTG_DESC,"Pouca energia, mas nunca para.","A little energy, but it never stops
 B_MOXIE,MOXIE,MOXIE,MOXIE,MOXIE
 B_MOXIE_DESC,Transforma o ar de Marte em oxigênio.,Turns Mars air into oxygen.,Convierte el aire de Marte en oxígeno.,Transforme l'air de Mars en oxygène.
 B_ANTENNA,Antena,Antenna,Antena,Antenne
-B_ANTENNA_DESC,Fala com a Terra.,Talks to Earth.,Habla con la Tierra.,Parle avec la Terre.
+B_ANTENNA_DESC,Recebe os avisos da NASA: a tempestade solar não pega o Mike de surpresa.,Gets NASA's warnings: solar storms don't catch Mike by surprise.,Recibe los avisos de la NASA: la tormenta solar no sorprende a Mike.,Reçoit les alertes de la NASA : la tempête solaire ne surprend pas Mike.
 B_PAD,Pista do Ingenuity,Ingenuity pad,Pista del Ingenuity,Piste d'Ingenuity
 B_PAD_DESC,Lugar de pouso do helicóptero Ingenuity. Ele voa com o Mike!,Landing spot for the Ingenuity helicopter. It flies with Mike!,Lugar de aterrizaje del helicóptero Ingenuity. ¡Vuela con Mike!,Aire d'atterrissage de l'hélicoptère Ingenuity. Il vole avec Mike !
 B_DECOR,Decoração,Decoration,Decoración,Décoration
@@ -81,7 +81,7 @@ TUTO_CONFIRM,Agora toque em Construir.,Now tap Build.,Ahora toca Construir.,"Mai
 TUTO_PLACE,Toque num quadrado claro para construir.,Tap a light square to build.,Toca un cuadrado claro para construir.,Touche une case claire pour construire.
 TUTO_GREENHOUSE,"Boa! Agora uma Estufa, para plantar comida. Toque em Construir.","Nice! Now a Greenhouse, to grow food. Tap Build.","¡Bien! Ahora un Invernadero, para cultivar comida. Toca Construir.","Bravo ! Maintenant une Serre, pour faire pousser à manger. Touche Construire."
 TUTO_PLANT,Toque na Estufa para plantar uma alface.,Tap the Greenhouse to plant lettuce.,Toca el Invernadero para plantar lechuga.,Touche la Serre pour planter une laitue.
-TUTO_EXPLORE,"Enquanto ela cresce, toque em Explorar. Eu trago um tubo de amostra!","While it grows, tap Explore. I'll bring back a sample tube!","Mientras crece, toca Explorar. ¡Traigo un tubo de muestra!","Pendant qu'elle pousse, touche Explorer. Je rapporte un tube d'échantillon !"
+TUTO_EXPLORE,"Enquanto ela cresce, toque em Explorar. Eu levo um lanche e trago um tubo de amostra!","While it grows, tap Explore. I'll take a snack and bring back a sample tube!","Mientras crece, toca Explorar. ¡Llevo una merienda y traigo un tubo de muestra!","Pendant qu'elle pousse, touche Explorer. Je prends un goûter et je rapporte un tube d'échantillon !"
 TUTO_WAIT,Estou explorando a cratera! Volto em {n} sóis.,I'm exploring the crater! Back in {n} sols.,¡Estoy explorando el cráter! Vuelvo en {n} soles.,J'explore le cratère ! Je reviens dans {n} sols.
 TUTO_TUBE,Voltei! Toque no tubo para abrir sua carta.,I'm back! Tap the tube to open your card.,¡Volví! Toca el tubo para abrir tu carta.,Je suis rentré ! Touche le tube pour ouvrir ta carte.
 TUTO_DONE,Muito bem! Cuide das 3 barras e complete o álbum.,Great job! Keep the 3 bars up and fill the album.,¡Muy bien! Cuida las 3 barras y completa el álbum.,Bravo ! Garde les 3 barres pleines et remplis l'album.
@@ -161,3 +161,19 @@ SET_SOUNDS,Sons,Sounds,Sonidos,Sons
 SET_ON,ligada,on,encendida,activée
 SET_OFF,desligada,off,apagada,désactivée
 SET_TUTORIAL,Ver o tutorial de novo,See the tutorial again,Ver el tutorial otra vez,Revoir le tutoriel
+SNACK_PACKED,"O Mike levou {name} de lanche. Lanche mais raro, carta mais rara!","Mike packed {name} as a snack. Rarer snack, rarer card!","Mike llevó {name} de merienda. ¡Merienda más rara, carta más rara!","Mike a pris {name} en goûter. Goûter plus rare, carte plus rare !"
+SNACK_HINT,Toda expedição precisa de um lanche da estufa. Lanche mais raro dá carta mais rara!,Every expedition needs a snack from the greenhouse. A rarer snack gives a rarer card!,Cada expedición necesita una merienda del invernadero. ¡Una merienda más rara da una carta más rara!,Chaque expédition a besoin d'un goûter de la serre. Un goûter plus rare donne une carte plus rare !
+NEED_FOOD,O Mike precisa de um lanche da estufa para explorar. Plante e colha!,Mike needs a snack from the greenhouse to explore. Plant and harvest!,Mike necesita una merienda del invernadero para explorar. ¡Planta y cosecha!,Mike a besoin d'un goûter de la serre pour explorer. Plante et récolte !
+LOCK_SHIELD,Escudo baixo: muita radiação lá fora. Espere o escudo subir.,Low shield: too much radiation outside. Wait for the shield to go up.,Escudo bajo: mucha radiación afuera. Espera a que suba el escudo.,Bouclier faible : trop de radiations dehors. Attends que le bouclier remonte.
+LOCK_EXPLORING,Espere o Mike voltar da expedição para construir.,Wait for Mike to come back from the expedition to build.,Espera a que Mike vuelva de la expedición para construir.,Attends que Mike revienne de l'expédition pour construire.
+STORM_PLANTS,"Sem escudo, a radiação atrapalhou as plantas da estufa.","Without the shield, radiation hurt the greenhouse plants.","Sin escudo, la radiación dañó las plantas del invernadero.","Sans bouclier, les radiations ont abîmé les plantes de la serre."
+STORM_WARNING,A antena recebeu um aviso da NASA: tempestade solar em {name} sóis! Guarde energia para o escudo.,The antenna got a NASA warning: solar storm in {name} sols! Save energy for the shield.,La antena recibió un aviso de la NASA: ¡tormenta solar en {name} soles! Guarda energía para el escudo.,L'antenne a reçu une alerte de la NASA : tempête solaire dans {name} sols ! Garde de l'énergie pour le bouclier.
+TUTO_NUDGE,"Primeiro, toque em: {name}","First, tap: {name}","Primero, toca: {name}","D'abord, touche : {name}"
+TUTO_SQUARE,um quadrado claro,a light square,un cuadrado claro,une case claire
+REMOVE_TITLE,Remover: {name}?,Remove: {name}?,¿Quitar: {name}?,Retirer : {name} ?
+REMOVE_TEXT,A energia que você gastou nela volta toda.,You get back all the energy you spent on it.,Recuperas toda la energía que gastaste.,Tu récupères toute l'énergie dépensée.
+REMOVE_YES,"Sim, remover","Yes, remove","Sí, quitar","Oui, retirer"
+REMOVE_NO,Não,No,No,Non
+BTN_OPEN,Abrir,Open,Abrir,Ouvrir
+TUBE_MYSTERY,O que será que tem aqui dentro?,What could be inside?,¿Qué habrá adentro?,Qu'est-ce qu'il y a dedans ?
+CARD_NEW_BADGE,NOVA!,NEW!,¡NUEVA!,NOUVELLE !

@@ -24,6 +24,16 @@ func _ready() -> void:
 	_area_da_casa()
 	_caminho_do_mike(main.get_node("Base"))
 	_tutorial()
+	_regras_novas()
+	# O recado do tutorial tem o tamanho do texto (antes crescia até a tela inteira e não voltava).
+	State.restart_tutorial()
+	hud._start.visible = false
+	hud._tut_update()
+	for i in 4:
+		await get_tree().process_frame
+	ok(hud._tut_card.visible and hud._tut_card.size.y < 260.0, "o recado do tutorial é pequeno (%d px de altura)" % hud._tut_card.size.y)
+	ok(hud._tut_card.position.y >= hud._bars_bottom() - 1.0, "o recado fica abaixo das barras, não por cima")
+	State.finish_tutorial()
 	print("RESULTADO: ", "TUDO OK" if falhas == 0 else "%d FALHA(S)" % falhas)
 	get_tree().quit(falhas)
 
@@ -41,6 +51,7 @@ func _tempestade() -> void:
 	_ticks(State.STORM_SOLS)
 	ok(State.cards.has(str(State.CARD_STORM)), "ganha a carta Tempestade solar de 2024")
 	ok(hud._card.visible, "a carta aparece na tela")
+	ok(hud._card_badge.visible, "carta nova ganha o selo NOVA!")
 	State.next_storm_sol = State.sol + 1
 	State._tick()
 	var escudo: float = State.shield
@@ -64,24 +75,31 @@ func _expedicao() -> void:
 
 func _construir_e_plantar() -> void:
 	State.energy = 100.0
-	ok(State.build("solar", Vector2i(1, 2)), "constrói um painel solar")
+	ok(State.build("solar", Vector2i(3, 3)), "constrói um painel solar")
 	ok(State.cards.has("11"), "o 1º painel solar dá a carta Painel solar")
 	ok(State.build_block_reason("flag") == "" or State.cards.size() < 5, "a bandeira destrava com 5 cartas")
 	State.energy = 100.0
-	ok(State.build("antenna", Vector2i(2, 2)), "constrói a antena")
+	ok(State.build("antenna", Vector2i(4, 3)), "constrói a antena")
 	ok(State.build_block_reason("antenna") == "NEED_MAX", "só dá para ter uma antena")
 	State.energy = 100.0
-	State.build("greenhouse", Vector2i(4, 5))
+	State.build("greenhouse", Vector2i(6, 6))
 	ok(State.unlocked_plants().size() == 2, "começa com alface e rabanete")
-	ok(State.plant(Vector2i(4, 5), "radish"), "planta rabanete")
+	ok(State.plant(Vector2i(6, 6), "radish"), "planta rabanete")
 	State.energy = 100.0
 	_ticks(State.PLANTS.radish.sols)
-	ok(State.harvest(Vector2i(4, 5)) == "radish", "colhe o rabanete")
+	ok(State.harvest(Vector2i(6, 6)) == "radish", "colhe o rabanete")
+	State.oxygen = 100.0
+	var raros_antes: int = int(State.inventory.get("radish", 0))
+	State.start_explore()
+	ok(State.snack == "radish" and int(State.inventory.get("radish", 0)) == raros_antes - 1, "a colheita vira lanche da expedição")
+	_ticks(State.EXPLORE_SOLS)
+	ok(State.snack == "" and State.tube_card != 0, "o lanche é usado no sorteio do tubo")
+	State.open_tube()
 	ok("kale" in State.unlocked_plants(), "a 1ª colheita destrava a couve")
 
 
 func _eventos() -> void:
-	State.plant(Vector2i(4, 5), "lettuce")   # a noite congelante só vem com planta crescendo
+	State.plant(Vector2i(6, 6), "lettuce")   # a noite congelante só vem com planta crescendo
 	_forcar_evento("cold")
 	ok(State.pending_event == "cold" and hud._choice.visible, "noite congelante pede uma escolha")
 	State.energy = 100.0
@@ -90,7 +108,7 @@ func _eventos() -> void:
 	_ticks(State.COLD_SOLS)
 	_forcar_evento("nosignal")
 	hud._on_choice(0)
-	ok(State.base_locked_reason() == "LOCK_NOSIGNAL" and not State.build("rtg", Vector2i(1, 4)), "sem sinal: não dá para mexer na base")
+	ok(State.base_locked_reason() == "LOCK_NOSIGNAL" and not State.build("rtg", Vector2i(3, 5)), "sem sinal: não dá para mexer na base")
 	_ticks(State.NOSIGNAL_SOLS)
 	ok(State.cards.has("4"), "quando o sinal volta, o pacote traz a carta Batata")
 	_forcar_evento("dust")
@@ -104,8 +122,8 @@ func _eventos() -> void:
 
 func _jogo_fechado() -> void:
 	State.energy = 100.0
-	State.build("greenhouse", Vector2i(1, 5))
-	State.plant(Vector2i(1, 5), "lettuce")
+	State.build("greenhouse", Vector2i(3, 6))
+	State.plant(Vector2i(3, 6), "lettuce")
 	var sol_antes: int = State.sol
 	State._catch_up(int(Time.get_unix_time_from_system()) - 600)
 	ok(State.sol > sol_antes and int(State.away.get("sols", 0)) > 0, "com o jogo fechado, o tempo passa")
@@ -152,7 +170,7 @@ func ok(cond: bool, nome: String) -> void:
 
 func _ingenuity(base: Node3D) -> void:
 	State.energy = 100.0
-	State.build("pad", Vector2i(4, 2))
+	State.build("pad", Vector2i(6, 3))
 	ok(base._pet != null, "a pista do Ingenuity faz o pet aparecer")
 	if base._pet == null:
 		return
@@ -167,34 +185,34 @@ func _niveis_e_album() -> void:
 	State.new_game()
 	State.tutorial = State.TUTORIAL_DONE
 	State.energy = 100.0
-	var casa := Vector2i(2, 3)
+	var casa := Vector2i(4, 4)
 	ok(State.upgrade_block_reason(casa) == "", "a casa pode ir para o nível 2 (tem espaço ao lado)")
 	State.upgrade(casa)
-	ok(State.cells_of(casa, "habitat", 2).size() == 2 and State.anchor_of(Vector2i(3, 3)) == casa, "casa no nível 2 ocupa 2 casas")
+	ok(State.cells_of(casa, "habitat", 2).size() == 2 and State.anchor_of(Vector2i(5, 4)) == casa, "casa no nível 2 ocupa 2 casas")
 	State.energy = 100.0
-	State.build("solar", Vector2i(4, 3))
+	State.build("solar", Vector2i(6, 4))
 	ok(State.upgrade_block_reason(casa) == "NEED_SPACE", "sem espaço ao lado, a casa não sobe para o nível 3")
-	ok(not State.build("moxie", Vector2i(3, 3)), "não dá para construir em cima da casa grande")
-	State.remove(Vector2i(4, 3))
+	ok(not State.build("moxie", Vector2i(5, 4)), "não dá para construir em cima da casa grande")
+	State.remove(Vector2i(6, 4))
 	State.energy = 100.0
 	ok(State.upgrade(casa) and State.cells_of(casa, "habitat", 3).size() == 3, "com espaço, a casa vai para o nível 3 (3 casas)")
 	State.energy = 100.0
-	State.build("rtg", Vector2i(0, 0))
+	State.build("rtg", Vector2i(2, 1))
 	State.energy = 100.0
-	State.upgrade(Vector2i(0, 0))
+	State.upgrade(Vector2i(2, 1))
 	State.energy = 100.0
-	State.upgrade(Vector2i(0, 0))
-	ok(State.item_name(State.item_at(Vector2i(0, 0))) == "B_KILOPOWER" and State.cards.has("14"), "RTG no nível 3 vira Kilopower e dá a carta")
+	State.upgrade(Vector2i(2, 1))
+	ok(State.item_name(State.item_at(Vector2i(2, 1))) == "B_KILOPOWER" and State.cards.has("14"), "RTG no nível 3 vira Kilopower e dá a carta")
 	var sem_dica := 0
 	for id in State.card_ids():
 		if State.card_hint(id).strip_edges() == "":
 			sem_dica += 1
 	ok(sem_dica == 0, "todas as %d cartas dizem como ganhar" % State.cards_total())
 	State.energy = 100.0
-	State.build("greenhouse", Vector2i(0, 6))
-	State.plant(Vector2i(0, 6), "radish")
+	State.build("greenhouse", Vector2i(2, 7))
+	State.plant(Vector2i(2, 7), "radish")
 	_ticks(30)
-	State.harvest(Vector2i(0, 6))
+	State.harvest(Vector2i(2, 7))
 	ok(int(State.inventory.get("radish", 0)) == 1, "colher conta no inventário (rabanete × 1)")
 
 
@@ -202,14 +220,14 @@ func _girar_energia_oxigenio() -> void:
 	State.new_game()
 	State.tutorial = State.TUTORIAL_DONE
 	State.energy = 100.0
-	var casa := Vector2i(2, 3)
+	var casa := Vector2i(4, 4)
 	State.upgrade(casa)
-	ok(State.anchor_of(Vector2i(3, 3)) == casa, "casa nível 2 deitada ocupa a casa ao lado")
-	ok(State.rotate(casa) and State.anchor_of(Vector2i(2, 4)) == casa and State.anchor_of(Vector2i(3, 3)) == Vector2i(-1, -1), "girar a casa: a fileira vai para a frente")
+	ok(State.anchor_of(Vector2i(5, 4)) == casa, "casa nível 2 deitada ocupa a casa ao lado")
+	ok(State.rotate(casa) and State.anchor_of(Vector2i(4, 5)) == casa and State.anchor_of(Vector2i(5, 4)) == Vector2i(-1, -1), "girar a casa: a fileira vai para a frente")
 	State.energy = 100.0
-	State.build("solar", Vector2i(3, 3))
+	State.build("solar", Vector2i(5, 4))
 	State.rotate(casa)
-	State.build("moxie", Vector2i(2, 4))
+	State.build("moxie", Vector2i(4, 5))
 	ok(State.rotate_block_reason(casa) == "NEED_SPACE", "não gira se a fileira nova não couber")
 	# Sem energia: a bateria de emergência da casa ajuda devagar.
 	State.new_game()
@@ -223,8 +241,8 @@ func _girar_energia_oxigenio() -> void:
 	State._tick()
 	ok(State.oxygen <= 0.0 and State.mike_inside() and State.explore_block_reason() == "LOCK_OXYGEN", "sem oxigênio, o Mike fica em casa e não explora")
 	State.energy = 100.0
-	State.build("greenhouse", Vector2i(1, 2))
-	State.plant(Vector2i(1, 2), "lettuce")
+	State.build("greenhouse", Vector2i(3, 3))
+	State.plant(Vector2i(3, 3), "lettuce")
 	State.oxygen = 10.0
 	var antes: float = State.oxygen
 	State.energy = 100.0
@@ -237,18 +255,18 @@ func _area_da_casa() -> void:
 	State.tutorial = State.TUTORIAL_DONE
 	State.energy = 100.0
 	ok(State.free_cells().size() == 15, "casa no nível 1: a base tem 4 x 4 casas (15 livres)")
-	ok(not State.build("solar", Vector2i(0, 0)), "não dá para construir fora da área aberta")
-	ok(State.build("rtg", Vector2i(1, 2)), "dentro da área, dá")
+	ok(not State.build("solar", Vector2i(2, 1)), "não dá para construir fora da área aberta")
+	ok(State.build("rtg", Vector2i(3, 3)), "dentro da área, dá")
 	State.energy = 100.0
-	ok(State.upgrade_block_reason(Vector2i(1, 2)) == "NEED_HOUSE", "construção não passa do nível da casa")
-	State.upgrade(Vector2i(2, 3))
-	ok(State.free_cells().size() == 36 - 3, "casa no nível 2: a base cresce para 6 x 6")
+	ok(State.upgrade_block_reason(Vector2i(3, 3)) == "NEED_HOUSE", "construção não passa do nível da casa")
+	State.upgrade(Vector2i(4, 4))
+	ok(State.free_cells().size() == 49 - 3, "casa no nível 2: a base cresce para 7 x 7")
 	State.energy = 100.0
-	ok(State.upgrade(Vector2i(1, 2)), "com a casa no nível 2, o RTG sobe para o nível 2")
+	ok(State.upgrade(Vector2i(3, 3)), "com a casa no nível 2, o RTG sobe para o nível 2")
 	State.energy = 100.0
-	ok(State.upgrade_block_reason(Vector2i(1, 2)) == "NEED_HOUSE", "mas não passa para o nível 3")
+	ok(State.upgrade_block_reason(Vector2i(3, 3)) == "NEED_HOUSE", "mas não passa para o nível 3")
 	State.energy = 100.0
-	State.upgrade(Vector2i(2, 3))
+	State.upgrade(Vector2i(4, 4))
 	ok(State.zone() == Rect2i(0, 0, State.GRID_W, State.GRID_H), "casa no nível 3: a grade inteira abre")
 	var em_breve := 0
 	for id in State.card_ids():
@@ -261,14 +279,14 @@ func _caminho_do_mike(base: Node3D) -> void:
 	State.new_game()
 	State.tutorial = State.TUTORIAL_DONE
 	State.energy = 100.0
-	State.upgrade(Vector2i(2, 3))
+	State.upgrade(Vector2i(4, 4))
 	State.energy = 100.0
-	State.upgrade(Vector2i(2, 3))
+	State.upgrade(Vector2i(4, 4))
 	State.energy = 100.0
-	State.build("greenhouse", Vector2i(2, 4))
+	State.build("greenhouse", Vector2i(4, 5))
 	# Do lado de trás da casa para a frente da estufa: a linha reta atravessa as duas.
-	var de: Vector3 = base.cell_center(Vector2i(3, 2))
-	var para: Vector3 = base.cell_center(Vector2i(3, 6))
+	var de: Vector3 = base.cell_center(Vector2i(5, 3))
+	var para: Vector3 = base.cell_center(Vector2i(5, 7))
 	var caminho: PackedVector3Array = base._round_corners(base._find_path(de, para))
 	var bateu := 0
 	for i in range(1, caminho.size()):
@@ -285,19 +303,20 @@ func _caminho_do_mike(base: Node3D) -> void:
 			curva = false
 	ok(curva, "sem quina reta: cada virada do caminho é suave")
 	# Construir em cima do Mike: ele sai andando para um lugar livre.
-	base.mike.position = base.cell_center(Vector2i(4, 4))
+	base._walking_out = false
+	base.mike.position = base.cell_center(Vector2i(6, 5))
 	base._path = PackedVector3Array()
 	base._path_i = 0
 	State.energy = 100.0
-	State.build("moxie", Vector2i(4, 4))
+	State.build("moxie", Vector2i(6, 5))
 	ok(base._path.size() > 0 and not base._nav_solid(base._path[-1]), "construíram em cima do Mike: ele sai para o lado")
 	# Toque no alto da casa (fora do chão dela) abre a casa.
 	base.whole_grid = false
-	var casa: Node3D = base._nodes["2,3"]
+	var casa: Node3D = base._nodes["4,4"]
 	var topo: AABB = casa.global_transform * base._merged_aabb(casa)
 	var tela: Vector2 = base.camera.unproject_position(topo.get_center() + Vector3(0, topo.size.y * 0.4, 0))
 	var acerto: Dictionary = base._item_under(base.camera.project_ray_origin(tela), base.camera.project_ray_normal(tela))
-	ok(not acerto.is_empty() and State.anchor_of(acerto.cell) == Vector2i(2, 3), "tocar no telhado da casa abre a casa")
+	ok(not acerto.is_empty() and State.anchor_of(acerto.cell) == Vector2i(4, 4), "tocar no telhado da casa abre a casa")
 	ok(base._mike_skins.has("suit"), "o Mike de traje está carregado para a expedição")
 	base._set_suit(true)
 	ok(base._mike_skins.suit[0].visible and not base._mike_skins.casual[0].visible, "na expedição, o Mike veste o traje")
@@ -324,14 +343,16 @@ func _tutorial() -> void:
 	hud._card_queue.clear()
 	hud._tut_update()
 	ok(hud._tut_card.visible and hud._tut_label.text == tr("TUTO_HELLO"), "o Mike dá o 1º recado: tocar em Construir")
-	ok(hud._tut_point() != Vector2.INF, "a seta aponta para o botão Construir")
+	ok(hud._tut_target() == hud._buttons.build, "a moldura dourada fica em volta do botão Construir")
+	hud._on_album()
+	ok(not hud._album.visible and hud._toast_label.text == tr("TUTO_NUDGE").format({"name": tr("BTN_BUILD")}), "no tutorial, tocar em outra coisa não abre: o Mike lembra o que tocar")
 	State.energy = 100.0
-	State.build("solar", Vector2i(1, 2))
+	State.build("solar", Vector2i(3, 3))
 	hud._tut_update()
 	ok(State.tutorial == 1, "construiu o painel: passo da estufa")
 	State.energy = 100.0
-	State.build("greenhouse", Vector2i(3, 2))
-	State.plant(Vector2i(3, 2), "lettuce")
+	State.build("greenhouse", Vector2i(5, 3))
+	State.plant(Vector2i(5, 3), "lettuce")
 	hud._tut_update()
 	ok(State.tutorial == 3 and hud._tut_label.text == tr("TUTO_EXPLORE"), "plantou: o Mike pede para explorar")
 	State.oxygen = 100.0
@@ -353,3 +374,61 @@ func _tutorial() -> void:
 	hud._card.visible = false
 	hud._card_queue.clear()
 	ok(hud._sols(tr("COLD_LEFT").format({"n": 1})).ends_with("1 sol"), "1 sol (não \"1 sóis\")")
+
+
+func _regras_novas() -> void:
+	State.new_game()
+	State.tutorial = State.TUTORIAL_DONE
+	State.oxygen = 100.0
+	ok(State.zone(3).size == Vector2i(10, 10) and State.zone(2).size == Vector2i(7, 7), "a base vai até 10 x 10 (4x4, 7x7, 10x10)")
+	ok(State.best_snack() == "lettuce", "o jogo começa com um lanche que veio da Terra")
+	State.inventory.clear()
+	ok(State.explore_block_reason() == "NEED_FOOD", "sem lanche, o Mike não sai para explorar")
+	State.inventory = {"lettuce": 1, "chile": 1}
+	ok(State.best_snack() == "chile" or State.plant_rarity("chile") == State.plant_rarity("lettuce"), "ele leva o lanche mais raro")
+	State.shield = 10.0
+	ok(State.explore_block_reason() == "LOCK_SHIELD", "com o escudo baixo, não dá para sair")
+	State.shield = 100.0
+	ok(State.start_explore(), "com lanche, oxigênio e escudo, ele sai")
+	ok(not State.build("solar", Vector2i(3, 3)) and State.build_block_reason("solar") == "LOCK_EXPLORING", "com o Mike fora, não dá para construir")
+	_ticks(State.EXPLORE_SOLS)
+	State.open_tube()
+	State.energy = 100.0
+	State.build("greenhouse", Vector2i(3, 3))
+	State.plant(Vector2i(3, 3), "lettuce")
+	_ticks(10)
+	var antes: float = float(State.item_at(Vector2i(3, 3)).growth)
+	State.next_storm_sol = State.sol + 1
+	State._tick()
+	hud._on_choice(1)
+	ok(is_equal_approx(float(State.item_at(Vector2i(3, 3)).growth), antes * State.STORM_PLANT_LOSS + 0.0) or float(State.item_at(Vector2i(3, 3)).growth) < antes, "sem escudo, as plantas perdem metade do que cresceram")
+	_ticks(State.STORM_SOLS)
+	State.energy = 100.0
+	ok(is_equal_approx(State.storm_shield_cost(), State.STORM_SHIELD_COST), "sem antena, o escudo custa %d" % int(State.STORM_SHIELD_COST))
+	State.build("antenna", Vector2i(4, 3))
+	ok(is_equal_approx(State.storm_shield_cost(), State.STORM_SHIELD_COST_WARNED), "com a antena (aviso da NASA), o escudo sai mais barato")
+	# Lixeira pede confirmação.
+	hud._card.visible = false
+	hud._card_queue.clear()
+	hud._choice.visible = false
+	hud._info.visible = false
+	hud._open_panel(Vector2i(4, 3))
+	hud._on_remove()
+	ok(hud._choice.visible and not State.item_at(Vector2i(4, 3)).is_empty(), "a lixeira primeiro pergunta (nada some sem confirmar)")
+	hud._on_choice(0)
+	ok(State.item_at(Vector2i(4, 3)).is_empty(), "confirmou: a construção sai")
+	# Colher de novo uma planta que já está no álbum não mostra a carta de novo.
+	var cartas_antes: int = State.cards.size()
+	var fila_antes: int = hud._card_queue.size()
+	State.energy = 100.0
+	State.plant(Vector2i(3, 3), "lettuce")
+	State.item_at(Vector2i(3, 3)).growth = 999.0
+	State.harvest(Vector2i(3, 3))
+	State.plant(Vector2i(3, 3), "lettuce")
+	State.item_at(Vector2i(3, 3)).growth = 999.0
+	State.harvest(Vector2i(3, 3))
+	ok(hud._card_queue.size() <= fila_antes + 1 and State.cards.size() <= cartas_antes + 1, "colher alface de novo não mostra a carta outra vez")
+	hud._card.visible = false
+	hud._card_queue.clear()
+	hud._choice.visible = false
+	hud._info.visible = false

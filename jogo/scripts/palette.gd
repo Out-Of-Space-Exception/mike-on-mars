@@ -43,6 +43,21 @@ const PLATE_EDGE := Color("5c2d31")
 const RIVET := Color("8a5a4e")
 const PAPER := Color("f2e3c2")
 const INK := Color("3b1a1e")
+const INK_DEEP := Color("2a1215")   # texto escuro sobre o terracota (5:1, a INK fica no limite)
+const OFF := Color("5c2d31")        # botão que ainda não dá para usar (no lugar de deixar transparente)
+const UP := Color("9be27a")         # "+3/sol"
+const DOWN := Color("ff9a8a")       # "-1/sol"
+static var _fonts := {}
+
+
+## A Rubik é uma fonte variável: sem dizer o peso, ela sai fininha (300). Texto 400, botões 700, títulos 800.
+static func font(weight: int) -> Font:
+	if not _fonts.has(weight) and ResourceLoader.exists(FONT):
+		var f := FontVariation.new()
+		f.base_font = load(FONT)
+		f.variation_opentype = {TextServerManager.get_primary_interface().name_to_tag("wght"): weight}
+		_fonts[weight] = f
+	return _fonts.get(weight)
 const STRIPE_H := 22.0
 
 
@@ -50,7 +65,8 @@ static func make_theme() -> Theme:
 	var t := Theme.new()
 	t.default_font_size = 30
 	if ResourceLoader.exists(FONT):
-		t.default_font = load(FONT)
+		t.default_font = font(400)
+		t.set_font("font", "Button", font(700))
 	t.set_color("font_color", "Label", TEXT)
 	for c in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
 		t.set_color(c, "Button", INK)
@@ -58,7 +74,8 @@ static func make_theme() -> Theme:
 	t.set_stylebox("normal", "Button", key(BUTTON))
 	t.set_stylebox("hover", "Button", key(BUTTON))
 	t.set_stylebox("pressed", "Button", key(BUTTON, true))
-	t.set_stylebox("disabled", "Button", key(BUTTON.darkened(0.35)))
+	t.set_stylebox("disabled", "Button", key(OFF))
+	t.set_color("font_disabled_color", "Button", TEXT)
 	t.set_stylebox("focus", "Button", StyleBoxEmpty.new())
 	t.set_stylebox("panel", "PanelContainer", plate(false))
 	t.set_stylebox("background", "ProgressBar", _box(Color("2a1215"), 6))
@@ -67,10 +84,13 @@ static func make_theme() -> Theme:
 
 ## Tecla: cantos pouco arredondados e uma borda grossa e mais escura embaixo; apertada, ela "afunda".
 static func key(color: Color, pressed := false) -> StyleBoxFlat:
-	var b := _box(color, 14)
-	b.border_color = color.darkened(0.38)
-	b.border_width_bottom = 2 if pressed else 9
-	b.content_margin_top = 16 if pressed else 10
+	var b := _box(color, 18)
+	b.border_color = INK
+	b.border_width_left = 4
+	b.border_width_right = 4
+	b.border_width_top = 4
+	b.border_width_bottom = 4 if pressed else 12
+	b.content_margin_top = 18 if pressed else 10
 	b.content_margin_bottom = 8
 	return b
 
@@ -89,12 +109,12 @@ static func plate(stripe := false) -> StyleBoxFlat:
 
 ## Papel: creme, canto pequeno e uma sombra dura deslocada (como um cartão apoiado na mesa).
 static func paper(edge: Color = INK) -> StyleBoxFlat:
-	var b := _box(PAPER, 6)
-	b.set_border_width_all(6)
+	var b := _box(PAPER, 8)
+	b.set_border_width_all(3 if edge == INK else 5)
 	b.border_color = edge
-	b.shadow_color = Color(0, 0, 0, 0.35)
-	b.shadow_size = 1
-	b.shadow_offset = Vector2(8, 10)
+	b.shadow_color = Color(INK, 0.45)
+	b.shadow_size = 0
+	b.shadow_offset = Vector2(6, 8)
 	b.content_margin_left = 30
 	b.content_margin_right = 30
 	b.content_margin_top = 24
