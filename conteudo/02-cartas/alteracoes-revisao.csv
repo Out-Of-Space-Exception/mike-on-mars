@@ -1,0 +1,136 @@
+id,campo,antes,depois
+1,fonte,https://www.nasa.gov/mission_pages/station/research/news/veggie,https://www.nasa.gov/wp-content/uploads/2019/04/veggie_fact_sheet_508.pdf
+1,status,CONFERIR: revisao visual da foto,ok
+2,status,CONFERIR: revisao visual da foto,ok
+3,fato_pt,Foi colhida no espaço bem a tempo do Dia de Ação de Graças (28/11/2018).,"Astronautas já cultivaram e colheram couve no Veggie, a horta da Estação Espacial."
+3,fato_en,"It was harvested in space just in time for Thanksgiving (November 28, 2018).","Astronauts have grown and harvested kale in Veggie, the Space Station garden."
+3,fato_es,Se cosechó en el espacio justo a tiempo para el Día de Acción de Gracias (28/11/2018).,"Los astronautas han cultivado y cosechado col rizada en Veggie, el huerto de la Estación Espacial."
+3,fato_fr,Il a été récolté dans l'espace juste à temps pour Thanksgiving (28/11/2018).,"Des astronautes ont cultivé et récolté du chou kale dans Veggie, le potager de la Station spatiale."
+3,numero_real,,cultivo e colheita de couve no Veggie; sem data no fato
+3,status,CONFERIR: revisao visual; foto de outro cultivo; data divergente nos metadados,ok
+4,fato_pt,"Com a mesma luz, a batata pode dar o dobro de comida de alguns grãos, diz um cientista da NASA.","Com a mesma luz, a batata pode dar o dobro de comida de algumas culturas de sementes, segundo um cientista da NASA."
+4,fato_en,"With the same light, potatoes could make twice as much food as some grains, says a NASA scientist.","With the same light, potatoes could yield twice as much food as some seed crops, says a NASA scientist."
+4,fato_es,"Con la misma luz, la papa puede dar el doble de comida que algunos granos, dice un científico de la NASA.","Con la misma luz, la papa podría dar el doble de alimento que algunos cultivos de semillas, según un científico de la NASA."
+4,fato_fr,"Avec la même lumière, la pomme de terre peut donner deux fois plus à manger que certaines céréales, selon un scientifique de la NASA.","Avec la même lumière, la pomme de terre pourrait donner deux fois plus de nourriture que certaines cultures à graines, selon un scientifique de la NASA."
+4,status,CONFERIR: revisao visual do recorte e correspondencia com o novo fato,ok
+5,fonte,https://www.nasa.gov/image-article/first-flower-grown-space-stations-veggie-facility/,https://www.nasa.gov/humans-in-space/zinnias-from-space-nasa-studies-the-multiple-benefits-of-gardening/
+5,status,CONFERIR: revisao visual da foto,ok
+6,status,CONFERIR: revisao visual da foto,ok
+7,fonte,https://www.jpl.nasa.gov/news/opportunity-rover-finds-strong-evidence-meridiani-planum-was-wet/,https://www.jpl.nasa.gov/images/pia19113-martian-concretions-near-fram-crater/
+7,status,CONFERIR: revisao visual da foto,RESERVA: fora das 36 cartas do jogo; revisao visual necessaria antes de reativar
+8,status,CONFERIR: revisao visual da foto,RESERVA: fora das 36 cartas do jogo; revisao visual necessaria antes de reativar
+9,status,CONFERIR: revisao visual da foto,ok
+10,fato_pt,Manchinhas na rocha Cheyava Falls. Talvez sejam um sinal de vida antiga!,"As manchas da rocha Cheyava Falls podem ser pistas de vida antiga, mas isso ainda não foi confirmado."
+10,fato_en,Little spots on the rock Cheyava Falls. They might be a sign of ancient life!,"The spots in Cheyava Falls may be clues to ancient life, but this has not been confirmed."
+10,fato_es,Manchitas en la roca Cheyava Falls. ¡Quizá sean una señal de vida antigua!,"Las manchas de Cheyava Falls podrían ser pistas de vida antigua, pero eso aún no está confirmado."
+10,fato_fr,De petites taches sur la roche Cheyava Falls. Elles sont peut-être un signe de vie ancienne !,"Les taches de Cheyava Falls pourraient être des indices de vie ancienne, mais cela n'est pas encore confirmé."
+10,status,CONFERIR: revisao visual da foto,RESERVA: fora das 36 cartas do jogo; revisao visual necessaria antes de reativar
+11,fato_pt,Marte fica mais longe do Sol. Lá chega no máximo 45% da luz que chega na Terra.,"Na superfície de Marte, a luz solar chega a no máximo 45% do valor típico na Terra, segundo um estudo da NASA."
+11,fato_en,Mars is farther from the Sun. It gets at most 45% of the sunlight Earth gets.,"At the surface of Mars, sunlight reaches at most 45% of typical Earth levels, according to a NASA study."
+11,fato_es,Marte está más lejos del Sol. Le llega como máximo el 45% de la luz que recibe la Tierra.,"En la superficie de Marte, la luz solar alcanza como máximo el 45% del valor típico en la Tierra, según un estudio de la NASA."
+11,fato_fr,Mars est plus loin du Soleil. Elle reçoit au plus 45 % de la lumière qui arrive sur Terre.,"À la surface de Mars, la lumière solaire atteint au plus 45 % du niveau habituel sur Terre, selon une étude de la NASA."
+11,numero_real,45%,ate 45% do fluxo solar tipico terrestre na superficie; varia com local e estacao
+11,status,CONFERIR: revisao visual da foto,ok
+12,status,CONFERIR: revisao visual da foto,ok
+13,status,CONFERIR: revisao visual da foto,ok
+14,status,CONFERIR: revisao visual da foto,ok
+15,status,CONFERIR: revisao visual da foto,ok
+16,fonte,https://www.nasa.gov/solar-system/planets/mars/nasa-watches-mars-light-up-during-epic-solar-storm,https://www.jpl.nasa.gov/news/nasa-watches-mars-light-up-during-epic-solar-storm/
+16,status,CONFERIR: revisao visual da foto,ok
+17,status,CONFERIR: revisao visual da foto,RESERVA: fora das 36 cartas do jogo; revisao visual necessaria antes de reativar
+18,status,CONFERIR: revisao visual da foto,RESERVA: fora das 36 cartas do jogo; revisao visual necessaria antes de reativar
+19,fato_pt,Um dia em Marte se chama sol. Ele dura 24 horas e 39 minutos.,Um dia em Marte se chama sol e dura cerca de 24 horas e 39 minutos.
+19,fato_en,A day on Mars is called a sol. It lasts 24 hours and 39 minutes.,A day on Mars is called a sol and lasts about 24 hours and 39 minutes.
+19,fato_es,Un día en Marte se llama sol. Dura 24 horas y 39 minutos.,Un día en Marte se llama sol y dura unas 24 horas y 39 minutos.
+19,fato_fr,Un jour sur Mars s'appelle un sol. Il dure 24 heures et 39 minutes.,Un jour sur Mars s'appelle un sol et dure environ 24 heures et 39 minutes.
+19,status,CONFERIR: revisao visual da foto,ok
+20,fato_pt,"Na Cratera Gale, o dia chega perto de 0 °C, e a noite, a quase 70 °C abaixo de zero.",O Curiosity mediu em Gale cerca de 0 °C de dia e −70 °C à noite.
+20,fato_en,"In Gale Crater, days get close to 0 °C, and nights drop to almost 70 °C below zero.",Curiosity measured about 0 °C by day and −70 °C at night in Gale.
+20,fato_es,"En el cráter Gale, el día llega casi a 0 °C, y la noche, a casi 70 °C bajo cero.",Curiosity midió en Gale unos 0 °C de día y −70 °C de noche.
+20,fato_fr,"Dans le cratère Gale, le jour approche 0 °C, et la nuit descend presque à 70 °C sous zéro.",Curiosity a mesuré à Gale environ 0 °C le jour et −70 °C la nuit.
+20,numero_real,−70 °C,cerca de 0 °C de dia e −70 °C a noite; medidas de agosto/2012 a fevereiro/2013
+20,fonte,https://science.nasa.gov/resource/steady-temperatures-at-mars-gale-crater,https://science.nasa.gov/photojournal/steady-temperatures-at-mars-gale-crater/
+20,status,CONFERIR: revisao visual da foto,ok
+21,fato_pt,"A poeira cobriu os painéis da sonda InSight, e a energia dela caiu de 5.000 para 500. Dez vezes menos!","Com o acúmulo de poeira, a energia diária do InSight caiu de cerca de 5.000 para 500 Wh por sol."
+21,fato_en,"Dust covered the InSight lander's panels, and its power fell from 5,000 to 500. Ten times less!","As dust built up, InSight's daily energy fell from about 5,000 to 500 Wh per sol."
+21,fato_es,El polvo cubrió los paneles de la sonda InSight y su energía bajó de 5000 a 500. ¡Diez veces menos!,"Al acumularse polvo, la energía diaria de InSight bajó de unos 5000 a 500 Wh por sol."
+21,fato_fr,"La poussière a recouvert les panneaux de la sonde InSight, et son énergie est passée de 5 000 à 500. Dix fois moins !","Avec la poussière accumulée, l'énergie quotidienne d'InSight est passée d'environ 5 000 à 500 Wh par sol."
+21,status,CONFERIR: foto atual de outro evento; alternativas InSight PIA25284 e PIA25286 localizadas; fato descreve acumulo de poeira e nao tempestade unica,CONFERIR: foto atual de Melas nao mostra o InSight; substituir pela PIA25286 e atualizar credito
+22,status,CONFERIR: fotos do evento de 06/02/2009 localizadas PIA11798 e PIA11799; sem foto encontrada do redemoinho durante a limpeza,CONFERIR: foto atual nao mostra a limpeza do Spirit em 2009; escolher registro PIA11798/PIA11799 ou identificar foto ilustrativa
+23,fato_pt,O robô Curiosity mediu a radiação de 30 raios-X de peito de uma vez só (20/05/2024).,"Na tempestade de 20/05/2024, o Curiosity mediu uma dose de radiação equivalente a 30 radiografias de tórax."
+23,fato_en,"The Curiosity rover measured as much radiation as 30 chest X-rays at once (May 20, 2024).","During the storm on May 20, 2024, Curiosity measured a radiation dose equal to 30 chest X-rays."
+23,fato_es,El rover Curiosity midió tanta radiación como 30 radiografías de tórax juntas (20/05/2024).,"En la tormenta del 20/05/2024, Curiosity midió una dosis de radiación equivalente a 30 radiografías de tórax."
+23,fato_fr,Le rover Curiosity a mesuré autant de radiations que 30 radios des poumons d'un coup (20/05/2024).,"Pendant la tempête du 20/05/2024, Curiosity a mesuré une dose de rayonnement équivalente à 30 radiographies du thorax."
+23,fonte,https://www.nasa.gov/solar-system/planets/mars/nasa-watches-mars-light-up-during-epic-solar-storm,https://www.jpl.nasa.gov/news/nasa-watches-mars-light-up-during-epic-solar-storm/
+23,status,CONFERIR: revisao visual da foto,ok
+24,status,CONFERIR: revisao visual da foto,ok
+25,status,CONFERIR: revisao visual da foto,ok
+26,status,CONFERIR: revisao visual da foto,ok
+27,fato_pt,O chão da Gale tem olivina e é parecido com o solo dos vulcões do Havaí.,O solo de Gale contém olivina e tem minerais parecidos com os de solos vulcânicos do Havaí.
+27,fato_en,Gale's ground has olivine and looks like the soil of Hawaii's volcanoes.,Gale's soil contains olivine and has minerals like those in volcanic soils in Hawaii.
+27,fato_es,El suelo de Gale tiene olivino y se parece al de los volcanes de Hawái.,El suelo de Gale contiene olivino y tiene minerales parecidos a los de suelos volcánicos de Hawái.
+27,fato_fr,Le sol de Gale contient de l'olivine et ressemble à celui des volcans d'Hawaï.,Le sol de Gale contient de l'olivine et des minéraux semblables à ceux des sols volcaniques d'Hawaï.
+27,status,CONFERIR: foto oficial de olivina isolada localizada na Terra; foto atual mostra Rocknest; revisar alternativa terrestre,ok
+28,fonte,https://science.nasa.gov/resource/high-dune-is-first-martian-dune-studied-up-close-2,https://science.nasa.gov/resource/high-dune-is-first-martian-dune-studied-up-close-2/
+28,status,CONFERIR: revisao visual da foto,ok
+29,status,CONFERIR: revisao visual da foto,CONFERIR: rever ceu extrapolado identificado na conferencia anterior; usar somente pixels da foto oficial
+30,fato_pt,"Entre 3,8 e 3,3 bilhões de anos atrás, a Gale teve rios e lagos.","Rios e lagos existiram em Gale em alguma época entre cerca de 3,8 e 3,3 bilhões de anos atrás."
+30,fato_en,"Between 3.8 and 3.3 billion years ago, Gale had rivers and lakes.",Rivers and lakes existed in Gale sometime between about 3.8 and 3.3 billion years ago.
+30,fato_es,"Hace entre 3800 y 3300 millones de años, Gale tuvo ríos y lagos.",En Gale hubo ríos y lagos en algún momento entre hace unos 3800 y 3300 millones de años.
+30,fato_fr,"Il y a entre 3,8 et 3,3 milliards d'années, Gale avait des rivières et des lacs.","Des rivières et des lacs existaient à Gale à une époque située entre environ 3,8 et 3,3 milliards d'années."
+30,status,CONFERIR: revisao visual da foto,ok
+31,status,CONFERIR: revisao visual da foto,ok
+32,fato_pt,Esse mineral é uma pista de que o ar de Marte já teve mais oxigênio.,Óxidos de manganês são uma pista de que Marte pode ter tido mais oxigênio no ar.
+32,fato_en,This mineral is a clue that Mars air once had more oxygen.,Manganese oxides are a clue that Mars may once have had more oxygen in its air.
+32,fato_es,Este mineral es una pista de que el aire de Marte tuvo más oxígeno.,Los óxidos de manganeso son una pista de que Marte pudo tener más oxígeno en el aire.
+32,fato_fr,Ce minéral est un indice que l'air de Mars avait autrefois plus d'oxygène.,Les oxydes de manganèse sont un indice que Mars a pu avoir plus d'oxygène dans son air.
+32,status,CONFERIR: foto de material isolado nao encontrada; imagem atual mostra fraturas com oxidos de manganes em Windjana,CONFERIR: recorte corta parte do detalhe de Windjana; reenquadrar preservando o material analisado
+33,numero_real,"~0,1% da rocha","menos de 0,1% de boro no veio Catabola; nao cerca de 0,1% da rocha toda"
+33,status,CONFERIR: foto de boro isolado nao encontrada; imagem atual mostra veio e medicoes de boro,ok
+34,fato_pt,"Em 2013, a rocha John Klein mostrou que a Gale já teve tudo o que seres vivos bem pequenos precisam.","Em 2013, uma amostra de John Klein revelou que Gale já teve condições para abrigar micróbios."
+34,fato_en,"In 2013, the John Klein rock showed that Gale once had everything tiny living things need.","In 2013, a sample from John Klein showed that Gale once had conditions that could support microbes."
+34,fato_es,"En 2013, la roca John Klein mostró que Gale tuvo todo lo que necesitan los seres vivos muy pequeños.","En 2013, una muestra de John Klein reveló que Gale tuvo condiciones para albergar microbios."
+34,fato_fr,"En 2013, la roche John Klein a montré que Gale avait autrefois tout ce qu'il faut à de tout petits êtres vivants.","En 2013, un échantillon de John Klein a révélé que Gale avait eu des conditions permettant la vie de microbes."
+34,status,CONFERIR: revisao visual da foto,ok
+35,status,CONFERIR: revisao visual da foto,ok
+36,fato_pt,"Numa pedra da Gale, o robô Curiosity achou as maiores moléculas de carbono já vistas em Marte.","Em 2025, cientistas anunciaram moléculas com 10 a 12 átomos de carbono numa amostra de Cumberland, coletada pelo Curiosity."
+36,fato_en,"In a Gale rock, the Curiosity rover found the biggest carbon molecules ever seen on Mars.","In 2025, scientists reported molecules with 10 to 12 carbon atoms in a Cumberland sample collected by Curiosity."
+36,fato_es,"En una roca de Gale, el rover Curiosity encontró las moléculas de carbono más grandes vistas en Marte.","En 2025, científicos anunciaron moléculas con 10 a 12 átomos de carbono en una muestra de Cumberland recogida por Curiosity."
+36,fato_fr,"Dans une roche de Gale, le rover Curiosity a trouvé les plus grosses molécules de carbone jamais vues sur Mars.","En 2025, des scientifiques ont annoncé des molécules de 10 à 12 atomes de carbone dans un échantillon de Cumberland prélevé par Curiosity."
+36,numero_real,10 a 12 carbonos,"10, 11 e 12 atomos de carbono; anuncio de 24/03/2025; amostra coletada em 2013"
+36,status,CONFERIR: foto direta das moleculas isoladas nao encontrada; foto atual mostra Cumberland; grafico oficial disponivel,ok
+37,fato_pt,Marte tem duas luas. Fobos dá três voltas no planeta por dia!,"Marte tem duas luas, e Fobos dá cerca de três voltas no planeta por dia."
+37,fato_en,Mars has two moons. Phobos goes around the planet three times a day!,"Mars has two moons, and Phobos goes around the planet about three times a day."
+37,fato_es,Marte tiene dos lunas. ¡Fobos da tres vueltas al planeta por día!,"Marte tiene dos lunas, y Fobos da unas tres vueltas al planeta por día."
+37,fato_fr,Mars a deux lunes. Phobos fait trois fois le tour de la planète par jour !,"Mars a deux lunes, et Phobos fait environ trois fois le tour de la planète par jour."
+37,status,CONFERIR: revisao visual da montagem; duas fontes oficiais registradas em revisao-fontes.md e creditos.csv; escalas independentes,ok
+38,status,CONFERIR: revisao visual da foto,ok
+39,fato_pt,O robô Curiosity viu a Terra e a Lua como estrelas brilhantes no céu.,O Curiosity fotografou a Terra e a Lua como pequenos pontos brilhantes no céu de Marte.
+39,fato_en,The Curiosity rover saw Earth and the Moon as bright stars in the sky.,Curiosity photographed Earth and the Moon as tiny bright points in the sky of Mars.
+39,fato_es,El rover Curiosity vio la Tierra y la Luna como estrellas brillantes en el cielo.,Curiosity fotografió la Tierra y la Luna como pequeños puntos brillantes en el cielo de Marte.
+39,fato_fr,Le rover Curiosity a vu la Terre et la Lune comme des étoiles brillantes dans le ciel.,Curiosity a photographié la Terre et la Lune comme de petits points brillants dans le ciel de Mars.
+39,status,CONFERIR: revisao visual da foto,CONFERIR: Terra e Lua pouco legiveis no enquadramento atual; alternativa 39 permanece opcional
+40,fato_pt,"Na Estação Espacial, só 12 tomates amadureceram, e ninguém pôde comer.","No experimento VEG-05 na Estação Espacial, 12 tomates amadureceram, mas os astronautas não puderam prová-los."
+40,fato_en,"On the Space Station, only 12 tomatoes ripened, and no one could eat them.","In the VEG-05 experiment on the Space Station, 12 tomatoes ripened, but astronauts could not taste them."
+40,fato_es,"En la Estación Espacial solo maduraron 12 tomates, y nadie pudo comerlos.","En el experimento VEG-05 en la Estación Espacial, maduraron 12 tomates, pero los astronautas no pudieron probarlos."
+40,fato_fr,"Dans la Station spatiale, seulement 12 tomates ont mûri, et personne n'a pu les manger.","Dans l'expérience VEG-05 à la Station spatiale, 12 tomates ont mûri, mais les astronautes n'ont pas pu les goûter."
+40,fonte,https://www.nasa.gov/missions/station/nasa-teams-persevere-through-plant-challenges-in-space,https://www.nasa.gov/missions/station/nasa-teams-persevere-through-plant-challenges-in-space/
+40,status,CONFERIR: revisao visual da foto,ok
+41,fato_pt,Uma rocha de uns 40 cm ao lado da areia onde o Curiosity pegou e estudou amostras de solo.,"Uma rocha de cerca de 40 cm de comprimento, ao lado da areia que o Curiosity coletou para estudar."
+41,fato_en,A rock about 40 cm long next to the sand where Curiosity scooped and studied soil.,"A rock about 40 cm long, beside the sand Curiosity scooped up to study."
+41,fato_es,Una roca de unos 40 cm junto a la arena donde el Curiosity recogió y estudió suelo.,"Una roca de unos 40 cm de largo, junto a la arena que Curiosity recogió para estudiar."
+41,fato_fr,Une roche d'environ 40 cm à côté du sable où Curiosity a ramassé et étudié du sol.,"Une roche d'environ 40 cm de long, à côté du sable que Curiosity a prélevé pour l'étudier."
+41,status,CONFERIR: revisão do Conteúdo,ok
+21,foto_nasa,https://science.nasa.gov/photojournal/melas-dust-storm/,https://science.nasa.gov/resource/insights-dusty-solar-panel/
+21,status,CONFERIR: foto atual de Melas nao mostra o InSight; substituir pela PIA25286 e atualizar credito,ok
+22,foto_nasa,https://www.jpl.nasa.gov/images/pia21457-a-dust-devil-on-hilly-terrain/,https://science.nasa.gov/photojournal/spirit-solar-panel-on-sol-1813-still-very-dusty/
+22,status,CONFERIR: foto atual nao mostra a limpeza do Spirit em 2009; escolher registro PIA11798/PIA11799 ou identificar foto ilustrativa,ok
+29,status,CONFERIR: rever ceu extrapolado identificado na conferencia anterior; usar somente pixels da foto oficial,ok
+32,status,CONFERIR: recorte corta parte do detalhe de Windjana; reenquadrar preservando o material analisado,ok
+39,fato_pt,O Curiosity fotografou a Terra e a Lua como pequenos pontos brilhantes no céu de Marte.,O Curiosity fotografou a Terra como um pequeno ponto brilhante no céu de Marte.
+39,fato_en,Curiosity photographed Earth and the Moon as tiny bright points in the sky of Mars.,Curiosity photographed Earth as a tiny bright point in the sky of Mars.
+39,fato_es,Curiosity fotografió la Tierra y la Luna como pequeños puntos brillantes en el cielo de Marte.,Curiosity fotografió la Tierra como un pequeño punto brillante en el cielo de Marte.
+39,fato_fr,Curiosity a photographié la Terre et la Lune comme de petits points brillants dans le ciel de Mars.,Curiosity a photographié la Terre comme un petit point brillant dans le ciel de Mars.
+39,fonte,https://science.nasa.gov/resource/bright-evening-star-seen-from-mars-is-earth/,https://www.jpl.nasa.gov/images/pia17935-curiosity-mars-rovers-first-image-of-earth-and-earths-moon/
+39,foto_nasa,https://science.nasa.gov/resource/bright-evening-star-seen-from-mars-is-earth/,https://www.jpl.nasa.gov/images/pia17935-curiosity-mars-rovers-first-image-of-earth-and-earths-moon/
+39,status,CONFERIR: Terra e Lua pouco legiveis no enquadramento atual; alternativa 39 permanece opcional,ok

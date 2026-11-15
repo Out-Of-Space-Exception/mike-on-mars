@@ -1,5 +1,7 @@
 # Conferencia das fontes das fotos 03 a 40
 
+Atualizacao: as decisoes finais das cartas 21, 22, 29, 32 e 39 estao em [pendencias-resolvidas.md](pendencias-resolvidas.md); a tabela abaixo preserva a pesquisa anterior.
+
 ## Busca complementar: materiais e eventos
 
 Pesquisa em fontes oficiais em 15/11/2026. **Nao encontrado nesta busca** nao significa que a imagem nao exista. As alternativas abaixo foram localizadas; nenhuma substituiu automaticamente a foto atual. Os status no cartas.csv registram o resultado e a revisao ainda necessaria.

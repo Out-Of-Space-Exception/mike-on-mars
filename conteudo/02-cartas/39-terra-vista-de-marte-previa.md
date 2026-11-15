@@ -7,5 +7,5 @@
 - Original preservado: originais/terra-lua-pia17935.jpg (78 x 168 px).
 - Recorte proporcional: x=0; y=27,5; largura=60; altura=39,0254 px. Ampliacao convencional de aproximadamente 15,73 vezes; sem sintese de detalhes.
 - O recorte destaca a Terra e exclui a Lua. Nao permite identificar continentes; a baixa resolucao da fonte limita a nitidez. A NASA informa combinacao de tres exposicoes na imagem original.
-- Status: opcao alternativa preservada a pedido do time; nao selecionada para substituir a foto atual.
-- A foto de entrega em fotos/39-terra-vista-de-marte.png continua inalterada.
+- Status: opcao selecionada na resolucao das pendencias a pedido do time; aplicada na foto de entrega.
+- A foto de entrega em fotos/39-terra-vista-de-marte.png recebeu esta opcao; a anterior esta preservada em originais/antes-da-revisao-final/. O fato nos quatro idiomas agora fala somente da Terra.

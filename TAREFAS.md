@@ -21,7 +21,7 @@
 ## ✍️ Conteúdo e pitch · Carolina e Davi · até 20h
 
 - [ ] 12h30 · [Os sons](conteudo/01-sons/PASSO.md)
-- [ ] 15h · [As cartas](conteudo/02-cartas/PASSO.md)
+- [x] 15h · [As cartas](conteudo/02-cartas/PASSO.md) — 36 cartas do jogo revisadas; cinco reservas mantidas fora do jogo; fontes e recortes documentados.
 - [ ] 16h · [Textos das cartas e dos avisos](conteudo/03-textos/PASSO.md)
 - [x] 17h · [Slides](conteudo/04-slides/PASSO.md) — versão de apoio em pt-BR aprovada pelo time; publicação no repositório autorizada. Demo oficial escolhida: vídeo em inglês.
 - [ ] 17h30 · [Traduções](conteudo/05-traducoes/PASSO.md)
