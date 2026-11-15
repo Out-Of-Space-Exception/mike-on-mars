@@ -28,7 +28,7 @@
 - [ ] 18h30 · [Texto da página do projeto](conteudo/06-pagina-do-projeto/PASSO.md)
 - [x] 19h · [Roteiro do vídeo](conteudo/07-roteiro-do-video/PASSO.md)
 - [x] 19h30 · [Cenas e créditos](conteudo/08-cenas-e-creditos/PASSO.md)
-- [ ] 20h · [Teste no celular](conteudo/09-teste-no-celular/PASSO.md)
+- [x] 20h · [Teste no celular](conteudo/09-teste-no-celular/PASSO.md) — rodada encerrada; resultados e limites no [relatorio](conteudo/09-teste-no-celular/bugs.md).
 
 ## 💻 Dev · Filipe e João · até 7h de domingo
 
@@ -61,3 +61,5 @@
 - [x] **Dev → Design:** o texto do MOXIE no painel de informação ([textos.csv](design/05-telas/info-construcao/textos.csv), `INFO_MOXIE`) ainda diz "O MOXIE de verdade fez 122 g...". Se quiserem, troquem por "O MOXIE fez 122 g de oxigênio em Marte." (o resto do jogo não usa mais "de verdade"). **Design:** trocado.
 - [ ] **Dev → todos:** o código agora é todo em inglês (nomes e comentários), inclusive os scripts do Design e as ferramentas. Os nomes de arquivos de modelos, sons e pastas continuam iguais.
 - [x] **Design → Conteúdo:** criar a carta **41 · Rocknest 3** (comum, tubo de amostra, Gale) no `cartas.csv`, com um fato de fonte oficial. A foto e a carta pronta estão em [design/05-telas/cartas-descobertas/](design/05-telas/cartas-descobertas/leiame.md). As cartas 26, 32, 34 e 35 ganharam fotos novas lá também, se quiserem trocar. **Design:** criada, com o fato da legenda da NASA. Status CONFERIR para o Conteúdo revisar o texto.
+
+- [ ] **Conteudo → Dev:** investigar os quatro problemas relatados no Redmi Note 11S/Firefox: camera presa embaixo do planeta apos casa nivel 2 (persiste ao reabrir), album sem rolagem, lentidao ao explorar e ao abrir tubos. Reproducao e limites do teste em [bugs.md](conteudo/09-teste-no-celular/bugs.md).
