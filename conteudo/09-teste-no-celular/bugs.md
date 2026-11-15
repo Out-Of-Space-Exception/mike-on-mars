@@ -7,24 +7,28 @@ Teste relatado por Davi em 15/11/2026 no Redmi Note 11S. Navegador: Firefox; ver
 - **O que eu esperava:** continuar navegando normalmente pela base apos a melhoria.
 - **O que aconteceu:** a tela fica travada na parte de baixo do planeta, como se a camera estivesse presa, impedindo navegar normalmente pela base. No reteste em guia normal, o problema nao apareceu antes de a casa chegar ao nivel 2. Esta e a sequencia relatada pelo jogador, sem causa tecnica confirmada. Ao fechar e reabrir o jogo em guia normal, o jogador confirmou que a casa continuou no nivel 2 e a camera permaneceu presa. Reabrir nao resolveu o problema; a causa tecnica ainda nao foi identificada. As quatro acoes de construcao nao foram confirmadas individualmente.
 - **Celular usado:** Redmi Note 11S; Firefox em guia normal; versao nao informada. Tambem houve relato inicial de navegacao ruim em guia anonima.
+- **Status (Dev):** não reproduzido. No PC, com tela de celular e a casa no nível 2, arrastar move a base normalmente. Com o zoom no máximo, a base fica pequena no alto e a parte de baixo do planeta ocupa a maior parte da tela: pode ser isso. CONFERIR no celular depois de publicar e, se acontecer de novo, mandar um print da tela.
 
 ### Bug 2 - Lentidao ao explorar
 - **O que eu fiz:** usei a exploracao.
 - **O que eu esperava:** resposta fluida ao comando e durante a exploracao.
 - **O que aconteceu:** explorar ficou muito lagado. CONFERIR se a lentidao ocorre no toque inicial, na animacao ou durante toda a acao; tempo e frequencia nao medidos.
 - **Celular usado:** Redmi Note 11S; Firefox em guia anonima; versao nao informada.
+- **Status (Dev):** melhorado. A vitrine 3D do painel de construção era desenhada a cada quadro o jogo inteiro, mesmo fechada; agora só com o painel aberto. CONFERIR no Redmi depois de publicar.
 
 ### Bug 3 - Lentidao ao abrir o tubo
 - **O que eu fiz:** abri um tubo de amostra.
 - **O que eu esperava:** abertura e revelacao da carta sem lentidao acentuada.
 - **O que aconteceu:** abrir o tubo ficou muito lagado. CONFERIR qual parte da abertura/revelacao apresenta a lentidao; tempo e frequencia nao medidos.
 - **Celular usado:** Redmi Note 11S; Firefox em guia anonima; versao nao informada.
+- **Status (Dev):** melhorado (o mesmo conserto do bug 2). CONFERIR no Redmi depois de publicar.
 
 ### Bug 4 - Album nao permite rolar a tela no celular
 - **O que eu fiz:** tentei navegar pela tela do album de cartas no celular.
 - **O que eu esperava:** conseguir rolar o album para acessar os itens fora da area visivel.
 - **O que aconteceu:** nao consegui rolar a tela do album; o jogador descreve a funcionalidade como ausente. Registra-se a falha observada, sem concluir se a causa e implementacao ausente, gesto nao reconhecido ou versao publicada desatualizada.
 - **Celular usado:** Redmi Note 11S; Firefox em guia anonima; versao nao informada.
+- **Status (Dev):** ✅ corrigido no código depois da versão testada: o álbum rola arrastando o dedo em cima das cartas (commit `5bac0be`). O link testado ainda era a versão das 05:14. CONFERIR no celular depois de publicar.
 
 ## Observacoes a confirmar
 
