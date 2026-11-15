@@ -133,6 +133,7 @@ var _album_tabs: HBoxContainer
 var _album_page_title: Label
 var _album_page := 0
 var _album_badge: PanelContainer
+var _explore_cost: PanelContainer   # "-30" + oxygen icon in the corner of the Explore button
 var _album_box: StyleBoxFlat
 var _shelf: Control
 const ALBUM_MAX_W := 1000.0   # on PC the album stays in the middle, at most this wide   # red dot on the Album button: how many new cards
@@ -1201,6 +1202,7 @@ func _refresh() -> void:
 		_btn_labels.explore.text = tr("TUBE_READY")
 	else:
 		_btn_labels.explore.text = tr("BTN_EXPLORE")
+	_explore_cost.visible = not State.exploring() and State.tube_card == 0   # opening the tube costs nothing
 	var explore_icon: TextureRect = _buttons.explore.get_meta("icon")
 	explore_icon.custom_minimum_size.y = 40 if State.exploring() else 66
 	# Only "Mike is exploring" breaks into 2 lines; "Explore" stays as before.
@@ -2328,6 +2330,42 @@ func _build_bottom() -> void:
 	abl.add_theme_color_override("font_color", Color.WHITE)
 	_album_badge.add_child(abl)
 	_buttons.album.add_child(_album_badge)
+	# Exploring uses oxygen: "-30" + the oxygen icon on a little plate in the corner (like the other costs).
+	_explore_cost = PanelContainer.new()
+	var eb := Palette._box(Palette.PLATE, 16)
+	eb.border_color = Palette.GOLD
+	eb.set_border_width_all(2)
+	eb.content_margin_left = 10
+	eb.content_margin_right = 8
+	eb.content_margin_top = 2
+	eb.content_margin_bottom = 2
+	_explore_cost.add_theme_stylebox_override("panel", eb)
+	_explore_cost.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_explore_cost.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_explore_cost.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	_explore_cost.offset_left = 12.0
+	_explore_cost.offset_right = 12.0
+	_explore_cost.offset_top = -16.0
+	var ec := HBoxContainer.new()
+	ec.add_theme_constant_override("separation", 2)
+	ec.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_explore_cost.add_child(ec)
+	var en := Label.new()
+	en.text = "-%d" % int(State.EXPLORE_OXYGEN)
+	en.add_theme_font_override("font", Palette.font(700))
+	en.add_theme_font_size_override("font_size", 22)
+	en.add_theme_color_override("font_color", Palette.TEXT)
+	en.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ec.add_child(en)
+	var eic := TextureRect.new()
+	eic.texture = _icon("oxygen")
+	eic.custom_minimum_size = Vector2(26, 26)
+	eic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	eic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	eic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	eic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ec.add_child(eic)
+	_buttons.explore.add_child(_explore_cost)
 	_buttons.settings.pressed.connect(_open_settings)
 	_gear = _buttons.settings
 

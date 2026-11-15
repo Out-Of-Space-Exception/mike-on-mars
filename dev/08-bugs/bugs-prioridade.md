@@ -14,6 +14,7 @@ Prioridade: **1 trava** (para, não abre ou perde o save) · **2 errado** (faz a
 | 6 | Couve igual à alface | Design, problema 2 | 2 | ✅ corrigido (`c776c16`) |
 | 7 | Em inglês aparecia "1 more sols" | teste do jogo | 2 | ✅ corrigido |
 | 8 | Custo escrito ("gasta 20 de energia") em vez de ícone, nos eventos e nos botões Melhorar e Consertar | Filipe | 2 | ✅ corrigido: "-20" e o ícone da energia no canto, igual ao botão Construir |
+| 8b | Explorar não mostrava que gasta 30 de oxigênio | Filipe | 2 | ✅ corrigido: "-30" e o ícone do oxigênio no canto do botão |
 | 9 | Estufa mostra a planta crescendo só numa linha de texto | Filipe | 3 | ✅ corrigido: ícone da planta num anel que enche, no painel e flutuando em cima da estufa |
 | 10 | "Sol N na Cratera Gale" fora do centro das barras | Filipe | 3 | ✅ corrigido |
 | 11 | Muita informação junta na tela | Design, problema 3 | 3 | Fica assim: barras em cima e botões embaixo, separados |
