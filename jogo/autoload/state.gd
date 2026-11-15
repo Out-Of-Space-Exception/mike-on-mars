@@ -603,7 +603,8 @@ func harvest(c: Vector2i) -> String:
 	it.growth = 0.0
 	harvests += 1
 	inventory[p] = int(inventory.get(p, 0)) + 1
-	add_card(PLANTS[p].card)
+	if not cards.has(str(PLANTS[p].card)):
+		add_card(PLANTS[p].card)
 	if unlocked_plants().size() > before:
 		var nova: String = unlocked_plants()[-1]
 		event_message.emit("SEED_NEW", tr(PLANTS[nova].name))
@@ -986,6 +987,15 @@ func _time_cards() -> void:
 		_reward_once(CARD_BLUE_SUNSET)
 	if count_items("antenna") > 0 and randf() < EARTH_SEEN_CHANCE:
 		_reward_once(CARD_EARTH_SEEN)
+
+
+## O textinho de cada construção: o da Thais (INFO_*, do painel de informação), senão a frase curta.
+func item_text(name_key: String) -> String:
+	var info := "INFO_" + name_key.trim_prefix("B_").trim_prefix("D_")
+	if tr(info) != info:
+		return tr(info)
+	var desc := name_key + "_DESC"
+	return tr(desc) if tr(desc) != desc else ""
 
 
 ## Quanto cada construção faz por sol agora (a mesma conta do _tick, sem mexer em nada).

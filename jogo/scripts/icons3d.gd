@@ -49,6 +49,22 @@ static func render(host: Node, model: Node3D, px := 160, cam_size := 1.7, spin :
 	return vp.get_texture()
 
 
+static var _outline: StandardMaterial3D
+
+
+## Contorno de figurinha: uma casca escura um pouco maior, desenhada por trás da peça.
+## Assim o ícone não some no botão nem no céu (contraste de 4 a 8 vezes, em vez de 1 a 2).
+static func outline() -> StandardMaterial3D:
+	if _outline == null:
+		_outline = StandardMaterial3D.new()
+		_outline.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		_outline.albedo_color = Color("3b1a1e")
+		_outline.cull_mode = BaseMaterial3D.CULL_FRONT
+		_outline.grow = true
+		_outline.grow_amount = 0.045
+	return _outline
+
+
 static func mat(color: Color, rough := 0.55, metal := 0.0) -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
 	m.albedo_color = color
@@ -56,6 +72,8 @@ static func mat(color: Color, rough := 0.55, metal := 0.0) -> StandardMaterial3D
 	m.metallic = metal
 	if color.a < 1.0:
 		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	else:
+		m.next_pass = outline()
 	return m
 
 
@@ -121,6 +139,28 @@ static func extrude(poly: PackedVector2Array, depth: float, color: Color) -> Mes
 	var m := mat(color)
 	m.cull_mode = BaseMaterial3D.CULL_DISABLED
 	mi.material_override = m
+	# Peça achatada: o contorno vem de uma cópia escura um pouco maior, logo atrás.
+	var back := MeshInstance3D.new()
+	var shape := PackedVector2Array()
+	var c := Vector2.ZERO
+	for p in poly:
+		c += p
+	c /= poly.size()
+	for p in poly:
+		shape.append(c + (p - c) * 1.0 + (p - c).normalized() * 0.07)
+	var st2 := SurfaceTool.new()
+	st2.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for i in Geometry2D.triangulate_polygon(shape):
+		st2.set_normal(Vector3(0, 0, 1))
+		st2.add_vertex(Vector3(shape[i].x, shape[i].y, -hz - 0.02))
+	back.mesh = st2.commit()
+	var bm := StandardMaterial3D.new()
+	bm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	bm.albedo_color = Color("3b1a1e")
+	bm.cull_mode = BaseMaterial3D.CULL_DISABLED
+	back.material_override = bm
+	m.next_pass = null
+	mi.add_child(back)
 	return mi
 
 
@@ -162,8 +202,8 @@ static func shield() -> Node3D:
 
 static func hammer() -> Node3D:
 	var root := Node3D.new()
-	root.add_child(part(cyl(0.065, 1.0), WOOD, Vector3(0, -0.1, 0)))
-	root.add_child(part(box(0.62, 0.22, 0.22), STEEL, Vector3(0, 0.42, 0), Vector3.ZERO, 0.35, 0.5))
+	root.add_child(part(cyl(0.1, 1.0), WOOD, Vector3(0, -0.1, 0)))
+	root.add_child(part(box(0.66, 0.3, 0.3), STEEL, Vector3(0, 0.42, 0), Vector3.ZERO, 0.35, 0.5))
 	root.add_child(part(box(0.12, 0.26, 0.26), STEEL_DARK, Vector3(-0.3, 0.42, 0), Vector3.ZERO, 0.35, 0.5))
 	root.rotation_degrees.z = -35.0
 	return root
@@ -171,11 +211,10 @@ static func hammer() -> Node3D:
 
 static func tube() -> Node3D:
 	var root := Node3D.new()
-	root.add_child(part(cyl(0.17, 0.72), Color(0.82, 0.93, 0.97, 0.5), Vector3.ZERO, Vector3.ZERO, 0.1))
-	root.add_child(part(ball(0.12), Color("b4532a"), Vector3(0, -0.2, 0)))
-	root.add_child(part(ball(0.08), Color("8a3a22"), Vector3(0.05, -0.05, 0.02)))
-	root.add_child(part(cyl(0.2, 0.13), GOLD, Vector3(0, 0.42, 0), Vector3.ZERO, 0.3, 0.6))
-	root.add_child(part(cyl(0.2, 0.13), GOLD, Vector3(0, -0.42, 0), Vector3.ZERO, 0.3, 0.6))
+	root.add_child(part(cyl(0.15, 0.4), Color("b4532a"), Vector3(0, -0.12, 0)))
+	root.add_child(part(cyl(0.24, 0.72), Color(0.86, 0.95, 0.98, 0.85), Vector3.ZERO, Vector3.ZERO, 0.1))
+	root.add_child(part(cyl(0.27, 0.14), BG, Vector3(0, 0.42, 0), Vector3.ZERO, 0.4, 0.2))
+	root.add_child(part(cyl(0.27, 0.14), BG, Vector3(0, -0.42, 0), Vector3.ZERO, 0.4, 0.2))
 	root.rotation_degrees.z = -25.0
 	return root
 
@@ -206,7 +245,7 @@ static func cards(frames: Array) -> Node3D:
 static func camera() -> Node3D:
 	var root := Node3D.new()
 	root.add_child(part(box(0.92, 0.58, 0.36), Color("3a3f47")))
-	root.add_child(part(box(0.94, 0.14, 0.38), TERRA, Vector3(0, 0.2, 0)))
+	root.add_child(part(box(0.94, 0.14, 0.38), GOLD, Vector3(0, 0.2, 0)))
 	root.add_child(part(cyl(0.22, 0.2), Color("1c1c1c"), Vector3(0, -0.03, 0.24), Vector3(90, 0, 0)))
 	root.add_child(part(cyl(0.14, 0.04), Color("4aa3d8"), Vector3(0, -0.03, 0.35), Vector3(90, 0, 0), 0.1))
 	root.add_child(part(cyl(0.07, 0.07), Color("bf2a2a"), Vector3(0.3, 0.33, 0)))
@@ -224,6 +263,52 @@ static func gear() -> Node3D:
 		var a := TAU * i / 8.0
 		body.add_child(part(box(0.18, 0.2, 0.18), STEEL, Vector3(cos(a) * 0.45, 0, sin(a) * 0.45), Vector3(0, -rad_to_deg(a), 0), 0.35, 0.55))
 	body.add_child(part(cyl(0.15, 0.22), STEEL_DARK, Vector3.ZERO, Vector3.ZERO, 0.4, 0.4))
+	return root
+
+
+static func move_arrows() -> Node3D:
+	var a := 0.1
+	var l := 0.36
+	var h := 0.24
+	var t := 0.62
+	var pts := PackedVector2Array([Vector2(0, t), Vector2(h, l), Vector2(a, l), Vector2(a, a), Vector2(l, a), Vector2(l, h),
+		Vector2(t, 0), Vector2(l, -h), Vector2(l, -a), Vector2(a, -a), Vector2(a, -l), Vector2(h, -l), Vector2(0, -t),
+		Vector2(-h, -l), Vector2(-a, -l), Vector2(-a, -a), Vector2(-l, -a), Vector2(-l, -h), Vector2(-t, 0), Vector2(-l, h),
+		Vector2(-l, a), Vector2(-a, a), Vector2(-a, l), Vector2(-h, l)])
+	var root := Node3D.new()
+	root.add_child(extrude(pts, 0.2, PAPER))
+	return root
+
+
+static func turn_arrow() -> Node3D:
+	var pts := PackedVector2Array()
+	var r_out := 0.46
+	var r_in := 0.28
+	var a0 := deg_to_rad(110.0)
+	var a1 := deg_to_rad(380.0)
+	for i in 25:
+		var a := lerpf(a0, a1, i / 24.0)
+		pts.append(Vector2(cos(a), sin(a)) * r_out)
+	pts.append(Vector2(cos(a1), sin(a1)) * (r_out + 0.12))
+	var tip := a1 + deg_to_rad(38.0)
+	pts.append(Vector2(cos(tip), sin(tip)) * ((r_out + r_in) / 2.0))
+	pts.append(Vector2(cos(a1), sin(a1)) * (r_in - 0.12))
+	for i in 25:
+		var a := lerpf(a1, a0, i / 24.0)
+		pts.append(Vector2(cos(a), sin(a)) * r_in)
+	var root := Node3D.new()
+	root.add_child(extrude(pts, 0.2, PAPER))
+	return root
+
+
+static func trash() -> Node3D:
+	var root := Node3D.new()
+	root.add_child(part(cyl(0.3, 0.68, 0.34), STEEL, Vector3(0, -0.12, 0), Vector3.ZERO, 0.4, 0.4))
+	for i in 3:
+		var x := (i - 1) * 0.13
+		root.add_child(part(box(0.05, 0.5, 0.05), STEEL_DARK, Vector3(x, -0.12, 0.3), Vector3.ZERO, 0.4, 0.3))
+	root.add_child(part(cyl(0.38, 0.08), STEEL_DARK, Vector3(0, 0.27, 0), Vector3.ZERO, 0.4, 0.4))
+	root.add_child(part(box(0.22, 0.08, 0.1), STEEL_DARK, Vector3(0, 0.35, 0)))
 	return root
 
 

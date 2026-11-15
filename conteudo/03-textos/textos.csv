@@ -168,3 +168,11 @@ LOCK_SHIELD,Escudo baixo: muita radiação lá fora. Espere o escudo subir.,Low 
 LOCK_EXPLORING,Espere o Mike voltar da expedição para construir.,Wait for Mike to come back from the expedition to build.,Espera a que Mike vuelva de la expedición para construir.,Attends que Mike revienne de l'expédition pour construire.
 STORM_PLANTS,"Sem escudo, a radiação atrapalhou as plantas da estufa.","Without the shield, radiation hurt the greenhouse plants.","Sin escudo, la radiación dañó las plantas del invernadero.","Sans bouclier, les radiations ont abîmé les plantes de la serre."
 STORM_WARNING,A antena recebeu um aviso da NASA: tempestade solar em {name} sóis! Guarde energia para o escudo.,The antenna got a NASA warning: solar storm in {name} sols! Save energy for the shield.,La antena recibió un aviso de la NASA: ¡tormenta solar en {name} soles! Guarda energía para el escudo.,L'antenne a reçu une alerte de la NASA : tempête solaire dans {name} sols ! Garde de l'énergie pour le bouclier.
+TUTO_NUDGE,"Primeiro, toque em: {name}","First, tap: {name}","Primero, toca: {name}","D'abord, touche : {name}"
+TUTO_SQUARE,um quadrado claro,a light square,un cuadrado claro,une case claire
+REMOVE_TITLE,Remover: {name}?,Remove: {name}?,¿Quitar: {name}?,Retirer : {name} ?
+REMOVE_TEXT,A energia que você gastou nela volta toda.,You get back all the energy you spent on it.,Recuperas toda la energía que gastaste.,Tu récupères toute l'énergie dépensée.
+REMOVE_YES,"Sim, remover","Yes, remove","Sí, quitar","Oui, retirer"
+REMOVE_NO,Não,No,No,Non
+BTN_OPEN,Abrir,Open,Abrir,Ouvrir
+TUBE_MYSTERY,O que será que tem aqui dentro?,What could be inside?,¿Qué habrá adentro?,Qu'est-ce qu'il y a dedans ?

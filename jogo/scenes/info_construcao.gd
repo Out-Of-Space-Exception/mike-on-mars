@@ -138,8 +138,7 @@ func abrir(type: String) -> void:
 	_tipo = type
 	var def: Dictionary = State.ITEMS[type]
 	_titulo.text = tr(def.name)
-	var desc: String = def.name + "_DESC"
-	_texto.text = tr(desc) if tr(desc) != desc else ""
+	_texto.text = State.item_text(def.name)
 	_texto.visible = _texto.text != ""
 	for c in _spin.get_children():
 		c.queue_free()

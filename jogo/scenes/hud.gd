@@ -26,6 +26,13 @@ var _bars := {}
 var _bar_labels := {}
 var _bar_fill := {}
 var _bar_box: Control
+var _btn_labels := {}         # texto de cada botão de baixo (o botão é montado com ícone + texto)
+var _hint_chip: PanelContainer
+var _card_rarity_pill: PanelContainer
+var _card_rays: Control
+var _tube_q: Label3D
+var _tube_opening := false
+var _tube_btn: Button
 var _top_box: Control
 var _bottom_box: Control
 var _popups: Array[PanelContainer] = []
@@ -88,14 +95,15 @@ var _tut_card: PanelContainer
 var _tut_label: Label
 var _tut_skip: Button
 var _tut_arrow: TextureRect
-var _tut_target := Vector2.INF
+var _tut_ring: Panel          # moldura dourada pulsando em volta do botão que o Mike pediu (não cobre nada)
 var _tut_done_at := -1.0
 var _pc_hint_shown := false
 const CARD_W := 560.0          # a carta com a moldura do Design (1066 x 1280) nesta largura
 const FRAME := {"comum": "comum", "raro": "raro", "épico": "epico", "lendário": "lendario"}
 var _card_source := ""
 var _card_queue: Array[int] = []
-var _card_new: Array[bool] = []    # "Carta nova!" só quando a criança acabou de ganhar
+var _card_new: Array[bool] = []
+var _card_reveal := false       # a carta que acabou de sair do tubo entra com festa    # "Carta nova!" só quando a criança acabou de ganhar
 var _tube: PanelContainer
 var _tube_node: Node3D
 var _tube_glass: StandardMaterial3D
@@ -251,6 +259,9 @@ func _lang_menu() -> PopupMenu:
 func on_cell_tapped(c: Vector2i) -> void:
 	if _build_menu.visible:
 		_build_menu.visible = false
+		_tut_update()
+		return
+	if mode == Mode.NONE and _tut_blocks("greenhouse" if State.item_at(c).get("type", "") == "greenhouse" else "base"):
 		return
 	var free: bool = c != base.OUTSIDE and State.item_at(c).is_empty()
 	# Área ainda fechada: abre quando a Casa do Mike sobe de nível.
@@ -296,6 +307,8 @@ func _set_mode(m: Mode) -> void:
 
 # ───────────── Botões de baixo ─────────────
 func _on_build() -> void:
+	if _tut_blocks("build"):
+		return
 	Sfx.play("abrir-menu")
 	_close_panel()
 	if mode != Mode.NONE:
@@ -306,6 +319,8 @@ func _on_build() -> void:
 
 
 func _on_build_item(type: String) -> void:
+	if _tut_blocks("build_" + type):
+		return
 	var reason := State.build_block_reason(type)
 	if reason != "":
 		_show_toast(tr(reason), true)
@@ -318,6 +333,8 @@ func _on_build_item(type: String) -> void:
 
 
 func _on_explore() -> void:
+	if _tut_blocks("explore"):
+		return
 	_build_menu.visible = false
 	if State.tube_card != 0:
 		_show_tube()
@@ -334,6 +351,8 @@ func _on_explore() -> void:
 
 
 func _on_album() -> void:
+	if _tut_blocks("album"):
+		return
 	Sfx.play("abrir-menu")
 	_build_menu.visible = false
 	_close_panel()
@@ -343,6 +362,8 @@ func _on_album() -> void:
 
 ## Cartão-postal: esconde a interface, põe "Sol N · Gale Crater" e baixa a foto da base.
 func _on_photo() -> void:
+	if _tut_blocks("photo"):
+		return
 	_build_menu.visible = false
 	_close_panel()
 	_set_mode(Mode.NONE)
@@ -393,8 +414,7 @@ func _refresh_panel() -> void:
 	_panel_title.text = tr(State.item_name(it))
 	_panel_level.text = tr("LEVEL").format({"n": int(it.level)})
 	_panel_level.get_parent().visible = State.upgrade_cost(selected) >= 0 or int(it.level) > 1
-	var desc_key: String = State.item_name(it) + "_DESC"
-	_panel_desc.text = tr(desc_key) if tr(desc_key) != desc_key else ""
+	_panel_desc.text = State.item_text(State.item_name(it))
 	_panel_desc.visible = _panel_desc.text != ""
 	# Quanto ela faz por sol, com os ícones das barras de cima.
 	for c in _panel_stats.get_children():
@@ -465,11 +485,29 @@ func _refresh_panel() -> void:
 		var up := _add_panel_button("%s  -%d" % [tr("BTN_UPGRADE"), cost], _on_upgrade, true)
 		up.icon = _icon("energy")
 		up.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		up.modulate = Color.WHITE if State.upgrade_block_reason(selected) == "" else Color(1, 1, 1, 0.55)
-	_add_panel_button(tr("BTN_MOVE"), _on_move)
-	_add_panel_button(tr("BTN_ROTATE"), _on_rotate)
+		up.custom_minimum_size.y = 96
+		up.set_meta("base_color", Palette.GOLD)
+		_style_key(up, State.upgrade_block_reason(selected) == "")
+	# Mover, girar e remover: só os ícones (setas em cruz, seta em curva e lixeira), lado a lado.
+	var tools := HBoxContainer.new()
+	tools.add_theme_constant_override("separation", 10)
+	_panel_buttons.add_child(tools)
+	var kinds := [["move", _on_move], ["turn", _on_rotate]]
 	if def.get("removable", true):
-		_add_panel_button(tr("BTN_REMOVE"), _on_remove)
+		kinds.append(["trash", _on_remove])
+	for pair in kinds:
+		var t := _key_button(pair[1], true)
+		t.custom_minimum_size = Vector2(0, 104)
+		t.icon = _icon(pair[0])
+		t.expand_icon = true
+		t.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		t.tooltip_text = tr({"move": "BTN_MOVE", "turn": "BTN_ROTATE", "trash": "BTN_REMOVE"}[pair[0]])
+		if pair[0] == "trash":
+			t.set_meta("base_color", Palette.OFF)
+			for s in ["normal", "hover", "focus"]:
+				t.add_theme_stylebox_override(s, Palette.key(Palette.OFF))
+			t.add_theme_stylebox_override("pressed", Palette.key(Palette.OFF, true))
+		tools.add_child(t)
 
 
 func _add_panel_button(text: String, action: Callable, main := false) -> Button:
@@ -505,12 +543,16 @@ func _place_panel(delta: float) -> void:
 
 
 func _on_move() -> void:
+	if _tut_blocks("action"):
+		return
 	Sfx.play("toque-botao")
 	_panel.visible = false
 	_set_mode(Mode.MOVE)
 
 
 func _on_rotate() -> void:
+	if _tut_blocks("action"):
+		return
 	var reason := State.rotate_block_reason(selected)
 	if reason == "" and State.rotate(selected):
 		Sfx.play("construir")
@@ -520,6 +562,8 @@ func _on_rotate() -> void:
 
 
 func _on_upgrade() -> void:
+	if _tut_blocks("action"):
+		return
 	var reason := State.upgrade_block_reason(selected)
 	if reason == "" and State.upgrade(selected):
 		Sfx.play("melhorar")
@@ -529,6 +573,20 @@ func _on_upgrade() -> void:
 
 
 func _on_remove() -> void:
+	if _tut_blocks("action"):
+		return
+	var it := State.item_at(selected)
+	if it.is_empty():
+		return
+	var target := selected
+	Sfx.play("toque-botao")
+	_show_choice(tr("REMOVE_TITLE").format({"name": tr(State.item_name(it))}), [tr("REMOVE_TEXT")],
+		tr("REMOVE_YES"), true, func() -> void:
+			selected = target
+			_do_remove(), tr("REMOVE_NO"), Callable())
+
+
+func _do_remove() -> void:
 	if State.remove(selected):
 		Sfx.play("remover")
 	_close_panel()
@@ -631,11 +689,17 @@ func _on_info_ok() -> void:
 func _show_tube() -> void:
 	if State.tube_card == 0 or _tube.visible or _start.visible:
 		return
-	var color: Color = Palette.RARITY.get(State.tube_rarity(), Palette.TEXT)
-	_tube_glass.albedo_color = Color(color, 0.6)
-	_tube_glass.emission = color
-	_tube_light.light_color = color
-	_tube_label.text = tr("TUBE_TAP")
+	# Suspense: tudo cinza e um "?". A cor da raridade só aparece quando abre.
+	var grey := Color(0.72, 0.72, 0.76)
+	_tube_glass.albedo_color = Color(grey, 0.6)
+	_tube_glass.emission = grey.darkened(0.4)
+	_tube_light.light_color = Color(0.9, 0.9, 0.95)
+	_tube_q.visible = true
+	_tube_node.scale = Vector3.ONE
+	_tube_opening = false
+	_tube_label.text = tr("TUBE_MYSTERY")
+	_tube_btn.text = tr("BTN_OPEN")
+	_tube_btn.disabled = false
 	_tube.visible = true
 	_update_dim()
 	_tut_update()
@@ -652,12 +716,83 @@ func _show_tube() -> void:
 	_tube_tween.tween_interval(0.3)
 
 
+## Abrir: o tubo treme cada vez mais forte, estoura numa fumaça na cor da carta e a carta aparece.
 func _on_tube_tap() -> void:
+	if _tube_opening or State.tube_card == 0:
+		return
+	_tube_opening = true
+	_tube_btn.disabled = true
 	if _tube_tween:
 		_tube_tween.kill()
-	_tube.visible = false
-	_update_dim()
-	State.open_tube()
+	var color: Color = Palette.RARITY.get(State.tube_rarity(), Palette.TEXT)
+	Sfx.play("tubo-abrir")
+	var t := create_tween()
+	for i in 8:
+		var amp := 0.08 + i * 0.05
+		t.tween_property(_tube_node, "rotation:z", amp, 0.045)
+		t.tween_property(_tube_node, "rotation:z", -amp, 0.09)
+	t.parallel().tween_property(_tube_node, "scale", Vector3.ONE * 1.18, 0.6)
+	t.tween_callback(func() -> void:
+		# A cor de verdade aparece, com um estouro de fumaça e um clarão.
+		_tube_q.visible = false
+		_tube_glass.albedo_color = Color(color, 0.7)
+		_tube_glass.emission = color
+		_tube_glass.emission_energy_multiplier = 2.5
+		_tube_light.light_color = color
+		_tube_light.light_energy = 5.0
+		_tube_smoke(color)
+		_flash.color = color.lightened(0.5)
+		_flash.modulate.a = 0.85
+		create_tween().tween_property(_flash, "modulate:a", 0.0, 0.6))
+	t.tween_property(_tube_node, "scale", Vector3.ONE * 1.6, 0.18).set_ease(Tween.EASE_OUT)
+	t.parallel().tween_property(_tube_node, "scale", Vector3.ZERO, 0.22).set_delay(0.18)
+	t.tween_interval(0.35)
+	t.tween_callback(func() -> void:
+		_tube.visible = false
+		_tube_glass.emission_energy_multiplier = 0.6
+		_tube_light.light_energy = 2.0
+		_flash.color = Color.WHITE
+		_update_dim()
+		_card_reveal = true
+		State.open_tube())
+
+
+## Fumaça colorida saindo do tubo (bolinhas que crescem e somem).
+func _tube_smoke(color: Color) -> void:
+	var p := CPUParticles3D.new()
+	p.one_shot = true
+	p.amount = 46
+	p.lifetime = 1.0
+	p.explosiveness = 0.95
+	p.direction = Vector3.UP
+	p.spread = 180.0
+	p.initial_velocity_min = 1.2
+	p.initial_velocity_max = 3.2
+	p.gravity = Vector3(0, 0.6, 0)
+	p.damping_min = 1.5
+	p.damping_max = 2.5
+	p.scale_amount_min = 0.5
+	p.scale_amount_max = 1.2
+	var grow := Curve.new()
+	grow.add_point(Vector2(0, 0.4))
+	grow.add_point(Vector2(1, 1.6))
+	p.scale_amount_curve = grow
+	var fade := Gradient.new()
+	fade.set_color(0, Color(color.lightened(0.35), 0.95))
+	fade.set_color(1, Color(color, 0.0))
+	p.color_ramp = fade
+	var m := SphereMesh.new()
+	m.radius = 0.18
+	m.height = 0.36
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.vertex_color_use_as_albedo = true
+	m.material = mat
+	p.mesh = m
+	_tube_node.get_parent().add_child(p)
+	p.emitting = true
+	get_tree().create_timer(1.6).timeout.connect(p.queue_free)
 
 
 # ───────────── Carta ─────────────
@@ -672,6 +807,7 @@ func _show_next_card() -> void:
 	if _card_queue.is_empty():
 		_card_new.clear()
 		_card.visible = false
+		_card_rays.visible = false
 		_update_dim()
 		return
 	var id: int = _card_queue.pop_front()
@@ -684,7 +820,13 @@ func _show_next_card() -> void:
 	if ResourceLoader.exists(frame):
 		_card_frame.texture = load(frame)
 	_card_rarity.text = tr(Palette.RARITY_KEY.get(rarity, "RARITY_COMMON"))
-	_card_rarity.add_theme_color_override("font_color", color.darkened(0.3))
+	var pill_box := Palette._box(color, 22)
+	pill_box.border_color = Palette.INK
+	pill_box.set_border_width_all(3)
+	pill_box.content_margin_left = 26
+	pill_box.content_margin_right = 26
+	_card_rarity_pill.add_theme_stylebox_override("panel", pill_box)
+	_card_rarity.add_theme_color_override("font_color", Color.WHITE if rarity == "épico" else Palette.INK)
 	_card_name.text = tr("CARD_%d_NAME" % id).to_upper()
 	var n := _card_name.text.length()
 	_card_name.add_theme_font_size_override("font_size", 30 if n <= 16 else (25 if n <= 24 else 20))
@@ -697,6 +839,21 @@ func _show_next_card() -> void:
 	_card_photo.texture = load(photo) if str(info.get("photo_file", "")) != "" and ResourceLoader.exists(photo) else null
 	_card.visible = true
 	_update_dim()
+	# Festa de recompensa: raios na cor da raridade girando atrás, e a carta chega girando e quicando.
+	var festive := _card_reveal or (is_new_card and int(State.cards.get(str(id), 0)) <= 1)
+	_card_reveal = false
+	_card_rays.visible = festive
+	_card_rays.set_meta("color", color)
+	_card_rays.queue_redraw()
+	if festive:
+		_root.move_child(_card_rays, _card.get_index())
+		_card.scale = Vector2(0.15, 0.15)
+		_card.rotation_degrees = -200.0
+		var t := create_tween().set_parallel()
+		t.tween_property(_card, "scale", Vector2.ONE, 0.55).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		t.tween_property(_card, "rotation_degrees", 0.0, 0.55).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		_card_rays.modulate.a = 0.0
+		t.tween_property(_card_rays, "modulate:a", 1.0, 0.4)
 	Sfx.play(REVEAL_SOUND.get(rarity, "revelar-comum"))
 	if id == State.CARD_AURORA:
 		Sfx.play("aurora")
@@ -716,10 +873,10 @@ func _refresh_album() -> void:
 		var info := State.card_info(id)
 		var owned := State.cards.has(str(id))
 		var b := Button.new()
-		b.custom_minimum_size = Vector2(150, 150)
+		b.custom_minimum_size = Vector2(190, 170)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		b.add_theme_font_size_override("font_size", 20)
+		b.add_theme_font_size_override("font_size", 22)
 		var color: Color = Palette.RARITY.get(info.get("rarity", "comum"), Palette.TEXT)
 		# Carta que a criança tem = papel com a borda da raridade; carta que falta = chapa escura.
 		var box: StyleBoxFlat = Palette.paper(color) if owned else Palette.plate()
@@ -764,11 +921,12 @@ func _refresh() -> void:
 		var value: float = State.get(bar)
 		_bars[bar].value = value
 		_bar_nums[bar].text = str(int(floor(value)))
+		_bar_nums[bar].add_theme_color_override("font_color", Color.WHITE if value < State.LOW else Palette.INK)
 		var r: float = rates[bar]
 		var rl: Label = _bar_rates[bar]
-		rl.visible = absf(r) >= 0.05
+		rl.get_parent().modulate.a = 1.0 if absf(r) >= 0.05 else 0.0
 		rl.text = ("%+d/sol" % roundi(r)) if absf(r) >= 1.0 else ("%+.1f/sol" % r)
-		rl.add_theme_color_override("font_color", Color("9be27a") if r > 0.0 else Color("ff9a8a"))
+		rl.add_theme_color_override("font_color", Palette.UP if r > 0.0 else Palette.DOWN)
 		_bar_labels[bar].text = tr(BAR_KEYS[bar])
 		_bars[bar].color = Palette.ALERT if value < State.LOW else Palette.BAR[bar]
 	_sol_label.text = "%s  •  %s" % [tr("HUD_SOL").format({"n": State.sol}), tr("HUD_PLACE")]
@@ -776,18 +934,20 @@ func _refresh() -> void:
 	_start_lang.icon = _icon("flag_" + State.locale)
 	_start_play.text = tr("BTN_PLAY")
 	_start_nasa.text = tr("BTN_NASA")
-	_buttons.build.text = tr("BTN_BUILD")
-	_buttons.album.text = tr("BTN_ALBUM")
-	_buttons.photo.text = tr("BTN_PHOTO")
+	_btn_labels.build.text = tr("BTN_BUILD")
+	_btn_labels.album.text = tr("BTN_ALBUM")
+	_btn_labels.photo.text = tr("BTN_PHOTO")
 	if State.exploring():
-		_buttons.explore.text = _sols(tr("EXPLORING").format({"n": State.explore_left}))
+		_btn_labels.explore.text = _sols(tr("EXPLORING").format({"n": State.explore_left}))
 	elif State.tube_card != 0:
-		_buttons.explore.text = tr("TUBE_READY")
+		_btn_labels.explore.text = tr("TUBE_READY")
 	else:
-		_buttons.explore.text = tr("BTN_EXPLORE")
-	_buttons.explore.modulate = Color(1, 1, 1, 0.55) if State.explore_block_reason() != "" and State.tube_card == 0 and not State.exploring() else Color.WHITE
-	_buttons.build.modulate = Color(1, 1, 1, 0.55) if State.base_locked_reason() != "" else Color.WHITE
+		_btn_labels.explore.text = tr("BTN_EXPLORE")
+	_style_key(_buttons.explore, not (State.explore_block_reason() != "" and State.tube_card == 0 and not State.exploring()))
+	_style_key(_buttons.build, State.base_locked_reason() == "")
+	_fit_button_texts()
 	_hint.text = _status_text()
+	_hint_chip.visible = _hint.text != ""
 	_tut_update()
 	_refresh_inventory()
 	if _panel.visible:
@@ -922,17 +1082,71 @@ func _refresh_build_menu() -> void:
 		if not State.is_unlocked(type):
 			continue
 		var b := Button.new()
-		b.custom_minimum_size = Vector2(0, 178)
+		b.custom_minimum_size = Vector2(0, 204)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		b.add_theme_font_size_override("font_size", 21)
-		b.text = tr(def.name) + ("\n-%d" % def.cost if def.cost > 0 else "")
-		b.icon = _thumb(type)
-		b.expand_icon = true
-		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-		b.add_theme_constant_override("icon_max_width", 104)
-		b.modulate = Color.WHITE if State.build_block_reason(type) == "" else Color(1, 1, 1, 0.5)
+		b.set_meta("type", type)
+		b.set_meta("base_color", Palette.BUTTON)
+		var col := VBoxContainer.new()
+		col.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		col.offset_top = 8
+		col.offset_bottom = -18
+		col.offset_left = 6
+		col.offset_right = -6
+		col.alignment = BoxContainer.ALIGNMENT_CENTER
+		col.add_theme_constant_override("separation", 2)
+		col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		b.add_child(col)
+		var pic := TextureRect.new()
+		pic.texture = _thumb(type)
+		pic.custom_minimum_size = Vector2(0, 92)
+		pic.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		pic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		pic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		pic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		col.add_child(pic)
+		b.set_meta("icon", pic)
+		var name_label := Label.new()
+		name_label.text = tr(def.name)
+		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		name_label.max_lines_visible = 2
+		name_label.add_theme_font_override("font", Palette.font(700))
+		name_label.add_theme_font_size_override("font_size", 21)
+		name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		col.add_child(name_label)
+		b.set_meta("label", name_label)
+		if def.cost > 0:
+			var pill := PanelContainer.new()
+			var pill_box := Palette._box(Color("8e2219"), 16)
+			pill_box.content_margin_left = 10
+			pill_box.content_margin_right = 14
+			pill_box.content_margin_top = 2
+			pill_box.content_margin_bottom = 2
+			pill_box.border_color = Palette.INK
+			pill_box.set_border_width_all(2)
+			pill.add_theme_stylebox_override("panel", pill_box)
+			pill.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+			pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			col.add_child(pill)
+			var cost_row := HBoxContainer.new()
+			cost_row.add_theme_constant_override("separation", 4)
+			cost_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			pill.add_child(cost_row)
+			var bolt := TextureRect.new()
+			bolt.texture = _icon("energy")
+			bolt.custom_minimum_size = Vector2(30, 30)
+			bolt.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			bolt.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			bolt.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			cost_row.add_child(bolt)
+			var cost := Label.new()
+			cost.text = "-%d" % def.cost
+			cost.add_theme_font_override("font", Palette.font(700))
+			cost.add_theme_font_size_override("font_size", 22)
+			cost.add_theme_color_override("font_color", Palette.TEXT)
+			cost.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			cost_row.add_child(cost)
+		_style_key(b, State.build_block_reason(type) == "")
 		if type in _info_construcao.COM_INFO:
 			b.pressed.connect(_open_build_info.bind(type))
 		else:
@@ -941,6 +1155,8 @@ func _refresh_build_menu() -> void:
 
 
 func _open_build_info(type: String) -> void:
+	if _tut_blocks("build_" + type):
+		return
 	Sfx.play("toque-botao")
 	_info_construcao.abrir(type)
 	_tut_update()
@@ -956,7 +1172,7 @@ func _show_toast(text: String, shake := false) -> void:
 	_toast_label.text = text
 	move_child(_toast, get_child_count() - 1)   # sempre por cima de tudo
 	_toast_label.custom_minimum_size.x = get_viewport().get_visible_rect().size.x - 32.0 - 30.0 - 56.0 - 16.0
-	_toast_style.border_color = Palette.ALERT if shake else Palette.GOLD
+	_toast_style.border_color = Palette.ALERT if shake else Palette.INK
 	var w := get_viewport().get_visible_rect().size.x
 	_toast.custom_minimum_size.x = w - 32.0
 	_toast.reset_size()
@@ -1006,9 +1222,9 @@ func _toast_top() -> float:
 # ───────────── Tutorial do primeiro minuto ─────────────
 func _build_tutorial() -> void:
 	_tut_card = PanelContainer.new()
-	var box := Palette.paper(Palette.GOLD)
-	box.set_corner_radius_all(24)
-	box.set_border_width_all(4)
+	var box := Palette.paper()
+	box.set_corner_radius_all(14)
+	box.set_border_width_all(3)
 	box.shadow_offset = Vector2(0, 6)
 	box.content_margin_left = 12
 	box.content_margin_right = 14
@@ -1042,8 +1258,10 @@ func _build_tutorial() -> void:
 	var skip := Button.new()
 	_tut_skip = skip
 	skip.flat = true
-	skip.add_theme_font_size_override("font_size", 22)
-	skip.add_theme_color_override("font_color", Palette.INK.lightened(0.35))
+	skip.add_theme_font_override("font", Palette.font(700))
+	skip.add_theme_font_size_override("font_size", 24)
+	skip.add_theme_color_override("font_color", Palette.BG)
+	skip.custom_minimum_size = Vector2(110, 72)
 	skip.size_flags_vertical = Control.SIZE_SHRINK_END
 	skip.pressed.connect(func() -> void:
 		State.finish_tutorial()
@@ -1058,6 +1276,18 @@ func _build_tutorial() -> void:
 	_tut_arrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_tut_arrow.visible = false
 	add_child(_tut_arrow)
+	_tut_ring = Panel.new()
+	var ring := StyleBoxFlat.new()
+	ring.bg_color = Color(0, 0, 0, 0)
+	ring.border_color = Palette.GOLD
+	ring.set_border_width_all(6)
+	ring.set_corner_radius_all(26)
+	ring.shadow_color = Color(Palette.GOLD, 0.55)
+	ring.shadow_size = 14
+	_tut_ring.add_theme_stylebox_override("panel", ring)
+	_tut_ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tut_ring.visible = false
+	add_child(_tut_ring)
 
 
 ## Avança o tutorial pelo que a criança já fez e escolhe o recado do passo de agora.
@@ -1118,50 +1348,107 @@ func _tut_update() -> void:
 		create_tween().tween_property(_tut_card, "modulate:a", 1.0, 0.3)
 
 
-## Onde a seta aponta agora (o meio de cima do botão, ou um ponto da base), ou INF para esconder.
-func _tut_point() -> Vector2:
+## O que o tutorial pede para tocar agora: um botão (ganha a moldura dourada), um ponto da base
+## (ganha a seta, bem acima da construção) ou nada.
+func _tut_target() -> Variant:
 	if not _tut_card.visible or _choice.visible or _info.visible or _card.visible or _nasa.visible or _album.visible:
-		return Vector2.INF
-	var top := func(c: Control) -> Vector2:
-		var r := c.get_global_rect()
-		return Vector2(r.get_center().x, r.position.y)
+		return null
 	match State.tutorial:
 		0, 1:
 			var type := "solar" if State.tutorial == 0 else "greenhouse"
 			if mode == Mode.BUILD:
-				return Vector2.INF
+				return null
 			if _info_construcao.visible:
-				return top.call(_info_construcao._btn_construir)
+				return _info_construcao._btn_construir
 			if _build_menu.visible:
 				for b in _build_grid.get_children():
-					if b is Button and not b.is_queued_for_deletion() and (b as Button).text.begins_with(tr(State.ITEMS[type].name)):
-						return top.call(b)
-				return Vector2.INF
-			return top.call(_buttons.build)
+					if b is Button and not b.is_queued_for_deletion() and b.get_meta("type", "") == type:
+						return b
+				return null
+			return _buttons.build
 		2:
 			if _panel.visible:
 				for b in _panel_buttons.find_children("*", "Button", true, false):
 					if not b.is_queued_for_deletion() and not b.get_parent().is_queued_for_deletion():
-						return top.call(b)
-				return Vector2.INF
+						return b
+				return null
 			for k in State.items:
 				if State.items[k].type == "greenhouse":
 					var node: Node3D = base._nodes.get(k)
 					if node:
-						return base.camera.unproject_position(node.global_position + Vector3(0.0, 1.6, 0.0))
+						var box: AABB = node.global_transform * base._merged_aabb(node)
+						return base.camera.unproject_position(Vector3(box.get_center().x, box.end.y + 0.6, box.get_center().z))
 		3:
-			return top.call(_buttons.explore)
+			return _buttons.explore
 		4:
 			if _tube.visible:
-				var r := _tube.get_global_rect()
-				return Vector2(r.get_center().x, r.position.y + 40.0)
+				return _tube
+	return null
+
+
+## O ponto que o tutorial aponta (para os testes): o meio de cima do botão, o ponto da base, ou INF.
+func _tut_point() -> Vector2:
+	var t: Variant = _tut_target()
+	if t is Control:
+		var r := (t as Control).get_global_rect()
+		return Vector2(r.get_center().x, r.position.y)
+	if t is Vector2:
+		return t
 	return Vector2.INF
+
+
+## O nome do que o Mike pediu para tocar (para o "Primeiro, toque em ...").
+func _tut_target_name() -> String:
+	match State.tutorial:
+		0, 1:
+			var type := "solar" if State.tutorial == 0 else "greenhouse"
+			if mode == Mode.BUILD:
+				return tr("TUTO_SQUARE")
+			if _info_construcao.visible:
+				return tr("INFO_BUILD")
+			if _build_menu.visible:
+				return tr(State.ITEMS[type].name)
+			return tr("BTN_BUILD")
+		2:
+			return tr("P_LETTUCE") if _panel.visible else tr("B_GREENHOUSE")
+		3:
+			return tr("BTN_EXPLORE")
+	return ""
+
+
+## No tutorial, só vale tocar no que o Mike pediu. Tocou em outra coisa: ele lembra o que é (e nada acontece).
+func _tut_blocks(what: String) -> bool:
+	if State.tutorial >= State.TUTORIAL_DONE or _start.visible:
+		return false
+	var allowed := false
+	match State.tutorial:
+		0, 1:
+			var type := "solar" if State.tutorial == 0 else "greenhouse"
+			allowed = what in ["build", "place", "build_" + type]
+		2:
+			allowed = what in ["greenhouse", "plant"]
+		3:
+			allowed = what == "explore"
+		4:
+			allowed = what in ["explore", "tube"]
+		_:
+			allowed = true
+	if allowed:
+		return false
+	if State.tutorial == 4 and not _tube.visible:
+		_show_toast(_sols(tr("TUTO_WAIT").format({"n": maxi(State.explore_left, 1)})))
+	else:
+		_show_toast(tr("TUTO_NUDGE").format({"name": _tut_target_name()}), true)
+	Sfx.play("travado")
+	return true
 
 
 func _process(delta: float) -> void:
 	if _tut_card == null:
 		return
 	_place_panel(delta)
+	if _card_rays.visible:
+		_card_rays.queue_redraw()
 	var vp := get_viewport().get_visible_rect().size
 	for p in _popups:
 		if p.visible:
@@ -1178,12 +1465,20 @@ func _process(delta: float) -> void:
 	if State.tutorial == 5 and _tut_done_at > 0.0 and Time.get_ticks_msec() / 1000.0 - _tut_done_at > 5.0:
 		State.finish_tutorial()
 		_tut_update()
-	var p := _tut_point()
-	_tut_arrow.visible = p != Vector2.INF
+	var target: Variant = _tut_target()
+	var t := Time.get_ticks_msec() / 1000.0
+	_tut_ring.visible = target is Control
+	if _tut_ring.visible:
+		move_child(_tut_ring, get_child_count() - 1)
+		var r := (target as Control).get_global_rect().grow(8.0 + sin(t * 6.0) * 3.0)
+		_tut_ring.position = r.position
+		_tut_ring.size = r.size
+		_tut_ring.modulate.a = 0.6 + 0.4 * sin(t * 6.0)
+	_tut_arrow.visible = target is Vector2
 	if _tut_arrow.visible:
 		move_child(_tut_arrow, get_child_count() - 1)
-		var bob := sin(Time.get_ticks_msec() / 1000.0 * 7.0) * 10.0
-		_tut_arrow.position = p - Vector2(_tut_arrow.size.x / 2.0, _tut_arrow.size.y + 6.0 + bob)
+		var bob := sin(t * 7.0) * 10.0
+		_tut_arrow.position = (target as Vector2) - Vector2(_tut_arrow.size.x / 2.0, _tut_arrow.size.y + 6.0 + bob)
 
 
 # ───────────── Ícones em 3D ─────────────
@@ -1211,6 +1506,12 @@ func _icon(key: String) -> Texture2D:
 			model = Icons3D.camera()
 		"settings":
 			model = Icons3D.gear()
+		"move":
+			model = Icons3D.move_arrows()
+		"turn":
+			model = Icons3D.turn_arrow()
+		"trash":
+			model = Icons3D.trash()
 		"nasa":
 			model = _item_model("antenna", 1.0)
 		_:
@@ -1218,7 +1519,7 @@ func _icon(key: String) -> Texture2D:
 				model = Icons3D.flag(load(LANG_FLAGS.get(key.trim_prefix("flag_"), LANG_FLAGS.en)))
 			else:
 				model = Node3D.new()
-	_icon_cache[key] = Icons3D.render(self, model, 160, 1.3)
+	_icon_cache[key] = Icons3D.render(self, model, 160, 1.12)
 	return _icon_cache[key]
 
 
@@ -1314,6 +1615,8 @@ func _build_settings() -> void:
 
 
 func _open_settings() -> void:
+	if _tut_blocks("settings"):
+		return
 	Sfx.play("abrir-menu")
 	_build_menu.visible = false
 	_close_panel()
@@ -1348,12 +1651,12 @@ func _refresh_settings() -> void:
 func _red_x(action: Callable) -> Button:
 	var x := Button.new()
 	x.text = "X"
-	x.custom_minimum_size = Vector2(76, 76)
+	x.custom_minimum_size = Vector2(96, 96)
 	x.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	x.add_theme_font_size_override("font_size", 38)
 	for c in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
 		x.add_theme_color_override(c, Color.WHITE)
-	var xb := Palette._box(Palette.ALERT, 38)
+	var xb := Palette._box(Palette.ALERT, 48)
 	xb.border_color = Color.WHITE
 	xb.set_border_width_all(4)
 	for s in ["normal", "hover", "pressed", "focus"]:
@@ -1361,6 +1664,36 @@ func _red_x(action: Callable) -> Button:
 	x.pressed.connect(action)
 	_juice(x)
 	return x
+
+
+## Tecla ligada (cor dela, texto escuro) ou desligada (vinho escuro, texto creme e ícone apagado).
+## Desligada não fica transparente: continua bem visível sobre o chão de Marte.
+func _style_key(b: Button, enabled: bool) -> void:
+	var color: Color = b.get_meta("base_color", Palette.BUTTON) if enabled else Palette.OFF
+	for s in ["normal", "hover", "focus", "disabled"]:
+		b.add_theme_stylebox_override(s, Palette.key(color))
+	b.add_theme_stylebox_override("pressed", Palette.key(color, true))
+	var ink: Color = Palette.TEXT if not enabled else (Palette.INK if color == Palette.GOLD else Palette.INK_DEEP)
+	var lb: Label = b.get_meta("label", null)
+	if lb:
+		lb.add_theme_color_override("font_color", ink)
+	for c in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
+		b.add_theme_color_override(c, ink)
+	var ic: TextureRect = b.get_meta("icon", null)
+	if ic:
+		ic.modulate = Color.WHITE if enabled else Color(0.6, 0.6, 0.6)
+
+
+## O nome de cada botão de baixo cabe numa linha (diminui a letra se precisar, como em "Construire").
+func _fit_button_texts() -> void:
+	for k in _btn_labels:
+		var lb: Label = _btn_labels[k]
+		var room: float = _buttons[k].size.x - 18.0
+		var size := 30 if k == "explore" else 24
+		var f: Font = Palette.font(700)
+		while size > 16 and room > 0.0 and f.get_string_size(lb.text, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x > room:
+			size -= 1
+		lb.add_theme_font_size_override("font_size", size)
 
 
 ## Todo botão responde na hora: afunda quando aperta e quica quando solta (pesquisa, item 16).
@@ -1404,7 +1737,7 @@ func _build_top() -> void:
 		label.visible = false
 		row.add_child(label)
 		var pb := TubeBar.new()
-		pb.custom_minimum_size = Vector2(0, 38)
+		pb.custom_minimum_size = Vector2(0, 44)
 		pb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		pb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		pb.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -1415,22 +1748,29 @@ func _build_top() -> void:
 		# Dentro da barra: quanto tem agora (à esquerda) e quanto muda por sol (à direita).
 		var num := Label.new()
 		num.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		num.offset_left = 16
+		num.offset_left = 18
 		num.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		num.add_theme_font_size_override("font_size", 24)
-		num.add_theme_color_override("font_color", Color.WHITE)
-		num.add_theme_color_override("font_outline_color", Palette.BG.darkened(0.3))
-		num.add_theme_constant_override("outline_size", 8)
+		num.add_theme_font_override("font", Palette.font(700))
+		num.add_theme_font_size_override("font_size", 27)
+		num.add_theme_color_override("font_color", Palette.INK)
 		pb.add_child(num)
+		var chip := PanelContainer.new()
+		var chip_box := Palette._box(Palette.PLATE, 10)
+		chip_box.content_margin_left = 8
+		chip_box.content_margin_right = 8
+		chip_box.content_margin_top = 2
+		chip_box.content_margin_bottom = 2
+		chip.add_theme_stylebox_override("panel", chip_box)
+		chip.custom_minimum_size = Vector2(104, 40)
+		chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(chip)
 		var rate := Label.new()
-		rate.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		rate.offset_right = -16
-		rate.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		rate.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		rate.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		rate.add_theme_font_size_override("font_size", 20)
-		rate.add_theme_color_override("font_outline_color", Palette.BG.darkened(0.3))
-		rate.add_theme_constant_override("outline_size", 8)
-		pb.add_child(rate)
+		rate.add_theme_font_override("font", Palette.font(700))
+		rate.add_theme_font_size_override("font_size", 22)
+		chip.add_child(rate)
 		_bar_nums[bar] = num
 		_bar_rates[bar] = rate
 
@@ -1445,7 +1785,8 @@ func _build_top() -> void:
 	pill_row.add_child(pill)
 
 	_sol_label = Label.new()
-	_sol_label.add_theme_font_size_override("font_size", 22)
+	_sol_label.add_theme_font_override("font", Palette.font(700))
+	_sol_label.add_theme_font_size_override("font_size", 24)
 	_sol_label.add_theme_color_override("font_color", Palette.TEXT)
 	_sol_label.add_theme_color_override("font_outline_color", Palette.BG.darkened(0.3))
 	_sol_label.add_theme_constant_override("outline_size", 8)
@@ -1457,12 +1798,22 @@ func _build_top() -> void:
 	_inventory.add_theme_constant_override("h_separation", 10)
 	top.add_child(_inventory)
 
+	_hint_chip = PanelContainer.new()
+	var hint_box := Palette._box(Color("4b171b"), 20)
+	hint_box.content_margin_left = 16
+	hint_box.content_margin_right = 16
+	hint_box.content_margin_top = 6
+	hint_box.content_margin_bottom = 6
+	_hint_chip.add_theme_stylebox_override("panel", hint_box)
+	_hint_chip.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_hint_chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	top.add_child(_hint_chip)
 	_hint = Label.new()
 	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_hint.add_theme_color_override("font_outline_color", Palette.BG)
-	_hint.add_theme_constant_override("outline_size", 10)
-	top.add_child(_hint)
+	_hint.add_theme_font_override("font", Palette.font(700))
+	_hint.add_theme_font_size_override("font_size", 24)
+	_hint.add_theme_color_override("font_color", Palette.TEXT)
+	_hint_chip.add_child(_hint)
 
 
 func _build_bottom() -> void:
@@ -1490,9 +1841,9 @@ func _build_bottom() -> void:
 	# pontinha apontando para ela. Nome e nível, uma frase do que ela faz, quanto faz por sol
 	# e as ações em lista (uma embaixo da outra). Tocar fora ou em outra construção fecha.
 	_panel = PanelContainer.new()
-	var card := Palette.paper(Palette.GOLD)
-	card.set_corner_radius_all(28)
-	card.set_border_width_all(5)
+	var card := Palette.paper()
+	card.set_corner_radius_all(14)
+	card.set_border_width_all(3)
 	card.shadow_offset = Vector2(0, 10)
 	card.shadow_size = 4
 	card.content_margin_left = 22
@@ -1510,8 +1861,8 @@ func _build_bottom() -> void:
 	_panel.add_child(_panel_tail)
 	var tail_edge := Line2D.new()
 	tail_edge.points = PackedVector2Array([Vector2(-22, -1), Vector2(0, 24), Vector2(22, -1)])
-	tail_edge.width = 5.0
-	tail_edge.default_color = Palette.GOLD
+	tail_edge.width = 3.0
+	tail_edge.default_color = Palette.INK
 	tail_edge.joint_mode = Line2D.LINE_JOINT_ROUND
 	_panel_tail.add_child(tail_edge)
 	var pbox := VBoxContainer.new()
@@ -1563,21 +1914,40 @@ func _build_bottom() -> void:
 	for k in ["build", "explore", "album", "photo", "settings"]:
 		var main_action: bool = k == "explore"
 		var b := Button.new()
-		b.custom_minimum_size = Vector2(0, 176 if main_action else 140)
-		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var gear: bool = k == "settings"
+		b.custom_minimum_size = Vector2(100 if gear else 0, 176 if main_action else 140)
+		b.size_flags_horizontal = Control.SIZE_FILL if gear else Control.SIZE_EXPAND_FILL
 		b.size_flags_vertical = Control.SIZE_SHRINK_END
-		b.size_flags_stretch_ratio = 1.5 if main_action else (0.7 if k == "settings" else 1.0)
-		b.add_theme_font_size_override("font_size", 32 if main_action else 26)
-		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		var color := Palette.GOLD if main_action else Palette.BUTTON
-		for s in ["normal", "hover", "disabled"]:
-			b.add_theme_stylebox_override(s, Palette.key(color))
-		b.add_theme_stylebox_override("pressed", Palette.key(color, true))
-		b.icon = _icon(k)
-		b.expand_icon = true
-		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-		b.add_theme_constant_override("icon_max_width", 84 if main_action else 70)
+		b.size_flags_stretch_ratio = 1.4 if main_action else 1.0
+		b.set_meta("base_color", Palette.GOLD if main_action else Palette.BUTTON)
+		# Dentro: o ícone 3D grande em cima e o nome em negrito embaixo (montados à mão, para cada um ter o seu contraste).
+		var col := VBoxContainer.new()
+		col.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		col.offset_top = 10
+		col.offset_bottom = -18
+		col.alignment = BoxContainer.ALIGNMENT_CENTER
+		col.add_theme_constant_override("separation", 0)
+		col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		b.add_child(col)
+		var ic := TextureRect.new()
+		ic.texture = _icon(k)
+		ic.custom_minimum_size = Vector2(0, 96 if main_action else 78)
+		ic.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		col.add_child(ic)
+		b.set_meta("icon", ic)
+		if not gear:
+			var lb := Label.new()
+			lb.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			lb.add_theme_font_override("font", Palette.font(700))
+			lb.add_theme_font_size_override("font_size", 30 if main_action else 24)
+			lb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			col.add_child(lb)
+			b.set_meta("label", lb)
+			_btn_labels[k] = lb
+		_style_key(b, true)
 		_juice(b)
 		row.add_child(b)
 		_buttons[k] = b
@@ -1586,14 +1956,13 @@ func _build_bottom() -> void:
 	_buttons.album.pressed.connect(_on_album)
 	_buttons.photo.pressed.connect(_on_photo)
 	_buttons.settings.pressed.connect(_open_settings)
-	_buttons.settings.vertical_icon_alignment = VERTICAL_ALIGNMENT_CENTER
 	_gear = _buttons.settings
 
 
 func _build_messages() -> void:
 	_toast = PanelContainer.new()
-	_toast_style = Palette.paper(Palette.GOLD)
-	_toast_style.set_corner_radius_all(24)
+	_toast_style = Palette.paper()
+	_toast_style.set_corner_radius_all(14)
 	_toast_style.set_border_width_all(3)
 	_toast_style.shadow_offset = Vector2(0, 6)
 	_toast_style.content_margin_left = 12
@@ -1625,12 +1994,13 @@ func _build_messages() -> void:
 	row.add_child(col)
 	var from := Label.new()
 	from.text = "Mike"
-	from.add_theme_font_size_override("font_size", 18)
-	from.add_theme_color_override("font_color", Palette.INK.lightened(0.35))
+	from.add_theme_font_override("font", Palette.font(700))
+	from.add_theme_font_size_override("font_size", 22)
+	from.add_theme_color_override("font_color", Palette.BG)
 	col.add_child(from)
 	_toast_label = Label.new()
 	_toast_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_toast_label.add_theme_font_size_override("font_size", 25)
+	_toast_label.add_theme_font_size_override("font_size", 27)
 	_toast_label.add_theme_color_override("font_color", Palette.INK)
 	col.add_child(_toast_label)
 
@@ -1658,7 +2028,11 @@ func _build_album() -> void:
 	head.add_child(nasa)
 	var close := Button.new()
 	close.text = "X"
-	close.custom_minimum_size = Vector2(80, 80)
+	close.custom_minimum_size = Vector2(96, 96)
+	for s in ["normal", "hover", "pressed", "focus"]:
+		close.add_theme_stylebox_override(s, Palette._box(Palette.ALERT, 48))
+	for c in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
+		close.add_theme_color_override(c, Color.WHITE)
 	close.pressed.connect(func() -> void: _album.visible = false)
 	head.add_child(close)
 	var scroll := ScrollContainer.new()
@@ -1666,7 +2040,7 @@ func _build_album() -> void:
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	box.add_child(scroll)
 	_album_grid = GridContainer.new()
-	_album_grid.columns = 4
+	_album_grid.columns = 3
 	_album_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_album_grid.add_theme_constant_override("h_separation", 10)
 	_album_grid.add_theme_constant_override("v_separation", 10)
@@ -1702,6 +2076,22 @@ func _build_popups() -> void:
 	_popup_button(ibox, _on_info_ok).text = "OK"
 
 	# Carta: papel creme com a borda na cor da raridade, um pouco torta, como uma carta de verdade.
+	# Raios atrás da carta (só quando ela é nova): giram devagar, na cor da raridade.
+	_card_rays = Control.new()
+	_card_rays.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_card_rays.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_card_rays.visible = false
+	_root.add_child(_card_rays)
+	_card_rays.draw.connect(func() -> void:
+		var c: Vector2 = _card_rays.size / 2.0
+		var col: Color = _card_rays.get_meta("color", Palette.GOLD)
+		var turn := Time.get_ticks_msec() / 1000.0 * 0.35
+		var reach := _card_rays.size.length()
+		for i in 14:
+			var a := turn + TAU * i / 14.0
+			var w := 0.11
+			_card_rays.draw_colored_polygon(PackedVector2Array([c, c + Vector2(cos(a - w), sin(a - w)) * reach, c + Vector2(cos(a + w), sin(a + w)) * reach]), Color(col, 0.28))
+		_card_rays.draw_circle(c, 260.0, Color(col.lightened(0.4), 0.25)))
 	# A carta é a moldura do Design 05 (uma por raridade) com a foto da NASA por baixo,
 	# o nome no título e o fato embaixo, nos retângulos do design/05-telas/moldura-carta.md.
 	_card = _popup(int(CARD_W))
@@ -1747,13 +2137,16 @@ func _build_popups() -> void:
 	_card_fact.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_card_fact.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_card_fact.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_card_fact.add_theme_font_size_override("font_size", 21)
+	_card_fact.add_theme_font_size_override("font_size", 24)
 	_card_fact.add_theme_color_override("font_color", Color("3a261c"))
 	face.add_child(_card_fact)
-	_card_rarity = _wrap_label("", 28)
-	_card_rarity.add_theme_color_override("font_outline_color", Palette.BG)
-	_card_rarity.add_theme_constant_override("outline_size", 10)
-	kbox.add_child(_card_rarity)
+	_card_rarity_pill = PanelContainer.new()
+	_card_rarity_pill.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	kbox.add_child(_card_rarity_pill)
+	_card_rarity = _wrap_label("", 32)
+	_card_rarity.autowrap_mode = TextServer.AUTOWRAP_OFF
+	_card_rarity.add_theme_font_override("font", Palette.font(800))
+	_card_rarity_pill.add_child(_card_rarity)
 	var crow := HBoxContainer.new()
 	crow.add_theme_constant_override("separation", 12)
 	kbox.add_child(crow)
@@ -1782,10 +2175,10 @@ func _build_popups() -> void:
 	vp.own_world_3d = true
 	view.add_child(vp)
 	_build_tube_scene(vp)
-	_tube_label = _title_label(36)
+	_tube_label = _title_label(34)
 	_tube_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	tbox.add_child(_tube_label)
-	_popup_button(tbox, _on_tube_tap).text = "OK"
+	_tube_btn = _popup_button(tbox, _on_tube_tap)
 
 	# Dados da NASA
 	_nasa = _popup(640)
@@ -1854,6 +2247,17 @@ func _build_tube_scene(vp: SubViewport) -> void:
 	rock.material_override = rock_mat
 	rock.position.y = -0.45
 	_tube_node.add_child(rock)
+	# O "?" na frente do tubo: ninguém sabe a raridade até abrir.
+	_tube_q = Label3D.new()
+	_tube_q.text = "?"
+	_tube_q.font = Palette.font(800)
+	_tube_q.font_size = 160
+	_tube_q.outline_size = 36
+	_tube_q.modulate = Palette.GOLD
+	_tube_q.outline_modulate = Palette.INK
+	_tube_q.pixel_size = 0.006
+	_tube_q.position = Vector3(0.0, 0.05, 0.6)
+	_tube_node.add_child(_tube_q)
 	_tube_light = OmniLight3D.new()
 	_tube_light.position = Vector3(0.0, 0.0, -0.9)
 	_tube_light.omni_range = 3.0

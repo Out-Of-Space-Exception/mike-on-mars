@@ -342,7 +342,9 @@ func _tutorial() -> void:
 	hud._card_queue.clear()
 	hud._tut_update()
 	ok(hud._tut_card.visible and hud._tut_label.text == tr("TUTO_HELLO"), "o Mike dá o 1º recado: tocar em Construir")
-	ok(hud._tut_point() != Vector2.INF, "a seta aponta para o botão Construir")
+	ok(hud._tut_target() == hud._buttons.build, "a moldura dourada fica em volta do botão Construir")
+	hud._on_album()
+	ok(not hud._album.visible and hud._toast_label.text == tr("TUTO_NUDGE").format({"name": tr("BTN_BUILD")}), "no tutorial, tocar em outra coisa não abre: o Mike lembra o que tocar")
 	State.energy = 100.0
 	State.build("solar", Vector2i(3, 3))
 	hud._tut_update()
@@ -404,6 +406,27 @@ func _regras_novas() -> void:
 	ok(is_equal_approx(State.storm_shield_cost(), State.STORM_SHIELD_COST), "sem antena, o escudo custa %d" % int(State.STORM_SHIELD_COST))
 	State.build("antenna", Vector2i(4, 3))
 	ok(is_equal_approx(State.storm_shield_cost(), State.STORM_SHIELD_COST_WARNED), "com a antena (aviso da NASA), o escudo sai mais barato")
+	# Lixeira pede confirmação.
+	hud._card.visible = false
+	hud._card_queue.clear()
+	hud._choice.visible = false
+	hud._info.visible = false
+	hud._open_panel(Vector2i(4, 3))
+	hud._on_remove()
+	ok(hud._choice.visible and not State.item_at(Vector2i(4, 3)).is_empty(), "a lixeira primeiro pergunta (nada some sem confirmar)")
+	hud._on_choice(0)
+	ok(State.item_at(Vector2i(4, 3)).is_empty(), "confirmou: a construção sai")
+	# Colher de novo uma planta que já está no álbum não mostra a carta de novo.
+	var cartas_antes: int = State.cards.size()
+	var fila_antes: int = hud._card_queue.size()
+	State.energy = 100.0
+	State.plant(Vector2i(3, 3), "lettuce")
+	State.item_at(Vector2i(3, 3)).growth = 999.0
+	State.harvest(Vector2i(3, 3))
+	State.plant(Vector2i(3, 3), "lettuce")
+	State.item_at(Vector2i(3, 3)).growth = 999.0
+	State.harvest(Vector2i(3, 3))
+	ok(hud._card_queue.size() <= fila_antes + 1 and State.cards.size() <= cartas_antes + 1, "colher alface de novo não mostra a carta outra vez")
 	hud._card.visible = false
 	hud._card_queue.clear()
 	hud._choice.visible = false

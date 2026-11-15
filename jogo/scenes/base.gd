@@ -1219,8 +1219,9 @@ func _make_item(type: String, level: int) -> Node3D:
 	label.name = "Label"
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	label.no_depth_test = true
+	label.font = Palette.font(700)
 	label.font_size = 44
-	label.outline_size = 14
+	label.outline_size = 12
 	label.pixel_size = 0.012
 	label.modulate = Palette.TEXT
 	label.outline_modulate = Palette.BG
@@ -1236,6 +1237,7 @@ func _make_item(type: String, level: int) -> Node3D:
 		ready_mark.text = "!"
 		ready_mark.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 		ready_mark.no_depth_test = true
+		ready_mark.font = Palette.font(800)
 		ready_mark.font_size = 96
 		ready_mark.outline_size = 18
 		ready_mark.pixel_size = 0.012
