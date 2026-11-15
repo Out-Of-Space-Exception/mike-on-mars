@@ -69,6 +69,12 @@ func _ready() -> void:
 	col.add_child(stage)
 	_spin = Node3D.new()
 	_stage_tex = Icons3D.render(self, _spin, 384, 1.9, true, Vector3(1.0, 0.75, 2.2))
+	# The spinning stage is a 3D scene drawn every frame: only while this panel is open
+	# (it used to keep drawing the whole game, which made weak phones slow everywhere).
+	var stage_view := _spin.get_viewport() as SubViewport
+	stage_view.render_target_update_mode = SubViewport.UPDATE_DISABLED
+	visibility_changed.connect(func() -> void:
+		stage_view.render_target_update_mode = SubViewport.UPDATE_ALWAYS if is_visible_in_tree() else SubViewport.UPDATE_DISABLED)
 	var screen := TextureRect.new()
 	screen.texture = _stage_tex
 	screen.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
