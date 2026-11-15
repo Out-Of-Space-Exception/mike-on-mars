@@ -206,8 +206,10 @@ func _ready() -> void:
 		clamp_bars()   # old saves: the bars went above the house cap
 	else:
 		new_game()
+	# The game always starts in English (Space Apps judges read in English). The child can still
+	# pick another language with the flag button, and that choice is saved.
 	if locale == "":
-		locale = _device_locale()
+		locale = "en"
 	TranslationServer.set_locale(locale)
 	_catch_up(saved_at)
 	# Shortcut for testing and recording the video: opening the link with ?tempestade brings the storm in 2 sols.

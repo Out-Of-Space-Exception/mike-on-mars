@@ -287,7 +287,7 @@ func _house_area() -> void:
 	for id in State.card_ids():
 		if str(State.card_info(id).get("place", "")).to_lower().contains("em breve"):
 			coming_soon += 1
-	ok(coming_soon == 0 and State.cards_total() == 35, "no \"coming soon\" card (35 cards in the album)")
+	ok(coming_soon == 0 and State.cards_total() == 36, "no \"coming soon\" card (36 cards in the album)")
 
 
 func _mike_path(base: Node3D) -> void:
