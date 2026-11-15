@@ -121,6 +121,9 @@ var _tube_tween: Tween
 var _album: PanelContainer
 var _album_title: Label
 var _album_grid: GridContainer
+var _album_scroll: ScrollContainer
+# Drag anywhere in the album to scroll it (the cards are buttons and used to swallow the finger).
+var _album_drag := {"down": false, "moved": false, "start": Vector2.ZERO, "from": 0.0, "last_y": 0.0, "speed": 0.0}
 var _album_bar: TubeBar
 var _album_count: Label
 var _album_next: Label
@@ -695,11 +698,14 @@ func _storm_inside() -> void:
 func _show_event(type: String) -> void:
 	match type:
 		"dust":
-			_show_info(tr("EV_DUST_TITLE"), tr("EV_DUST_TEXT"), State.ack_event)
-			Sfx.play("energia-cai")
+			# With panels they get dirty; without panels the storm passes and the energy does not change.
+			var panel := State.count_items("solar") > 0
+			_show_info(tr("EV_DUST_TITLE"), tr("EV_DUST_TEXT" if panel else "EV_DUST_TEXT_NOPANEL"), State.ack_event)
+			Sfx.play("energia-cai" if panel else "alerta")
 		"devil":
-			_show_info(tr("EV_DEVIL_TITLE"), tr("EV_DEVIL_TEXT"), State.ack_event)
-			Sfx.play("energia-volta")
+			# It only "cleans the panels" when there were dirty panels to clean.
+			_show_info(tr("EV_DEVIL_TITLE"), tr("EV_DEVIL_TEXT" if State.devil_cleaned else "EV_DEVIL_TEXT_NOPANEL"), State.ack_event)
+			Sfx.play("energia-volta" if State.devil_cleaned else "alerta")
 		"cold":
 			_show_choice(tr("EV_COLD_TITLE"), [tr("EV_COLD_TEXT"), tr("EV_COLD_Q")],
 				_with_cost(tr("EV_COLD_A"), State.cold_cost()), State.can_afford(State.cold_cost()),
@@ -707,9 +713,13 @@ func _show_event(type: String) -> void:
 				tr("EV_COLD_B"), func() -> void: State.choose_cold(false))
 			Sfx.play("alerta")
 		"nosignal":
-			_show_choice(tr("EV_NOSIGNAL_TITLE"), [tr("EV_NOSIGNAL_TEXT"), tr("EV_NOSIGNAL_Q")],
-				tr("PLAN_SAVE"), true, func() -> void: State.choose_nosignal("save"),
-				tr("PLAN_PLANT"), func() -> void: State.choose_nosignal("plant"))
+			if State.count_items("greenhouse") == 0:
+				# Without a greenhouse the autopilot question (save energy / keep planting) makes no sense: just the notice.
+				_show_info(tr("EV_NOSIGNAL_TITLE"), tr("EV_NOSIGNAL_TEXT"), func() -> void: State.choose_nosignal("save"))
+			else:
+				_show_choice(tr("EV_NOSIGNAL_TITLE"), [tr("EV_NOSIGNAL_TEXT"), tr("EV_NOSIGNAL_Q")],
+					tr("PLAN_SAVE"), true, func() -> void: State.choose_nosignal("save"),
+					tr("PLAN_PLANT"), func() -> void: State.choose_nosignal("plant"))
 			Sfx.play("alerta")
 
 
@@ -1136,11 +1146,17 @@ func _refresh() -> void:
 	(_album_badge.get_node("N") as Label).text = str(unseen)
 	_btn_labels.settings.text = tr("BTN_SETTINGS")
 	if State.exploring():
-		_btn_labels.explore.text = _sols(tr("EXPLORING").format({"n": State.explore_left}))
+		_btn_labels.explore.text = tr("EXPLORING_SHORT")   # "Mike is exploring": up to 2 lines inside the button
 	elif State.tube_card != 0:
 		_btn_labels.explore.text = tr("TUBE_READY")
 	else:
 		_btn_labels.explore.text = tr("BTN_EXPLORE")
+	var explore_icon: TextureRect = _buttons.explore.get_meta("icon")
+	explore_icon.custom_minimum_size.y = 40 if State.exploring() else 66
+	# Only "Mike is exploring" breaks into 2 lines; "Explore" stays as before.
+	_btn_labels.explore.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if State.exploring() else TextServer.AUTOWRAP_OFF
+	if not State.exploring():
+		_btn_labels.explore.custom_minimum_size = Vector2.ZERO
 	_style_key(_buttons.explore, not (State.explore_block_reason() != "" and State.tube_card == 0 and not State.exploring()))
 	_style_key(_buttons.build, State.base_locked_reason() == "")
 	_fit_button_texts()
@@ -1194,7 +1210,7 @@ func _status_raw() -> String:
 		return tr("OUT_ENERGY_HINT")
 	if State.cold_left > 0:
 		return tr("COLD_LEFT").format({"n": State.cold_left})
-	if State.dust_left > 0:
+	if State.dust_left > 0 and State.count_items("solar") > 0:   # "dirty panels" only if there is a panel
 		return tr("DUST_LEFT").format({"n": State.dust_left})
 	if State.tutorial < State.TUTORIAL_DONE:
 		return ""
@@ -1660,7 +1676,50 @@ func _tut_blocks(what: String) -> bool:
 	return true
 
 
+## Album: drag the finger (or the mouse) anywhere on the cards to scroll, with a little glide at the end.
+## Runs before the buttons get the event, so it works on top of the cards too.
+func _input(event: InputEvent) -> void:
+	if _album == null or not _album.visible or _album_scroll == null:
+		return
+	var d := _album_drag
+	var is_press: bool = (event is InputEventScreenTouch) or (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT)
+	if is_press:
+		if event.pressed:
+			if _album_scroll.get_global_rect().has_point(event.position) and not _card.visible and not _info.visible:
+				d.down = true
+				d.moved = false
+				d.start = event.position
+				d.from = float(_album_scroll.scroll_vertical)
+				d.last_y = event.position.y
+				d.speed = 0.0
+		elif d.down:
+			d.down = false
+			# The card buttons get this same release right after: only then forget the drag.
+			(func() -> void: d.moved = false).call_deferred()
+		return
+	var is_drag: bool = (event is InputEventScreenDrag) or (event is InputEventMouseMotion and event.button_mask & MOUSE_BUTTON_MASK_LEFT != 0)
+	if is_drag and d.down:
+		var dy: float = event.position.y - d.start.y
+		if not d.moved and absf(dy) > 12.0:   # small wiggles still count as a tap
+			d.moved = true
+		if d.moved:
+			_album_scroll.scroll_vertical = int(d.from - dy)
+			if event.position.y != d.last_y:   # on phones the same move also arrives as an emulated mouse move
+				d.speed = lerpf(float(d.speed), (d.last_y - event.position.y) / maxf(get_process_delta_time(), 0.001), 0.5)
+				d.last_y = event.position.y
+			get_viewport().set_input_as_handled()
+
+
+func _album_glide(delta: float) -> void:
+	var d := _album_drag
+	if _album_scroll == null or d.down or absf(float(d.speed)) < 20.0:
+		return
+	_album_scroll.scroll_vertical += int(float(d.speed) * delta)
+	d.speed = float(d.speed) * pow(0.04, delta)   # slows down in about a second
+
+
 func _process(delta: float) -> void:
+	_album_glide(delta)
 	if _tut_card == null:
 		return
 	_place_panel(delta)
@@ -1912,9 +1971,27 @@ func _fit_button_texts() -> void:
 			continue   # the button has no width yet (before the first draw)
 		var size := 26 if k == "explore" else 21
 		var f: Font = Palette.font(700)
-		while size > 16 and room > 0.0 and f.get_string_size(lb.text, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x > room:
+		var lines := 2 if lb.autowrap_mode != TextServer.AUTOWRAP_OFF else 1
+		if lines > 1:
+			size = 21   # 2 lines + the icon must fit in the golden box
+			room -= 12.0
+		while size > 16 and room > 0.0 and not _text_fits(f, lb.text, size, room, lines):
 			size -= 1
+		if lines > 1:
+			# A wrapped label has no height of its own inside the box: reserve the lines it needs.
+			var extra: float = lb.get_theme_stylebox("normal").get_minimum_size().y + lb.get_theme_constant("line_spacing") * (lines - 1)
+			lb.custom_minimum_size = Vector2(0.0, f.get_height(size) * lines + extra + 2.0)
 		lb.add_theme_font_size_override("font_size", size)
+
+
+## Fits in "lines" lines of width "room": no word wider than the room and the whole text within the lines.
+func _text_fits(f: Font, text: String, size: int, room: float, lines: int) -> bool:
+	if lines <= 1:
+		return f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x <= room
+	for w in text.split(" ", false):
+		if f.get_string_size(w, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x > room:
+			return false
+	return f.get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_CENTER, room, size).y <= f.get_height(size) * lines + 1.0
 
 
 ## Every button responds right away: sinks when pressed and bounces when released (research, item 16).
@@ -2164,6 +2241,11 @@ func _build_bottom() -> void:
 			lb.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			lb.add_theme_font_override("font", Palette.font(700))
 			lb.add_theme_font_size_override("font_size", 26 if main_action else 21)
+			# A long text never widens the button (that pushed the icon out of the box): it is cut with "…".
+			lb.clip_text = true
+			lb.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+			if main_action:
+				lb.max_lines_visible = 2   # "Mike is / exploring" (the 2 lines are turned on in _refresh)
 			lb.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			col.add_child(lb)
 			b.set_meta("label", lb)
@@ -2318,6 +2400,7 @@ func _build_album() -> void:
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	box.add_child(scroll)
+	_album_scroll = scroll
 	# The grid stays in the middle (before, it all went to the left on PC).
 	var center := CenterContainer.new()
 	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -2461,9 +2544,13 @@ func _album_tile(id: int, w := 192.0) -> Control:
 		glow.tween_property(frame, "modulate", Color.WHITE, 0.8).set_trans(Tween.TRANS_SINE)
 		b.tree_exiting.connect(glow.kill)
 	if owned:
-		b.pressed.connect(_queue_card.bind(id, false))
+		b.pressed.connect(func() -> void:
+			if not _album_drag.moved:   # a drag to scroll is not a tap on the card
+				_queue_card(id, false))
 	else:
-		b.pressed.connect(func() -> void: _show_info(tr("HOW_TITLE"), State.card_hint(id), Callable()))
+		b.pressed.connect(func() -> void:
+			if not _album_drag.moved:
+				_show_info(tr("HOW_TITLE"), State.card_hint(id), Callable()))
 	return b
 
 

@@ -9,7 +9,7 @@ Conferencia tecnica da copia local em 2026-11-14. Nao substitui a escuta e a ver
 | `construir.wav` | WAV legivel | 0.69 s; 1 canal(is); 44100 Hz |
 | `melhorar.wav` | WAV legivel | 0.29 s; 1 canal(is); 44100 Hz |
 | `colher.wav` | WAV legivel | 0.11 s; 2 canal(is); 44100 Hz |
-| `tubo-abrir.wav` | WAV legivel | 5.00 s; 1 canal(is); 44100 Hz |
+| `tubo-abrir.wav` | WAV legivel | 1.82 s; 2 canal(is); 44100 Hz (magical_3.ogg convertido para WAV 16 bits) |
 | `revelar-comum.wav` | WAV legivel | 0.28 s; 1 canal(is); 44100 Hz |
 | `revelar-raro.wav` | WAV legivel | 0.69 s; 1 canal(is); 44100 Hz |
 | `revelar-epico.wav` | WAV legivel | 0.54 s; 1 canal(is); 44100 Hz |

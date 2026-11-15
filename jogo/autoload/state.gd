@@ -159,6 +159,7 @@ var cold_left := 0
 var cold_heated := false
 var nosignal_left := 0
 var nosignal_plan := ""
+var devil_cleaned := false   # the last dust devil cleaned dirty panels (picks the message)
 var explore_left := 0            # sols left until Mike returns
 var storm_warned := false   # the antenna already warned about the next storm
 var last_empty := false   # the last expedition came back with nothing
@@ -963,19 +964,27 @@ func event_active() -> bool:
 
 func _start_event() -> void:
 	next_event_sol = sol + randi_range(EVENT_EVERY.x, EVENT_EVERY.y)
-	var options := ["dust", "cold", "nosignal"]
+	# Dust storm and dust devil happen with or without solar panels (it is Mars weather);
+	# only the effect on the panels needs a panel, and the message changes (see hud.gd, _show_event).
+	var options := ["dust", "devil", "cold", "nosignal"]
 	# The freezing night only comes when a plant is growing in the greenhouse (otherwise the question makes no sense).
 	if not _has_growing_plant():
 		options.erase("cold")
+	var has_panel := count_items("solar") > 0
 	if dust_left > 0:
-		options = ["devil"]      # dirty panel? the next event is the dust devil that cleans it
+		if has_panel:
+			options = ["devil"]  # dirty panel? the next event is the dust devil that cleans it
+		else:
+			dust_left = 0        # the panels were removed: there is nothing left to clean
 	var type: String = options.pick_random()
 	if type == "dust":
-		dust_left = DUST_SOLS
 		_reward_once(CARD_DUST)
-		# The dust devil that cleans the panels comes while they are still dirty (before, there was never time).
-		next_event_sol = sol + randi_range(5, DUST_SOLS - 4)
+		if has_panel:
+			dust_left = DUST_SOLS
+			# The dust devil that cleans the panels comes while they are still dirty (before, there was never time).
+			next_event_sol = sol + randi_range(5, DUST_SOLS - 4)
 	elif type == "devil":
+		devil_cleaned = dust_left > 0
 		dust_left = 0
 		_reward_once(CARD_DEVIL)
 	_pause_for(type)

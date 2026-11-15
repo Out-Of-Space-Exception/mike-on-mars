@@ -40,6 +40,8 @@ EV_DUST_TITLE,Tempestade de poeira!,Dust storm!,¡Tormenta de polvo!,Tempête de
 EV_DUST_TEXT,A poeira cobriu os painéis solares. Eles vão fazer menos energia por um tempo.,Dust covered the solar panels. They'll make less energy for a while.,El polvo cubrió los paneles solares. Darán menos energía por un tiempo.,La poussière a recouvert les panneaux solaires. Ils feront moins d'énergie pendant un moment.
 EV_DEVIL_TITLE,Redemoinho de poeira!,Dust devil!,¡Remolino de polvo!,Tourbillon de poussière !
 EV_DEVIL_TEXT,O vento girou e limpou os painéis!,The swirling wind cleaned the panels!,¡El viento giró y limpió los paneles!,Le vent a tourbillonné et a nettoyé les panneaux !
+EV_DUST_TEXT_NOPANEL,"Uma nuvem de poeira passou pela cratera. A base não tem painel solar, então a energia não mudou.","A dust cloud swept over the crater. The base has no solar panel, so the energy didn't change.","Una nube de polvo pasó por el cráter. La base no tiene paneles solares, así que la energía no cambió.","Un nuage de poussière a balayé le cratère. La base n'a pas de panneau solaire, donc l'énergie n'a pas changé."
+EV_DEVIL_TEXT_NOPANEL,O vento girou e levantou poeira pela cratera. Que espetáculo!,The swirling wind lifted dust across the crater. What a show!,El viento giró y levantó polvo por el cráter. ¡Qué espectáculo!,Le vent a tourbillonné et soulevé la poussière dans le cratère. Quel spectacle !
 EV_COLD_TITLE,Noite congelante!,Freezing night!,¡Noche helada!,Nuit glaciale !
 EV_COLD_Q,Aquecer a estufa?,Heat the greenhouse?,¿Calentamos el invernadero?,On chauffe la serre ?
 EV_NOSIGNAL_TITLE,Sem sinal da Terra!,No signal from Earth!,¡Sin señal de la Tierra!,Pas de signal de la Terre !
@@ -73,6 +75,7 @@ STORM_SHIELDED,Escudo ligado por mais {n} sóis,Shield up for {n} more sols,Escu
 STORM_INSIDE,Mike em casa por mais {n} sóis,Mike stays inside for {n} more sols,Mike se queda adentro {n} soles más,Mike reste à l'intérieur encore {n} sols
 STORM_OVER,A tempestade passou!,The storm is over!,¡La tormenta pasó!,La tempête est finie !
 EXPLORING,O Mike está explorando. Volta em {n} sóis,Mike is exploring. Back in {n} sols,Mike está explorando. Vuelve en {n} soles,Mike explore. Retour dans {n} sols
+EXPLORING_SHORT,O Mike está explorando,Mike is exploring,Mike está explorando,Mike explore
 TUBE_READY,Abrir o tubo!,Open the tube!,¡Abre el tubo!,Ouvre le tube !
 LOCK_STORM,O Mike espera a tempestade passar.,Mike waits for the storm to pass.,Mike espera a que pase la tormenta.,Mike attend la fin de la tempête.
 D_FLAG,Bandeira,Flag,Bandera,Drapeau
