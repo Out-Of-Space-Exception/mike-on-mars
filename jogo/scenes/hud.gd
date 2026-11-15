@@ -538,20 +538,18 @@ func _refresh_panel() -> void:
 	if it.get("broken", false):
 		_panel_info.visible = true
 		_panel_info.text = tr("BROKEN_TEXT")
-		var fix := _add_panel_button("%s  %d" % [tr("BTN_REPAIR"), State.repair_cost(selected)], _on_repair, true)
-		fix.icon = _icon("energy")
-		fix.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		var fix := _add_panel_button(tr("BTN_REPAIR"), _on_repair, true)
 		fix.custom_minimum_size.y = 88
 		fix.set_meta("base_color", Palette.GOLD)
 		_style_key(fix, State.can_afford(State.repair_cost(selected)))
+		_cost_tag(fix, State.repair_cost(selected))
 		cost = -1
 	if cost >= 0:
-		var up := _add_panel_button("%s  %d" % [tr("BTN_UPGRADE"), cost], _on_upgrade, true)
-		up.icon = _icon("energy")
-		up.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		var up := _add_panel_button(tr("BTN_UPGRADE"), _on_upgrade, true)
 		up.custom_minimum_size.y = 88
 		up.set_meta("base_color", Palette.GOLD)
 		_style_key(up, State.upgrade_block_reason(selected) == "")
+		_cost_tag(up, cost)
 	# Move, rotate and remove: icons only (cross arrows, curved arrow and trash can), side by side.
 	var tools := HBoxContainer.new()
 	tools.add_theme_constant_override("separation", 16)
@@ -685,14 +683,47 @@ func _show_storm(event: Dictionary) -> void:
 		lines.append(tr("EV_SOLAR_CURIOSITY"))
 	lines.append(tr("EV_SOLAR_Q"))
 	_show_choice(tr("EV_SOLAR_TITLE"), lines,
-		_with_cost(tr("EV_SOLAR_A"), State.storm_shield_cost()), State.can_afford(State.storm_shield_cost()),
-		_storm_shield, tr("EV_SOLAR_B"), _storm_inside)
+		tr("EV_SOLAR_A"), State.can_afford(State.storm_shield_cost()),
+		_storm_shield, tr("EV_SOLAR_B"), _storm_inside, int(State.storm_shield_cost()))
 	Sfx.play("alerta")
 
 
-## "Yes, raise it (costs 30 energy)": the choice button says how much energy it uses.
-func _with_cost(text: String, cost: float) -> String:
-	return "%s (%s)" % [text, tr("COST_ENERGY").format({"n": int(cost)})]
+## "-30 ⚡" in the right corner of the button, like the Build button: the child sees which bar
+## loses how much (no "uses 30 energy" written out). 0 hides it (the choice button is reused).
+func _cost_tag(b: Button, cost: int, bar := "energy") -> void:
+	var tag: HBoxContainer = b.get_node_or_null("Cost")
+	if tag == null:
+		tag = HBoxContainer.new()
+		tag.name = "Cost"
+		tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		tag.alignment = BoxContainer.ALIGNMENT_END
+		tag.add_theme_constant_override("separation", 4)
+		tag.set_anchors_and_offsets_preset(Control.PRESET_RIGHT_WIDE)
+		tag.offset_left = -150.0
+		tag.offset_right = -18.0
+		b.add_child(tag)
+		var n := Label.new()
+		n.name = "N"
+		n.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		n.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		n.add_theme_font_override("font", Palette.font(700))
+		n.add_theme_font_size_override("font_size", 28)
+		tag.add_child(n)
+		var ic := TextureRect.new()
+		ic.name = "Icon"
+		ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		ic.custom_minimum_size = Vector2(36, 36)
+		ic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		tag.add_child(ic)
+	tag.visible = cost > 0
+	var n: Label = tag.get_node("N")
+	n.text = "-%d" % cost
+	n.add_theme_color_override("font_color", b.get_theme_color("font_disabled_color" if b.disabled else "font_color"))
+	var ic: TextureRect = tag.get_node("Icon")
+	ic.texture = _icon(bar)
+	ic.modulate = Color(0.6, 0.6, 0.6) if b.disabled else Color.WHITE
 
 
 func _storm_shield() -> void:
@@ -717,9 +748,9 @@ func _show_event(type: String) -> void:
 			Sfx.play("energia-volta" if State.devil_cleaned else "alerta")
 		"cold":
 			_show_choice(tr("EV_COLD_TITLE"), [tr("EV_COLD_TEXT"), tr("EV_COLD_Q")],
-				_with_cost(tr("EV_COLD_A"), State.cold_cost()), State.can_afford(State.cold_cost()),
+				tr("EV_COLD_A"), State.can_afford(State.cold_cost()),
 				func() -> void: State.choose_cold(true),
-				tr("EV_COLD_B"), func() -> void: State.choose_cold(false))
+				tr("EV_COLD_B"), func() -> void: State.choose_cold(false), int(State.cold_cost()))
 			Sfx.play("alerta")
 		"nosignal":
 			if State.count_items("greenhouse") == 0:
@@ -732,7 +763,7 @@ func _show_event(type: String) -> void:
 			Sfx.play("alerta")
 
 
-func _show_choice(title: String, lines: Array, a_text: String, a_enabled: bool, a_action: Callable, b_text: String, b_action: Callable) -> void:
+func _show_choice(title: String, lines: Array, a_text: String, a_enabled: bool, a_action: Callable, b_text: String, b_action: Callable, a_cost := 0) -> void:
 	_set_mode(Mode.NONE)
 	_close_panel()
 	_build_menu.visible = false
@@ -744,6 +775,7 @@ func _show_choice(title: String, lines: Array, a_text: String, a_enabled: bool, 
 		_choice_lines.add_child(l)
 	_choice_a.text = a_text
 	_choice_a.disabled = not a_enabled
+	_cost_tag(_choice_a, a_cost)
 	_choice_b.text = b_text
 	_choice_actions = [a_action, b_action]
 	_choice.visible = true
