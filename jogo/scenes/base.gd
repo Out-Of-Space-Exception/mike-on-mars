@@ -15,7 +15,7 @@ const MIKE_MODEL_HEIGHT := 4.0   # height of mike.glb in file units
 const MIKE_HEIGHT := 1.5         # Mike's height in the game (the camera gets close at the start)
 const DESIGN_MIKE := 2.2         # Design's tamanhos.csv measures everything with Mike = 2.2
 const GROW_MARK_GAP := 0.85      # space between the top of the greenhouse and the growing-plant ring
-const GROW_MARK_PIXEL := 0.013   # ring size (128 px texture): about 80 px on screen with the normal camera
+const GROW_MARK_PX := 64.0       # ring size on screen (UI pixels), the same at any zoom (it used to grow when zooming in)
 const INGENUITY := "res://models/nasa/ingenuity.glb"
 const INGENUITY_WIDTH := 1.3
 const CAM_MIN := 12.0            # closest camera (small base)
@@ -120,7 +120,7 @@ void fragment() {
 var _sky: MeshInstance3D
 var _warn_tex: Texture2D       # the yellow "broken" warning (drawn once)
 var _plant_icons := {}         # plant -> texture rendered from its 3D model (greenhouse panel, seeds, inventory)
-var _mark_scale := 1.0         # the growing-plant ring grows a little when the camera moves away
+var _mark_px := 0.01           # pixel_size of the growing-plant ring right now (follows the zoom)
 var _sky_mat: ShaderMaterial
 
 
@@ -162,9 +162,10 @@ func _process(delta: float) -> void:
 		var warn: Sprite3D = _nodes[k].get_node_or_null("Broken")
 		if warn and warn.visible:
 			warn.position.y = float(warn.get_meta("y", 2.0)) + sin(_time * 3.0) * 0.15
-	var mark := clampf(camera.size / 16.0, 1.0, 2.0)
-	if absf(mark - _mark_scale) > 0.02:
-		_mark_scale = mark
+	# The ring keeps the same size on screen: its size in the world follows the zoom (KEEP_WIDTH camera).
+	var mark := camera.size * GROW_MARK_PX / (maxf(get_viewport().get_visible_rect().size.x, 1.0) * 128.0)
+	if absf(mark - _mark_px) > _mark_px * 0.01:
+		_mark_px = mark
 		for k in _nodes:
 			_place_grow_mark(_nodes[k])
 	var show_names := camera.size < 14.5
@@ -1296,11 +1297,11 @@ func _place_grow_mark(node: Node3D) -> void:
 	var grow: Sprite3D = node.get_node_or_null("Growing")
 	if grow == null:
 		return
-	grow.pixel_size = GROW_MARK_PIXEL * _mark_scale
-	grow.position.y = float(node.get_meta("top")) + GROW_MARK_GAP + 64.0 * grow.pixel_size
+	grow.pixel_size = _mark_px
+	grow.position.y = float(node.get_meta("top")) + GROW_MARK_GAP + 64.0 * _mark_px
 	var ready_mark: Label3D = node.get_node("Ready")
-	ready_mark.pixel_size = 0.012 * _mark_scale
-	ready_mark.position.y = grow.position.y + (64.0 * grow.pixel_size + 0.7 * _mark_scale if grow.visible else 0.0)
+	ready_mark.pixel_size = _mark_px * 0.92
+	ready_mark.position.y = grow.position.y + (64.0 * _mark_px + 56.0 * ready_mark.pixel_size if grow.visible else 0.0)
 
 
 ## Placeholder shapes for what has no model yet (house, greenhouse, Ingenuity pad).
