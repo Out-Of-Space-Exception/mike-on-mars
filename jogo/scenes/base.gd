@@ -913,6 +913,9 @@ func _rebend() -> void:
 					flat = flat / d * rim
 					w = Vector3(flat.x, floor_y, flat.y)
 					d = rim
+				else:
+					# Perto da beirada os morros vão sumindo: a borda do planeta fica lisa, sem "dentes".
+					w.y = floor_y + (w.y - floor_y) * (1.0 - smoothstep(rim - 7.0, rim - 0.5, d))
 				w.y -= planet_drop(d)
 				verts[i] = inv * w
 				if i < normals.size() and d > _flat_r:

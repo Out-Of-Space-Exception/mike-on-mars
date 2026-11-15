@@ -170,11 +170,17 @@ func _on_play() -> void:
 		var text := _sols(tr("AWAY_SOLS").format({"n": away.sols}))
 		if int(away.get("plants", 0)) > 0:
 			text += "\n" + tr("AWAY_PLANTS").format({"n": away.plants})
-		_show_info(tr("AWAY_TITLE"), text, Callable())
+		# Uma janela de cada vez: primeiro o "enquanto você estava fora", depois o que estava esperando.
+		_show_info(tr("AWAY_TITLE"), text, _after_welcome)
 		Sfx.play("bem-vindo")
 		State.away = {}
+		return
+	_after_welcome()
+
+
+func _after_welcome() -> void:
 	_resume_pending()
-	if State.tube_card != 0:
+	if State.tube_card != 0 and not _choice.visible:
 		_show_tube()
 
 
