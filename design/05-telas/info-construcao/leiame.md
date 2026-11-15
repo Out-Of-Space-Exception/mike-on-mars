@@ -41,7 +41,7 @@ O script lê tudo do `State.ITEMS`. Se um número mudar no jogo, o painel muda j
 | Estufa | ⚡ -1 ao plantar · 🫁 + cada planta | As plantas crescem aqui. A luz gasta energia. Sem energia, elas crescem pela metade. | `energy_when_planted`, `PLANT_OXYGEN`, `SLOW_GROWTH` |
 | Painel solar | ⚡ +3 por sol | Na tempestade de poeira, a poeira cobre o painel e tapa a luz do Sol: ele faz só 30% por 15 sóis. | `energy`, `DUST_FACTOR`, `DUST_SOLS` |
 | Bateria nuclear (RTG) | ⚡ +1 por sol | Pouca energia, mas não para nunca: nem de noite, nem na poeira. No nível 3 vira Kilopower: +4. | `energy`, `KILOPOWER_ENERGY` |
-| MOXIE | ⚡ -1 · 🫁 +2 por sol | Tira oxigênio do ar de Marte. O MOXIE de verdade fez 122 g de oxigênio em Marte. | `energy`, `oxygen`; fato: CONTEXTO, seção 6 |
+| MOXIE | ⚡ -1 · 🫁 +2 por sol | Tira oxigênio do ar de Marte. O MOXIE fez 122 g de oxigênio em Marte. | `energy`, `oxygen`; fato: CONTEXTO, seção 6 |
 | Antena | — | Fala com a Terra. Com ela, às vezes você ganha a carta "Terra vista de Marte". | `EARTH_SEEN_CHANCE` (2% por sol) |
 | Pista do Ingenuity | 🃏 +1 carta | O helicóptero Ingenuity pousa aqui. Só dá para ter 1. | `card`, `max` |
 
