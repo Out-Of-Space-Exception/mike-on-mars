@@ -13,6 +13,10 @@ func _ready() -> void:
 	hud = main.get_node("Hud")
 	State.new_game()
 	State.tutorial = State.TUTORIAL_DONE
+	# Os testes de regra começam com as barras cheias (o começo devagar tem o teste dele).
+	State.energy = 100.0
+	State.oxygen = 100.0
+	State.shield = 100.0
 	_tempestade()
 	_expedicao()
 	_construir_e_plantar()
@@ -27,6 +31,7 @@ func _ready() -> void:
 	_regras_novas()
 	_batata_e_album()
 	_quebrar_e_consertar()
+	_comeco_devagar()
 	# O recado do tutorial tem o tamanho do texto (antes crescia até a tela inteira e não voltava).
 	State.restart_tutorial()
 	hud._start.visible = false
@@ -371,6 +376,7 @@ func _tutorial() -> void:
 	ok(State.tutorial == 5, "abriu o tubo: parabéns")
 	State.tutorial = 0
 	State.started = true
+	State.energy = 100.0
 	var sol_parado: int = State.sol
 	State._process(30.0)
 	ok(State.sol == sol_parado, "no tutorial, o tempo fica parado esperando a criança")
@@ -484,3 +490,18 @@ func _quebrar_e_consertar() -> void:
 	ok(is_zero_approx(float(State.item_rates(State.item_at(Vector2i(3, 3))).energy)), "quebrado não faz energia")
 	State.energy = 100.0
 	ok(State.repair(Vector2i(3, 3)) and not State.item_at(Vector2i(3, 3)).get("broken", false), "consertar faz voltar a funcionar")
+
+
+func _comeco_devagar() -> void:
+	State.new_game()
+	ok(is_equal_approx(State.energy, 20.0) and is_equal_approx(State.oxygen, 40.0) and is_equal_approx(State.shield, 40.0), "começo devagar: energia 20, oxigênio e escudo 40")
+	State.build("solar", Vector2i(3, 3))
+	State.tutorial = 1
+	ok(State.tutorial_needs_energy() and not State.tutorial_holds_time(), "no tutorial, sem energia para a estufa o tempo anda")
+	State.tutorial = State.TUTORIAL_DONE
+	State.energy = 100.0
+	State.upgrade(Vector2i(4, 4))
+	ok(State.oxygen >= 60.0 and State.shield >= 60.0, "casa no nível 2: as barras sobem para 60")
+	State.energy = 100.0
+	State.upgrade(Vector2i(4, 4))
+	ok(is_equal_approx(State.energy, 100.0) and is_equal_approx(State.oxygen, 100.0), "casa no nível 3: as barras enchem")

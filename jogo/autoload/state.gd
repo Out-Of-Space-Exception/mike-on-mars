@@ -18,7 +18,8 @@ const GRID_W := 10
 const GRID_H := 10
 const BAR_MAX := 100.0
 const LOW := 20.0                   # barra abaixo disso trava ou desacelera
-const START := {"energy": 60.0, "oxygen": 60.0, "shield": 100.0}
+const START := {"energy": 20.0, "oxygen": 40.0, "shield": 40.0}   # começo devagar: a casa faz as barras subirem
+const HOUSE_BARS := {2: 60.0, 3: 100.0}   # casa no nível 2: as 3 barras sobem para 60; no nível 3, enchem
 const START_ITEMS := {"4,4": "habitat"}
 const START_INVENTORY := {"lettuce": 1}   # um lanche que veio da Terra, para a 1ª expedição
 const MAX_LEVEL := 3
@@ -334,7 +335,16 @@ func finish_tutorial() -> void:
 
 
 func tutorial_holds_time() -> bool:
-	return tutorial < TUTORIAL_DONE and not exploring()
+	return tutorial < TUTORIAL_DONE and not exploring() and not tutorial_needs_energy()
+
+
+## No tutorial, o Mike pediu para construir algo que ainda não dá para pagar: o tempo anda até a energia chegar.
+func tutorial_needs_energy() -> bool:
+	if tutorial == 0:
+		return energy < float(ITEMS.solar.cost) and count_items("solar") == 0
+	if tutorial == 1:
+		return energy < float(ITEMS.greenhouse.cost) and count_items("greenhouse") == 0
+	return false
 
 
 func start() -> void:
@@ -625,6 +635,10 @@ func upgrade(c: Vector2i) -> bool:
 	if items[key(c)].type == "rtg" and int(items[key(c)].level) == MAX_LEVEL and not cards.has(str(CARD_KILOPOWER)):
 		add_card(CARD_KILOPOWER)
 	if items[key(c)].type == "habitat":
+		var fill: float = HOUSE_BARS.get(int(items[key(c)].level), 0.0)
+		energy = maxf(energy, fill)
+		oxygen = maxf(oxygen, fill)
+		shield = maxf(shield, fill)
 		event_message.emit("MAP_GROW", "")
 	_after_action()
 	return true

@@ -127,7 +127,9 @@ var _album_next: Label
 var _album_tabs: HBoxContainer
 var _album_page_title: Label
 var _album_page := 0
-var _album_badge: PanelContainer   # bolinha vermelha no botão Álbum: quantas cartas novas
+var _album_badge: PanelContainer
+var _album_box: StyleBoxFlat
+const ALBUM_MAX_W := 1000.0   # no PC o álbum fica no meio, no máximo desta largura   # bolinha vermelha no botão Álbum: quantas cartas novas
 var _nasa: PanelContainer
 var _nasa_text: Label
 var _start: Control
@@ -1058,10 +1060,16 @@ func _refresh_album() -> void:
 	# Todas as cartas juntas, grandes: 2 colunas no celular e mais colunas em tela larga.
 	for c in _album_grid.get_children():
 		c.queue_free()
-	var room := minf(get_viewport().get_visible_rect().size.x, 1400.0) - 64.0 - 24.0
-	var cols := maxi(2, int((room + 16.0) / 316.0))
+	# O álbum ocupa uma coluna no meio da tela (como o resto da interface): 2 cartas por linha
+	# no celular e até 3 no PC, sempre grandes.
+	var vw := get_viewport().get_visible_rect().size.x
+	var side := maxf(32.0, (vw - ALBUM_MAX_W) / 2.0)
+	_album_box.content_margin_left = side
+	_album_box.content_margin_right = side
+	var room := vw - side * 2.0 - 24.0
+	var cols := clampi(int((room + 16.0) / 300.0), 2, 3)
 	_album_grid.columns = cols
-	var tile_w := minf((room - (cols - 1) * 16.0) / cols, 360.0)
+	var tile_w := minf((room - (cols - 1) * 16.0) / cols, 320.0)
 	var all_ids := State.card_ids()
 	for id in all_ids:
 		_album_grid.add_child(_album_tile(id, tile_w))
@@ -1499,7 +1507,9 @@ func _tut_update() -> void:
 	match s:
 		0, 1:
 			var type := "solar" if s == 0 else "greenhouse"
-			if mode == Mode.BUILD:
+			if State.tutorial_needs_energy() and mode != Mode.BUILD:
+				text = tr("TUTO_WAIT_ENERGY")
+			elif mode == Mode.BUILD:
 				text = tr("TUTO_PLACE")
 			elif _info_construcao.visible:
 				text = tr("TUTO_CONFIRM")
@@ -2220,6 +2230,7 @@ func _build_album() -> void:
 	_album = PanelContainer.new()
 	_album.set_anchors_preset(Control.PRESET_FULL_RECT)
 	var album_box := Palette._box(Palette.BG.darkened(0.15), 0)
+	_album_box = album_box
 	album_box.content_margin_left = 32
 	album_box.content_margin_right = 32
 	album_box.content_margin_top = 32
@@ -2286,12 +2297,15 @@ func _build_album() -> void:
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	box.add_child(scroll)
+	# A grade fica no meio (antes ia toda para a esquerda no PC).
+	var center := CenterContainer.new()
+	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(center)
 	_album_grid = GridContainer.new()
 	_album_grid.columns = 3
-	_album_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_album_grid.add_theme_constant_override("h_separation", 16)
 	_album_grid.add_theme_constant_override("v_separation", 24)
-	scroll.add_child(_album_grid)
+	center.add_child(_album_grid)
 
 
 func _page_icon(page: int) -> Texture2D:
