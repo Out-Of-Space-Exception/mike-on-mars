@@ -2,7 +2,7 @@
 
 Apresentação editável: [slides.pptx](slides.pptx). PDF: [slides.pdf](slides.pdf).
 
-Versão em português do Brasil aprovada pelo time para uso interno. Sete slides, horizontal 16:9, com a paleta e a fonte Rubik do projeto. As capturas reais permanecem com a interface original em inglês. O PDF preserva os slides como imagens; editar textos no PPTX ou na apresentação ao vivo.
+Versão em português do Brasil aprovada pelo time para uso interno. Sete slides, horizontal 16:9, com a paleta e a fonte Rubik do projeto. As capturas reais permanecem com a interface original em inglês. O PDF preserva os slides como imagens; editar textos no PPTX no arquivo editável.
 
 A pedido do time, esta entrega substitui o rascunho em inglês. Publicação no repositório autorizada pelo time. Não é a demo oficial de submissão, para a qual o time escolheu o vídeo em inglês. Não há pendência de Google Slides/Canva para esta versão interna.
 
@@ -30,17 +30,17 @@ Fonte: https://www.jpl.nasa.gov/images/pia19400-sunset-in-mars-gale-crater/
 ## 3. Solução
 **Uma base em Marte no navegador**
 
-- Construa uma base. Cultive. Explore e faça descobertas.
-- Jogue no celular. Sem login. Sem baixar.
-- Salve sua base e volte para continuar jogando.
+- Cultive com sementes. Explore e faça descobertas.
+- Receba sementes da Terra. Os pacotes precisam de antena.
+- Jogue no celular, sem login. A base fica salva no aparelho.
 
-Imagem: captura-estufa-en.jpg, captura real da versão publicada em inglês em 15/11/2026. Avisos: Jogo publicado · Interface em inglês; Made with AI · Recursos do jogo; veja os créditos.
+Imagem: captura-estufa-en.jpg, carta de tempestade sobre o painel da estufa; captura real da versão publicada em inglês em 15/11/2026. Avisos: Jogo publicado · Interface em inglês; Made with AI · Recursos do jogo; veja os créditos.
 
 ## 4. Como funciona
 **Construir, cultivar e explorar**
 
 - Cuide de três barras: Energia, Oxigênio e Escudo.
-- Construa, plante e explore para ampliar sua coleção.
+- Construa, plante e explore. Nem toda busca traz amostra.
 - Eventos trazem escolhas. Recursos baixos limitam ações, sem encerrar a partida.
 
 Imagem: captura-base-en.jpg, captura real da versão publicada em inglês. Aviso: Made with AI · Recursos do jogo; veja os créditos.
@@ -55,7 +55,7 @@ Imagem: captura-base-en.jpg, captura real da versão publicada em inglês. Aviso
 Imagem: foto 09, enxofre. Cristais de enxofre · Foto: NASA/JPL-Caltech/MSSS.
 Fontes visíveis: ccmc.gsfc.nasa.gov/DONKI/ · science.nasa.gov
 Fontes completas nas notas: https://ccmc.gsfc.nasa.gov/DONKI/ e https://science.nasa.gov/resource/curiosity-views-sulfur-crystals-within-a-crushed-rock/
-Quantidade atual: 36, apos inclusao de Rocknest 3; atualizacao e82c03f e verificacao em jogo/test/game_test.gd. O CONTEXTO.md ainda cita 35; este slide acompanha a entrega atual, sem alterar o contexto de outra dupla.
+Quantidade atual: 36 cartas ativas; cinco reservas fora do jogo. Fontes na revisão das cartas e no cartas.csv.
 
 ## 6. Impacto
 **Praticar a gestão de recursos**

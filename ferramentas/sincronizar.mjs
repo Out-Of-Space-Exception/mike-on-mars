@@ -45,7 +45,7 @@ writeFileSync(join(ROOT, 'jogo/data/textos.csv'), lines.join('\n') + '\n');
 // The game reads English ids; the Content team's sheet stays in Portuguese.
 const CATEGORY = {'Plantas': 'plants', 'Minerais': 'minerals', 'Tecnologias': 'tech', 'Robôs': 'robots', 'Céu e clima': 'sky', 'Descobertas': 'discoveries'};
 const RARITY = {'comum': 'common', 'raro': 'rare', 'épico': 'epic', 'lendário': 'legendary'};
-const HOW = {'colher na estufa': 'harvest', 'tubo de amostra': 'tube', 'construir': 'build', 'explorar': 'explore', 'aguentar o evento': 'event'};
+const HOW = {'colher na estufa': 'harvest', 'tubo de amostra': 'tube', 'construir': 'build', 'explorar': 'explore', 'aguentar o evento': 'event', 'pacote da Terra': 'package'};
 const cards = cardRows.filter(c => !/em breve/i.test(c.onde)).map(c => ({
   id: Number(c.id), category: CATEGORY[c.categoria] ?? c.categoria, rarity: RARITY[c.raridade] ?? c.raridade, how: HOW[c.como_ganha] ?? c.como_ganha, place: c.onde,
   number: c.numero_real, source: c.fonte, photo: c.foto_nasa,

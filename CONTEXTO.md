@@ -39,9 +39,9 @@ Você está ajudando o time **Out of Space Exception** (Brasil) no NASA Space Ap
 - **A Casa do Mike faz as barras crescerem:** no nível 1, a energia vai até 20 e o oxigênio e o escudo até 40; no nível 2, tudo vai até 60; no nível 3, até 100. Melhorar a casa também enche as barras.
 - **Construir:** toca no item, toca no chão (sem arrastar). Dá para **mover, girar, remover sem perder nada e melhorar** (o painel cresce, a estufa aumenta). O álbum destrava **decorações**.
 - **A Casa do Mike manda na base:** o nível dela abre área nova para construir (4 x 4 casas no nível 1, 6 x 6 no 2, 6 x 8 no 3) e é o nível máximo das outras construções. O planetinha cresce junto.
-- **Plantar:** na estufa. A luz da estufa gasta energia. As plantas crescem num tempo proporcional ao real (alface ≈ 1 min 20 s; pimenta ≈ 5 min).
-- **Explorar:** gasta oxigênio. O Mike volta com um **tubo de amostra** (igual aos que o rover Perseverance lacra em Marte), que treme, brilha na cor da raridade e revela uma **carta**.
-- **Cartas:** **35** no jogo (as 5 de Meridiani e Jezero ficaram fora, para o jogo sair fechadinho), em 4 raridades com cor fixa: comum (cinza), raro (azul), épico (roxo) e lendário (dourado). As mesmas cores que as crianças já conhecem de outros jogos. Cada uma tem **foto real da NASA**, nome de verdade e **1 linha de fato**, que aparece como **prêmio** depois que a criança ganha (nunca como lição).
+- **Plantar:** na estufa, usando sementes. A criança começa com 5 sementes de alface; cada colheita devolve de 1 a 3 sementes. Com a antena construída, chegam pacotes da Terra com 3 sementes sorteadas após 150 sóis sem pacote, ou quando termina o evento Sem sinal (a contagem pausa durante o evento). As cartas de batata e tomate chegam sorteadas até o 5º pacote. A luz da estufa gasta energia. As plantas crescem num tempo proporcional ao real (alface ≈ 1 min 20 s; pimenta ≈ 5 min).
+- **Explorar:** gasta 30 de oxigênio e exige escudo suficiente. Algumas buscas voltam vazias; quando encontra uma amostra, o Mike volta com um **tubo de amostra** (igual aos que o rover Perseverance lacra em Marte), que treme, brilha na cor da raridade e revela uma **carta**.
+- **Cartas:** **36** no jogo (as 5 de Meridiani e Jezero ficaram fora, para o jogo sair fechadinho), em 4 raridades com cor fixa: comum (cinza), raro (azul), épico (roxo) e lendário (dourado). As mesmas cores que as crianças já conhecem de outros jogos. Cada uma tem **foto real da NASA**, nome de verdade e **1 linha de fato**, que aparece como **prêmio** depois que a criança ganha (nunca como lição).
 - **A base fica salva** no aparelho e **cresce até com o jogo fechado** ("enquanto você estava fora, 3 alfaces ficaram prontas!").
 - **Sem game over:** barra baixa só **trava ou desacelera** uma ação até recuperar (sem oxigênio, o Mike não sai; sem energia, a estufa desacelera).
 - **Escolha de verdade:** painel solar dá muita energia, mas sofre com a poeira. Bateria nuclear (RTG) dá pouca, mas nunca para.
@@ -49,7 +49,7 @@ Você está ajudando o time **Out of Space Exception** (Brasil) no NASA Space Ap
 - **Cartão-postal:** print da base ("Sol 47 · Gale") para mostrar aos amigos.
 - **O jogo pausa** quando a criança precisa escolher. Nada de cronômetro.
 
-### Eventos (sorteados; todo evento tem lado ruim e lado bom)
+### Eventos (sorteados; mudam recursos e podem trazer descobertas)
 
 | Evento | Lado ruim | Lado bom |
 |---|---|---|

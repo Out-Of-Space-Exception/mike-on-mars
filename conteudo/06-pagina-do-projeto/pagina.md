@@ -6,23 +6,23 @@
 - **Challenge:** Build a Junior Astronaut Mission Trainer
 
 ## High-level project summary
-Mike on Mars is a free browser game for kids aged 7 to 12. Players help astronaut Mike run a small base in Gale Crater, where the Curiosity rover works. To keep Mike safe, they must balance energy, oxygen and protection from the Sun. Real NASA data drives the game: solar storms come from NASA's DONKI database, and every card a player collects shows a real NASA fact with its source. Kids feel the hard choices of a real mission, and the science shows up as a prize, not a lesson.
+Mike on Mars is a free browser game where kids aged 7 to 12 practice running a Mars base. Players manage energy, oxygen and shielding, grow crops and collect discoveries with NASA photographs and sourced facts. Archived NASA DONKI records inspire solar storms that turn resource management into a mission choice.
 
 ## Detailed project description
 **What it does**
 - Only 3 bars: Energy, Oxygen and Shield (protection from the Sun's radiation).
 - **Build:** tap an item, then tap the ground. Items can be moved, removed and upgraded.
-- **Plant:** grow real space crops in the greenhouse, like lettuce, radish and Hatch chile. The greenhouse lights use energy.
-- **Explore:** Mike uses oxygen to explore and comes back with a sample tube. The tube shakes, glows in the color of its rarity and opens a card.
+- **Plant:** grow real space crops in the greenhouse, like lettuce, radish and Hatch chile. Planting uses seeds, and the greenhouse lights use energy. Players start with lettuce seeds. Harvesting returns seeds; Earth packages bring more when an antenna is built.
+- **Explore:** Mike needs enough shielding and spends 30 oxygen to explore. Some searches return empty; others bring back a sample tube. The tube shakes, glows in the color of its rarity and opens a card.
 - **36 cards** in 4 rarities (common, rare, epic, legendary). Each card has a real name, a NASA photo and a 1-line fact.
-- **Events** always have a bad side and a good side. Example: in a solar storm, raising the shield uses energy, but a shielded player may win the legendary "Aurora on Mars" card. Other events: dust storm, dust devil, freezing night and no signal from Earth.
+- **Events** change resources and can bring discoveries. Example: in a solar storm, raising the shield uses energy, but a shielded player may win the legendary "Aurora on Mars" card. Other events: dust storm, dust devil, freezing night and no signal from Earth.
 - **Real trade-off:** solar panels give lots of energy but suffer from dust; the nuclear battery (RTG) gives a little energy but never stops.
-- **No game over.** A low bar only slows or pauses an action until it recovers. The game pauses when the player has to choose. There is no timer.
+- **No game over.** A low bar only slows or pauses an action until it recovers. The game pauses when the player has to choose. Choices have no countdown.
 - The base is saved on the device and keeps growing while the game is closed.
 - Ingenuity, the Mars helicopter, flies behind Mike as a pet.
 
 **Benefits**
-- Kids learn real mission names (MOXIE, Ingenuity, Curiosity, Perseverance) and real Mars facts.
+- Kids discover real mission names (MOXIE, Ingenuity, Curiosity, Perseverance) and real Mars facts.
 - Kids practice real mission choices: power vs. dust, shield vs. energy, plants vs. oxygen.
 - Free. It runs in the phone browser, with no download and no login.
 - No child data: the game asks for no name, photo or account.
@@ -30,7 +30,7 @@ Mike on Mars is a free browser game for kids aged 7 to 12. Players help astronau
 
 **What we want to achieve**
 - Kids who feel that space missions are about smart choices, and who want to learn more.
-- Next steps: two more places on Mars, Meridiani and Jezero. They show on the map as "coming soon" and are not playable yet.
+- Next steps: two more places on Mars, Meridiani and Jezero. These are future ideas, outside the current playable Gale release.
 
 **Tools**
 - Game engine: Godot Engine 4.7.2, exported to the web.
@@ -41,53 +41,49 @@ Mike on Mars is a free browser game for kids aged 7 to 12. Players help astronau
 ## NASA data
 **1. DONKI: real solar storms**
 - Source: DONKI, NASA's Space Weather Database Of Notifications, Knowledge, Information: https://ccmc.gsfc.nasa.gov/DONKI/
-- What we use: 140 solar storm events (WSA-ENLIL simulations) from 2024 that reached Mars, downloaded from the NASA API (https://api.nasa.gov/).
-- How the game uses it: each solar storm in the game is a real 2024 event and shows its real date. The player chooses: raise the shield (uses energy) or keep Mike inside. The first storm is always the one of May 20, 2024, which the Curiosity rover measured in Gale Crater.
+- What we use: 140 archived DONKI WSA-ENLIL records from 2024 with modeled Mars impacts, downloaded from the NASA API (https://api.nasa.gov/).
+- How the game uses it: solar storms use dates from the archived records. Simulation outputs are not direct measurements of conditions at the base; resource costs and shielding are simplified game rules. The player chooses: raise the shield (uses energy) or keep Mike inside. The first storm is always the one of May 20, 2024, which the Curiosity rover measured in Gale Crater.
 - This is archived data, not live. The game says so on its "NASA data" screen.
 
 **2. Facts and photos on the 36 cards**
 - Every card fact comes from a NASA page (nasa.gov, science.nasa.gov or jpl.nasa.gov). The game links each card to its source.
 - Sources, card by card:
-  - Lettuce: https://www.nasa.gov/mission_pages/station/research/news/veggie
-  - Radish: https://www.nasa.gov/missions/station/astronauts-harvest-radish-crop-on-international-space-station/
-  - Kale: https://www.nasa.gov/exploration-research-and-technology/growing-plants-in-space/
-  - Potato: https://www.nasa.gov/science-research/nasa-plant-researchers-explore-question-of-deep-space-food-crops/
-  - Zinnia: https://www.nasa.gov/image-article/first-flower-grown-space-stations-veggie-facility/
-  - Hatch chile: https://www.nasa.gov/image-article/fresh-chiles-spice-up-taco-night/
-  - Hematite ("blueberries"): https://www.jpl.nasa.gov/news/opportunity-rover-finds-strong-evidence-meridiani-planum-was-wet/
-  - Jarosite: https://www.jpl.nasa.gov/news/opportunity-rover-finds-strong-evidence-meridiani-planum-was-wet/
-  - Sulfur: https://www.nasa.gov/missions/mars-science-laboratory/curiosity-rover/nasas-curiosity-rover-discovers-a-surprise-in-a-martian-rock/
-  - Leopard spots: https://www.nasa.gov/news-release/nasa-says-mars-rover-discovered-potential-biosignature-last-year/
-  - Solar panel: https://www.nasa.gov/wp-content/uploads/2024/01/mars-surface-power-generation-challenges-and-considerations.pdf
-  - Nuclear battery (RTG): https://science.nasa.gov/planetary-science/programs/radioisotope-power-systems/faq/
-  - MOXIE: https://www.nasa.gov/missions/mars-2020-perseverance/perseverance-rover/nasas-oxygen-generating-experiment-moxie-completes-mars-mission/
-  - Kilopower: https://www.nasa.gov/news-release/demonstration-proves-nuclear-fission-system-can-provide-space-exploration-power/
-  - Ingenuity: https://www.nasa.gov/news-release/after-three-years-on-mars-nasas-ingenuity-helicopter-mission-ends/
-  - Curiosity: https://www.nasa.gov/solar-system/planets/mars/nasa-watches-mars-light-up-during-epic-solar-storm
-  - Opportunity: https://www.jpl.nasa.gov/news/opportunity-hunkers-down-during-dust-storm/
-  - Perseverance: https://www.nasa.gov/news-release/nasa-says-mars-rover-discovered-potential-biosignature-last-year/
-  - Sol (a Mars day): https://www.nasa.gov/wp-content/uploads/2024/01/mars-surface-power-generation-challenges-and-considerations.pdf
-  - Gale cold: https://science.nasa.gov/resource/steady-temperatures-at-mars-gale-crater
-  - Dust storm: https://science.nasa.gov/resource/insights-power-generation-after-landing-and-spring-2022/
-  - Dust devil: https://www.jpl.nasa.gov/news/spirit-gets-energy-boost-from-cleaner-solar-panels/
-  - 2024 solar storm: https://www.nasa.gov/solar-system/planets/mars/nasa-watches-mars-light-up-during-epic-solar-storm
-  - Frost on Mars: https://www.jpl.nasa.gov/images/pia00530-frost-on-utopia-planitia/
-  - Aurora on Mars: https://science.nasa.gov/solar-system/planets/mars/nasa-observes-first-visible-light-auroras-at-mars/
-  - White veins: https://science.nasa.gov/resource/veins-in-sheepbed-outcrop/
-  - Olivine: https://www.jpl.nasa.gov/news/nasa-rovers-first-soil-studies-help-fingerprint-martian-minerals/
-  - Bagnold Dunes: https://science.nasa.gov/resource/high-dune-is-first-martian-dune-studied-up-close-2
-  - Mount Sharp: https://www.jpl.nasa.gov/news/cracks-in-ancient-martian-mud-surprise-nasas-curiosity-rover-team/
-  - Ancient lakes: https://www.jpl.nasa.gov/news/nasas-curiosity-rover-team-confirms-ancient-lakes-on-mars/
-  - Mud cracks: https://www.jpl.nasa.gov/news/cracks-in-ancient-martian-mud-surprise-nasas-curiosity-rover-team/
-  - Manganese oxide: https://www.jpl.nasa.gov/news/nasa-rover-findings-point-to-a-more-earth-like-martian-past/
-  - Boron: https://www.jpl.nasa.gov/news/mars-rock-ingredient-stew-seen-as-plus-for-habitability/
-  - John Klein rock: https://www.jpl.nasa.gov/news/nasa-rover-finds-conditions-once-suited-for-ancient-life-on-mars/
-  - Lebanon meteorite: https://www.jpl.nasa.gov/images/pia18387-curiosity-finds-iron-meteorite-on-mars/
-  - Organic molecules: https://science.nasa.gov/missions/mars-science-laboratory/nasas-curiosity-rover-detects-largest-organic-molecules-found-on-mars/
-  - Phobos and Deimos: https://science.nasa.gov/mars/moons/
-  - Blue sunset: https://www.jpl.nasa.gov/images/pia19400-sunset-in-mars-gale-crater/
-  - Earth seen from Mars: https://science.nasa.gov/resource/bright-evening-star-seen-from-mars-is-earth/
-  - Dwarf tomato: https://www.nasa.gov/missions/station/nasa-teams-persevere-through-plant-challenges-in-space
+  - Lettuce: [fact](https://www.nasa.gov/wp-content/uploads/2019/04/veggie_fact_sheet_508.pdf); [photo](https://www.nasa.gov/image-article/tending-your-garden-space/).
+  - Radish: [fact](https://www.nasa.gov/missions/station/astronauts-harvest-radish-crop-on-international-space-station/); [photo](https://www.nasa.gov/image-article/radish-bulbs-are-pictured-inside-stations-advanced-plant-habitat/).
+  - Kale: [fact](https://www.nasa.gov/exploration-research-and-technology/growing-plants-in-space/); [photo](https://images.nasa.gov/details/iss075e0250227).
+  - Potato: [fact](https://www.nasa.gov/science-research/nasa-plant-researchers-explore-question-of-deep-space-food-crops/); [photo](https://images.nasa.gov/details/KSC-95pc1197).
+  - Zinnia: [fact](https://www.nasa.gov/humans-in-space/zinnias-from-space-nasa-studies-the-multiple-benefits-of-gardening/); [photo](https://www.nasa.gov/image-article/a-bloom-in-space/).
+  - Hatch chile: [fact](https://www.nasa.gov/image-article/fresh-chiles-spice-up-taco-night/); [photo](https://www.nasa.gov/missions/station/nasas-second-pepper-harvest-sets-record-on-space-station/).
+  - Sulfur: [fact](https://www.nasa.gov/missions/mars-science-laboratory/curiosity-rover/nasas-curiosity-rover-discovers-a-surprise-in-a-martian-rock/); [photo](https://science.nasa.gov/resource/curiosity-views-sulfur-crystals-within-a-crushed-rock/).
+  - Solar panel: [fact](https://www.nasa.gov/wp-content/uploads/2024/01/mars-surface-power-generation-challenges-and-considerations.pdf); [photo](https://science.nasa.gov/resource/insights-dusty-solar-panel/).
+  - Nuclear battery (RTG): [fact](https://science.nasa.gov/planetary-science/programs/radioisotope-power-systems/faq/); [photo](https://science.nasa.gov/resource/installing-the-mmrtg-power-source/).
+  - MOXIE: [fact](https://www.nasa.gov/missions/mars-2020-perseverance/perseverance-rover/nasas-oxygen-generating-experiment-moxie-completes-mars-mission/); [photo](https://science.nasa.gov/photojournal/moxie-all-tucked-in/).
+  - Kilopower: [fact](https://www.nasa.gov/news-release/demonstration-proves-nuclear-fission-system-can-provide-space-exploration-power/); [photo](https://www.nasa.gov/image-article/kilopower-13/).
+  - Ingenuity: [fact](https://www.nasa.gov/news-release/after-three-years-on-mars-nasas-ingenuity-helicopter-mission-ends/); [photo](https://science.nasa.gov/photojournal/ingenuity-deployed-on-mars/).
+  - Curiosity: [fact](https://www.jpl.nasa.gov/news/nasa-watches-mars-light-up-during-epic-solar-storm/); [photo](https://science.nasa.gov/photojournal/curiositys-selfie-at-mont-mercou/).
+  - Sol (a Mars day): [fact](https://www.nasa.gov/wp-content/uploads/2024/01/mars-surface-power-generation-challenges-and-considerations.pdf); [photo](https://science.nasa.gov/resource/sunrise-on-mars-viking-2/).
+  - Gale cold: [fact](https://science.nasa.gov/photojournal/steady-temperatures-at-mars-gale-crater/); [photo](https://science.nasa.gov/photojournal/curiosity-looks-downslope-from-the-sulfate-unit/).
+  - Dust storm: [fact](https://science.nasa.gov/resource/insights-power-generation-after-landing-and-spring-2022/); [photo](https://science.nasa.gov/resource/insights-dusty-solar-panel/).
+  - Dust devil: [fact](https://www.jpl.nasa.gov/news/spirit-gets-energy-boost-from-cleaner-solar-panels/); [photo](https://science.nasa.gov/photojournal/spirit-solar-panel-on-sol-1813-still-very-dusty/).
+  - 2024 solar storm: [fact](https://www.jpl.nasa.gov/news/nasa-watches-mars-light-up-during-epic-solar-storm/); [photo](https://science.nasa.gov/resource/curiosity-sees-streaks-and-specks-during-2024-solar-storm/).
+  - Frost on Mars: [fact](https://www.jpl.nasa.gov/images/pia00530-frost-on-utopia-planitia/); [photo](https://science.nasa.gov/photojournal/ice-on-mars/).
+  - Aurora on Mars: [fact](https://science.nasa.gov/solar-system/planets/mars/nasa-observes-first-visible-light-auroras-at-mars/); [photo](https://science.nasa.gov/solar-system/planets/mars/nasa-observes-first-visible-light-auroras-at-mars/).
+  - White veins: [fact](https://science.nasa.gov/resource/veins-in-sheepbed-outcrop/); [photo](https://science.nasa.gov/resource/veins-in-sheepbed-outcrop/).
+  - Olivine: [fact](https://www.jpl.nasa.gov/news/nasa-rovers-first-soil-studies-help-fingerprint-martian-minerals/); [photo](https://www.jpl.nasa.gov/images/pia16174-wind-blown-martian-sand/).
+  - Bagnold Dunes: [fact](https://science.nasa.gov/resource/high-dune-is-first-martian-dune-studied-up-close-2/); [photo](https://science.nasa.gov/resource/high-dune-is-first-martian-dune-studied-up-close-2/).
+  - Mount Sharp: [fact](https://www.jpl.nasa.gov/news/cracks-in-ancient-martian-mud-surprise-nasas-curiosity-rover-team/); [photo](https://www.jpl.nasa.gov/images/pia16769-mount-sharp-panorama-in-raw-colors/).
+  - Ancient lakes: [fact](https://www.jpl.nasa.gov/news/nasas-curiosity-rover-team-confirms-ancient-lakes-on-mars/); [photo](https://science.nasa.gov/photojournal/strata-at-base-of-mount-sharp/).
+  - Mud cracks: [fact](https://www.jpl.nasa.gov/news/cracks-in-ancient-martian-mud-surprise-nasas-curiosity-rover-team/); [photo](https://www.jpl.nasa.gov/news/cracks-in-ancient-martian-mud-surprise-nasas-curiosity-rover-team/).
+  - Manganese oxide: [fact](https://www.jpl.nasa.gov/news/nasa-rover-findings-point-to-a-more-earth-like-martian-past/); [photo](https://www.jpl.nasa.gov/images/pia20752-nasas-curiosity-at-site-of-clues-about-ancient-oxygen/).
+  - Boron: [fact](https://www.jpl.nasa.gov/news/mars-rock-ingredient-stew-seen-as-plus-for-habitability/); [photo](https://www.jpl.nasa.gov/images/pia21251-boron-in-calcium-sulfate-vein-at-catabola-mars/).
+  - John Klein rock: [fact](https://www.jpl.nasa.gov/news/nasa-rover-finds-conditions-once-suited-for-ancient-life-on-mars/); [photo](https://www.jpl.nasa.gov/images/pia16726-curiositys-first-sample-drilling/).
+  - Lebanon meteorite: [fact](https://www.jpl.nasa.gov/images/pia18387-curiosity-finds-iron-meteorite-on-mars/); [photo](https://www.jpl.nasa.gov/images/pia18387-curiosity-finds-iron-meteorite-on-mars/).
+  - Organic molecules: [fact](https://science.nasa.gov/missions/mars-science-laboratory/nasas-curiosity-rover-detects-largest-organic-molecules-found-on-mars/); [photo](https://science.nasa.gov/resource/cumberland-target-drilled-by-curiosity/).
+  - Phobos and Deimos: [fact](https://science.nasa.gov/mars/moons/); [photo](https://science.nasa.gov/photojournal/phobos-from-5800-kilometers-color/).
+  - Blue sunset: [fact](https://www.jpl.nasa.gov/images/pia19400-sunset-in-mars-gale-crater/); [photo](https://www.jpl.nasa.gov/images/pia19400-sunset-in-mars-gale-crater/).
+  - Earth seen from Mars: [fact](https://www.jpl.nasa.gov/images/pia17935-curiosity-mars-rovers-first-image-of-earth-and-earths-moon/); [photo](https://www.jpl.nasa.gov/images/pia17935-curiosity-mars-rovers-first-image-of-earth-and-earths-moon/).
+  - Dwarf tomato: [fact](https://www.nasa.gov/missions/station/nasa-teams-persevere-through-plant-challenges-in-space/); [photo](https://www.nasa.gov/missions/station/nasa-teams-persevere-through-plant-challenges-in-space/).
+  - Rocknest 3: [fact](https://science.nasa.gov/resource/a-martian-rock-called-rocknest-3/); [photo](https://science.nasa.gov/resource/a-martian-rock-called-rocknest-3/).
 
 **3. Ingenuity 3D model**
 - The official Mars Ingenuity Helicopter 3D model by NASA/JPL-Caltech is the pet that flies behind Mike: https://science.nasa.gov/resource/mars-ingenuity-helicopter-3d-model/
@@ -96,6 +92,7 @@ Mike on Mars is a free browser game for kids aged 7 to 12. Players help astronau
 None. All the data and facts in the game come from NASA.
 
 ## Use of AI
+- OpenAI Codex: reviewed card science and translations, resolved photo sources, updated this draft and the Portuguese support slides to match the current seed and exploration rules. Gameplay captures are real screenshots, not generated scenes.
 We used AI tools and we list every use here. Any image or video made with AI carries a visible "Made with AI" watermark.
 - OpenAI ChatGPT/Codex: researched and checked NASA image sources, prepared conventional crops and a documented two-moon photo montage, reviewed credits, and helped draft the pitch scripts and capture plan. The NASA photographs were not generated by AI.
 - OpenAI Codex: wrote the scripts that assembled reference videos from existing repository images, captions and credited music. These are reference edits, not recordings of gameplay.
@@ -152,7 +149,7 @@ We used AI tools and we list every use here. Any image or video made with AI car
 - Audacity 4.0.2 (audio editing) · Muse Group · GPL · https://www.audacityteam.org/
 - Mars Ingenuity Helicopter 3D Model (pet) · NASA/JPL-Caltech · free use with credit (NASA media guidelines) · https://science.nasa.gov/resource/mars-ingenuity-helicopter-3d-model/
 - Junegull (logo title font) · Ray Larabie (Larabie Fonts) · Larabie Fonts Freeware EULA (free for personal and commercial use; used only as an image in the logo) · https://www.larabiefonts.com/
-- NASA sources of the 40 card facts: listed in "NASA data" above.
+- NASA sources of the 36 active card facts and photographs: listed in "NASA data" above.
 
 - Magic Spell SFX (magical_3.ogg, replacement sample-tube sound) · JaggedStone · CC0 · https://opengameart.org/content/magic-spell-sfx
 

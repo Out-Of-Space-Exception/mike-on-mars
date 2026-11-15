@@ -51,3 +51,7 @@ As cinco reservas não voltam ao jogo com esta revisão. Jarosita (8) precisa de
 - Créditos e uso de IA: [creditos.csv](../../creditos.csv).
 
 A entrega de Conteúdo está concluída para as 36 cartas ativas. A tabela acima preserva o diagnóstico inicial; as decisões finais e as novas fotos constam em pendencias-resolvidas.md. Nenhum arquivo de jogo/ foi alterado e nenhuma publicação foi feita nesta revisão.
+
+## Compatibilidade apos o pull
+
+A atualizacao das sementes e pacotes ja foi implementada pela equipe: as cartas 4 e 40 chegam por pacote da Terra, e nao pela colheita. O campo como_ganha foi ajustado nas duas linhas e o sincronizador normaliza a regra como package. Raridades e IDs continuam iguais.
