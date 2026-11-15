@@ -33,6 +33,9 @@ var _card_rays: Control
 var _tube_q: Label3D
 var _tube_opening := false
 var _tube_btn: Button
+var _tube_lid: MeshInstance3D
+var _tube_ring: MeshInstance3D
+var _tube_beam: MeshInstance3D
 var _top_box: Control
 var _bottom_box: Control
 var _popups: Array[PanelContainer] = []
@@ -60,6 +63,8 @@ var _panel_desc: Label
 var _panel_stats: HBoxContainer
 var _panel_tail: Polygon2D
 var _panel_pos := Vector2.INF
+var _panel_sig := ""          # o que o menu flutuante mostra; só remonta os botões quando isso muda
+var _build_sig := ""
 var _dim: ColorRect
 var _choice: PanelContainer
 var _choice_title: Label
@@ -391,6 +396,7 @@ func _on_photo() -> void:
 # ───────────── Painel do item tocado ─────────────
 func _open_panel(c: Vector2i) -> void:
 	var was_open := _panel.visible and selected == c
+	_panel_sig = ""
 	selected = c
 	_panel.visible = true
 	_build_menu.visible = false
@@ -412,6 +418,15 @@ func _refresh_panel() -> void:
 	if it.is_empty():
 		_close_panel()
 		return
+	# A cada sol só muda o "Alface · 12/33 sóis": os botões ficam como estão (antes piscavam).
+	var sig := "%s|%s|%d|%s|%s|%s|%s|%s|%s" % [selected, it.type, int(it.level), it.get("plant", ""), State.plant_ready(selected),
+		State.base_locked_reason(), State.upgrade_block_reason(selected), State.unlocked_plants(), TranslationServer.get_locale()]
+	if sig == _panel_sig:
+		if it.type == "greenhouse" and str(it.get("plant", "")) != "" and not State.plant_ready(selected):
+			_panel_info.text = tr("PLANT_GROWING").format({
+				"plant": tr(State.PLANTS[it.plant].name), "n": int(it.growth), "max": State.PLANTS[it.plant].sols})
+		return
+	_panel_sig = sig
 	var def: Dictionary = State.ITEMS[it.type]
 	_panel_title.text = tr(State.item_name(it))
 	_panel_level.text = tr("LEVEL").format({"n": int(it.level)})
@@ -487,7 +502,7 @@ func _refresh_panel() -> void:
 		var up := _add_panel_button("%s  -%d" % [tr("BTN_UPGRADE"), cost], _on_upgrade, true)
 		up.icon = _icon("energy")
 		up.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		up.custom_minimum_size.y = 96
+		up.custom_minimum_size.y = 84
 		up.set_meta("base_color", Palette.GOLD)
 		_style_key(up, State.upgrade_block_reason(selected) == "")
 	# Mover, girar e remover: só os ícones (setas em cruz, seta em curva e lixeira), lado a lado.
@@ -499,7 +514,8 @@ func _refresh_panel() -> void:
 		kinds.append(["trash", _on_remove])
 	for pair in kinds:
 		var t := _key_button(pair[1], true)
-		t.custom_minimum_size = Vector2(0, 104)
+		t.custom_minimum_size = Vector2(0, 84)
+		t.add_theme_constant_override("icon_max_width", 56)
 		t.icon = _icon(pair[0])
 		t.expand_icon = true
 		t.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -697,7 +713,17 @@ func _show_tube() -> void:
 	_tube_glass.emission = grey.darkened(0.4)
 	_tube_light.light_color = Color(0.9, 0.9, 0.95)
 	_tube_q.visible = true
+	_tube_q.modulate.a = 1.0
+	_tube_q.scale = Vector3.ONE
 	_tube_node.scale = Vector3.ONE
+	_tube_node.visible = true
+	_tube_lid.position = Vector3(0.0, 0.82, 0.0)
+	_tube_lid.rotation = Vector3.ZERO
+	_tube_lid.visible = true
+	_tube_ring.visible = false
+	_tube_beam.visible = false
+	_tube_glass.emission_energy_multiplier = 0.6
+	_tube_light.light_energy = 2.0
 	_tube_opening = false
 	_tube_label.text = tr("TUBE_MYSTERY")
 	_tube_btn.text = tr("BTN_OPEN")
@@ -718,7 +744,8 @@ func _show_tube() -> void:
 	_tube_tween.tween_interval(0.3)
 
 
-## Abrir: o tubo treme cada vez mais forte, estoura numa fumaça na cor da carta e a carta aparece.
+## Abrir: o tubo treme cada vez mais forte e vai acendendo; a tampa voa, sai um anel de choque,
+## faíscas e fumaça na cor da carta, um facho de luz sobe... e a carta aparece girando.
 func _on_tube_tap() -> void:
 	if _tube_opening or State.tube_card == 0:
 		return
@@ -728,35 +755,113 @@ func _on_tube_tap() -> void:
 		_tube_tween.kill()
 	var color: Color = Palette.RARITY.get(State.tube_rarity(), Palette.TEXT)
 	Sfx.play("tubo-abrir")
+	_tube_label.text = "..."
+	# O "?" cresce e some.
+	var q := create_tween().set_parallel()
+	q.tween_property(_tube_q, "scale", Vector3.ONE * 1.6, 0.35)
+	q.tween_property(_tube_q, "modulate:a", 0.0, 0.35)
+	# 1) Treme cada vez mais rápido e mais forte, e o vidro vai brilhando.
+	var shake := 0.0
 	var t := create_tween()
-	for i in 8:
-		var amp := 0.08 + i * 0.05
-		t.tween_property(_tube_node, "rotation:z", amp, 0.045)
-		t.tween_property(_tube_node, "rotation:z", -amp, 0.09)
-	t.parallel().tween_property(_tube_node, "scale", Vector3.ONE * 1.18, 0.6)
-	t.tween_callback(func() -> void:
-		# A cor de verdade aparece, com um estouro de fumaça e um clarão.
-		_tube_q.visible = false
-		_tube_glass.albedo_color = Color(color, 0.7)
-		_tube_glass.emission = color
-		_tube_glass.emission_energy_multiplier = 2.5
-		_tube_light.light_color = color
-		_tube_light.light_energy = 5.0
-		_tube_smoke(color)
-		_flash.color = color.lightened(0.5)
-		_flash.modulate.a = 0.85
-		create_tween().tween_property(_flash, "modulate:a", 0.0, 0.6))
-	t.tween_property(_tube_node, "scale", Vector3.ONE * 1.6, 0.18).set_ease(Tween.EASE_OUT)
-	t.parallel().tween_property(_tube_node, "scale", Vector3.ZERO, 0.22).set_delay(0.18)
-	t.tween_interval(0.35)
+	for i in 12:
+		var amp := 0.04 + i * 0.03
+		var d := maxf(0.07 - i * 0.004, 0.025)
+		t.tween_property(_tube_node, "rotation:z", amp, d)
+		t.tween_property(_tube_node, "rotation:z", -amp, d * 2.0)
+		shake += d * 3.0
+	t.tween_property(_tube_node, "rotation:z", 0.0, 0.04)
+	var grey := Color(0.72, 0.72, 0.76)
+	create_tween().tween_method(func(v: float) -> void:
+		_tube_glass.emission = grey.lerp(Color.WHITE, v)
+		_tube_glass.emission_energy_multiplier = 0.6 + v * 2.5
+		_tube_light.light_energy = 2.0 + v * 4.0
+		_tube_node.scale = Vector3(1.0 - v * 0.08, 1.0 + v * 0.12, 1.0 - v * 0.08), 0.0, 1.0, shake)
+	# 2) Estouro.
+	t.tween_callback(_tube_burst.bind(color))
+	t.tween_interval(1.0)
+	# 3) A carta.
 	t.tween_callback(func() -> void:
 		_tube.visible = false
-		_tube_glass.emission_energy_multiplier = 0.6
-		_tube_light.light_energy = 2.0
-		_flash.color = Color.WHITE
 		_update_dim()
 		_card_reveal = true
 		State.open_tube())
+
+
+func _tube_burst(color: Color) -> void:
+	_tube_glass.albedo_color = Color(color, 0.75)
+	_tube_glass.emission = color
+	_tube_glass.emission_energy_multiplier = 3.0
+	_tube_light.light_color = color
+	_tube_light.light_energy = 7.0
+	# A tampa voa girando.
+	var lid := create_tween().set_parallel()
+	lid.tween_property(_tube_lid, "position", Vector3(0.6, 2.6, 0.4), 0.55).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+	lid.tween_property(_tube_lid, "rotation", Vector3(5.0, 0.0, 3.0), 0.55)
+	lid.chain().tween_callback(func() -> void: _tube_lid.visible = false)
+	# O tubo dá um "pulo" (achata e estica).
+	var body := create_tween()
+	body.tween_property(_tube_node, "scale", Vector3(1.25, 0.8, 1.25), 0.08)
+	body.tween_property(_tube_node, "scale", Vector3(0.9, 1.15, 0.9), 0.12)
+	body.tween_property(_tube_node, "scale", Vector3.ONE, 0.2).set_trans(Tween.TRANS_BACK)
+	# Anel de choque.
+	_tube_ring.visible = true
+	_tube_ring.scale = Vector3.ONE * 0.4
+	_tube_ring.position = Vector3(0.0, 0.7, 0.0)
+	var ring_mat: StandardMaterial3D = _tube_ring.material_override
+	ring_mat.albedo_color = Color(color.lightened(0.3), 0.95)
+	var ring := create_tween().set_parallel()
+	ring.tween_property(_tube_ring, "scale", Vector3.ONE * 4.5, 0.55).set_ease(Tween.EASE_OUT)
+	ring.tween_property(ring_mat, "albedo_color:a", 0.0, 0.55)
+	# Facho de luz subindo.
+	_tube_beam.visible = true
+	_tube_beam.scale = Vector3(1.0, 0.05, 1.0)
+	var beam_mat: StandardMaterial3D = _tube_beam.material_override
+	beam_mat.albedo_color = Color(color.lightened(0.4), 0.7)
+	var beam := create_tween()
+	beam.tween_property(_tube_beam, "scale", Vector3.ONE, 0.25).set_ease(Tween.EASE_OUT)
+	beam.tween_property(beam_mat, "albedo_color:a", 0.0, 0.7)
+	# Faíscas e fumaça.
+	_tube_sparks(color)
+	_tube_smoke(color)
+	# Clarão na tela, na cor da carta.
+	_flash.color = color.lightened(0.55)
+	_flash.modulate.a = 0.9
+	var f := create_tween()
+	f.tween_property(_flash, "modulate:a", 0.0, 0.7)
+	f.tween_callback(func() -> void: _flash.color = Color.WHITE)
+
+
+## Faíscas brilhantes que saltam do tubo e caem.
+func _tube_sparks(color: Color) -> void:
+	var p := CPUParticles3D.new()
+	p.one_shot = true
+	p.amount = 70
+	p.lifetime = 1.0
+	p.explosiveness = 1.0
+	p.position = Vector3(0.0, 0.8, 0.0)
+	p.direction = Vector3.UP
+	p.spread = 70.0
+	p.initial_velocity_min = 3.0
+	p.initial_velocity_max = 6.0
+	p.gravity = Vector3(0, -7, 0)
+	p.scale_amount_min = 0.5
+	p.scale_amount_max = 1.0
+	var fade := Gradient.new()
+	fade.set_color(0, Color.WHITE)
+	fade.add_point(0.25, color.lightened(0.3))
+	fade.set_color(1, Color(color, 0.0))
+	p.color_ramp = fade
+	var m := BoxMesh.new()
+	m.size = Vector3.ONE * 0.09
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.vertex_color_use_as_albedo = true
+	m.material = mat
+	p.mesh = m
+	_tube_node.get_parent().add_child(p)
+	p.emitting = true
+	get_tree().create_timer(1.6).timeout.connect(p.queue_free)
 
 
 ## Fumaça colorida saindo do tubo (bolinhas que crescem e somem).
@@ -959,6 +1064,7 @@ func _refresh() -> void:
 	_btn_labels.build.text = tr("BTN_BUILD")
 	_btn_labels.album.text = tr("BTN_ALBUM")
 	_btn_labels.photo.text = tr("BTN_PHOTO")
+	_btn_labels.settings.text = tr("BTN_SETTINGS")
 	if State.exploring():
 		_btn_labels.explore.text = _sols(tr("EXPLORING").format({"n": State.explore_left}))
 	elif State.tube_card != 0:
@@ -1005,6 +1111,9 @@ func _status_raw() -> String:
 		return tr("NOSIGNAL_LEFT").format({"n": State.nosignal_left})
 	if State.storm_active():
 		return tr("STORM_SHIELDED" if State.storm_shielded else "STORM_INSIDE").format({"n": State.storm_left})
+	var to_storm: int = State.next_storm_sol - State.sol
+	if State.storm_warned and to_storm > 0 and to_storm <= State.STORM_WARN_SOLS:
+		return tr("STORM_SOON").format({"n": to_storm})
 	if mode == Mode.BUILD:
 		return "" if State.tutorial < State.TUTORIAL_DONE else tr("TUT_BUILD")
 	if mode == Mode.MOVE:
@@ -1097,6 +1206,12 @@ func _plant_icon(p: String) -> Texture2D:
 
 
 func _refresh_build_menu() -> void:
+	var sig := TranslationServer.get_locale()
+	for type in State.BUILDABLE:
+		sig += "|%s%s%s" % [type, State.is_unlocked(type), State.build_block_reason(type)]
+	if sig == _build_sig and _build_grid.get_child_count() > 0:
+		return   # nada mudou: não remonta (não pisca)
+	_build_sig = sig
 	for c in _build_grid.get_children():
 		c.queue_free()
 	for type in State.BUILDABLE:
@@ -1104,7 +1219,7 @@ func _refresh_build_menu() -> void:
 		if not State.is_unlocked(type):
 			continue
 		var b := Button.new()
-		b.custom_minimum_size = Vector2(0, 204)
+		b.custom_minimum_size = Vector2(0, 172)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.set_meta("type", type)
 		b.set_meta("base_color", Palette.BUTTON)
@@ -1120,7 +1235,7 @@ func _refresh_build_menu() -> void:
 		b.add_child(col)
 		var pic := TextureRect.new()
 		pic.texture = _thumb(type)
-		pic.custom_minimum_size = Vector2(0, 92)
+		pic.custom_minimum_size = Vector2(0, 72)
 		pic.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		pic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		pic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -1133,7 +1248,7 @@ func _refresh_build_menu() -> void:
 		name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		name_label.max_lines_visible = 2
 		name_label.add_theme_font_override("font", Palette.font(700))
-		name_label.add_theme_font_size_override("font_size", 21)
+		name_label.add_theme_font_size_override("font_size", 19)
 		name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		col.add_child(name_label)
 		b.set_meta("label", name_label)
@@ -1156,7 +1271,7 @@ func _refresh_build_menu() -> void:
 			pill.add_child(cost_row)
 			var bolt := TextureRect.new()
 			bolt.texture = _icon("energy")
-			bolt.custom_minimum_size = Vector2(30, 30)
+			bolt.custom_minimum_size = Vector2(24, 24)
 			bolt.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			bolt.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			bolt.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -1164,7 +1279,7 @@ func _refresh_build_menu() -> void:
 			var cost := Label.new()
 			cost.text = "-%d" % def.cost
 			cost.add_theme_font_override("font", Palette.font(700))
-			cost.add_theme_font_size_override("font_size", 22)
+			cost.add_theme_font_size_override("font_size", 19)
 			cost.add_theme_color_override("font_color", Palette.TEXT)
 			cost.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			cost_row.add_child(cost)
@@ -1193,12 +1308,15 @@ func _update_dim() -> void:
 func _show_toast(text: String, shake := false) -> void:
 	_toast_label.text = text
 	move_child(_toast, get_child_count() - 1)   # sempre por cima de tudo
-	_toast_label.custom_minimum_size.x = get_viewport().get_visible_rect().size.x - 32.0 - 30.0 - 56.0 - 16.0
+	# Na mesma largura das barras e dos botões (no meio da tela), não na tela inteira.
+	var vw := get_viewport().get_visible_rect().size.x
+	var w := minf(vw - 40.0, MAX_W)
+	var x0 := (vw - w) / 2.0
+	_toast_label.custom_minimum_size.x = w - 30.0 - 48.0 - 18.0
 	_toast_style.border_color = Palette.ALERT if shake else Palette.INK
-	var w := get_viewport().get_visible_rect().size.x
-	_toast.custom_minimum_size.x = w - 32.0
+	_toast.custom_minimum_size.x = w
 	_toast.reset_size()
-	_toast.position.x = 16.0
+	_toast.position.x = x0
 	if _toast_tween:
 		_toast_tween.kill()
 	_toast_tween = create_tween()
@@ -1210,14 +1328,14 @@ func _show_toast(text: String, shake := false) -> void:
 		_toast_tween.set_parallel()
 		_toast_tween.tween_property(_toast, "position:y", y, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		_toast_tween.tween_property(_toast, "modulate:a", 1.0, 0.2)
-		_toast_tween.chain()
+		_toast_tween.set_parallel(false)   # o resto (esperar 5 s, depois sumir) vem um depois do outro
 	else:
 		_toast.position.y = y
 		_toast.modulate.a = 1.0
 	_toast_down = true
 	if shake:
 		for d in [14.0, -12.0, 8.0, -4.0, 0.0]:
-			_toast_tween.tween_property(_toast, "position:x", 16.0 + d, 0.05)
+			_toast_tween.tween_property(_toast, "position:x", x0 + d, 0.05)
 	_toast_tween.tween_interval(5.0)
 	_toast_tween.tween_callback(func() -> void: _toast_down = false)
 	_toast_tween.tween_property(_toast, "modulate:a", 0.0, 0.3)
@@ -1266,7 +1384,7 @@ func _build_tutorial() -> void:
 	head.atlas = load("res://ui/icons/mike.png")
 	head.region = Rect2(300, 230, 290, 290)
 	face.texture = head
-	face.custom_minimum_size = Vector2(60, 60)
+	face.custom_minimum_size = Vector2(50, 50)
 	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	face.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -1274,7 +1392,7 @@ func _build_tutorial() -> void:
 	_tut_label = Label.new()
 	_tut_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_tut_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_tut_label.add_theme_font_size_override("font_size", 27)
+	_tut_label.add_theme_font_size_override("font_size", 24)
 	_tut_label.add_theme_color_override("font_color", Palette.INK)
 	row.add_child(_tut_label)
 	var skip := Button.new()
@@ -1358,7 +1476,9 @@ func _tut_update() -> void:
 	_tut_label.text = text
 	_tut_skip.text = tr("TUTO_SKIP")
 	_tut_skip.visible = s < 5
-	var w := get_viewport().get_visible_rect().size.x - 32.0
+	var vwt := get_viewport().get_visible_rect().size.x
+	var w := minf(vwt - 40.0, MAX_W)
+	_tut_card.position.x = (vwt - w) / 2.0
 	_tut_card.custom_minimum_size.x = w
 	_tut_label.custom_minimum_size.x = w - 26.0 - 60.0 - 28.0 - (_tut_skip.get_minimum_size().x + 14.0 if s < 5 else 0.0)
 	_tut_card.size = Vector2(w, 0.0)
@@ -1541,7 +1661,7 @@ func _icon(key: String) -> Texture2D:
 				model = Icons3D.flag(load(LANG_FLAGS.get(key.trim_prefix("flag_"), LANG_FLAGS.en)))
 			else:
 				model = Node3D.new()
-	_icon_cache[key] = Icons3D.render(self, model, 160, 1.12)
+	_icon_cache[key] = Icons3D.render(self, model, 160, 1.3)
 	return _icon_cache[key]
 
 
@@ -1715,7 +1835,7 @@ func _fit_button_texts() -> void:
 		var room: float = _buttons[k].size.x - 18.0
 		if room < 40.0:
 			continue   # o botão ainda não tem largura (antes do primeiro desenho)
-		var size := 30 if k == "explore" else 24
+		var size := 26 if k == "explore" else 21
 		var f: Font = Palette.font(700)
 		while size > 16 and room > 0.0 and f.get_string_size(lb.text, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x > room:
 			size -= 1
@@ -1754,7 +1874,7 @@ func _build_top() -> void:
 		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		rows.add_child(row)
 		var icon := TextureRect.new()
-		icon.custom_minimum_size = Vector2(52, 52)
+		icon.custom_minimum_size = Vector2(40, 40)
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon.texture = _icon(bar)
@@ -1763,7 +1883,7 @@ func _build_top() -> void:
 		label.visible = false
 		row.add_child(label)
 		var pb := TubeBar.new()
-		pb.custom_minimum_size = Vector2(0, 44)
+		pb.custom_minimum_size = Vector2(0, 34)
 		pb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		pb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		pb.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -1777,7 +1897,7 @@ func _build_top() -> void:
 		num.offset_left = 18
 		num.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		num.add_theme_font_override("font", Palette.font(700))
-		num.add_theme_font_size_override("font_size", 27)
+		num.add_theme_font_size_override("font_size", 22)
 		num.add_theme_color_override("font_color", Palette.INK)
 		pb.add_child(num)
 		var chip := PanelContainer.new()
@@ -1787,7 +1907,7 @@ func _build_top() -> void:
 		chip_box.content_margin_top = 2
 		chip_box.content_margin_bottom = 2
 		chip.add_theme_stylebox_override("panel", chip_box)
-		chip.custom_minimum_size = Vector2(104, 40)
+		chip.custom_minimum_size = Vector2(88, 32)
 		chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		row.add_child(chip)
@@ -1795,7 +1915,7 @@ func _build_top() -> void:
 		rate.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		rate.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		rate.add_theme_font_override("font", Palette.font(700))
-		rate.add_theme_font_size_override("font_size", 22)
+		rate.add_theme_font_size_override("font_size", 19)
 		chip.add_child(rate)
 		_bar_nums[bar] = num
 		_bar_rates[bar] = rate
@@ -1937,27 +2057,27 @@ func _build_bottom() -> void:
 	row.add_theme_constant_override("separation", 12)
 	row.alignment = BoxContainer.ALIGNMENT_END
 	bottom.add_child(row)
-	for k in ["build", "explore", "album", "photo", "settings"]:
+	for k in ["build", "album", "explore", "photo", "settings"]:
 		var main_action: bool = k == "explore"
 		var b := Button.new()
-		var gear: bool = k == "settings"
-		b.custom_minimum_size = Vector2(100 if gear else 0, 176 if main_action else 140)
-		b.size_flags_horizontal = Control.SIZE_FILL if gear else Control.SIZE_EXPAND_FILL
+		var gear := false   # a engrenagem agora é um botão igual aos outros, com o nome embaixo
+		b.custom_minimum_size = Vector2(0, 138 if main_action else 116)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.size_flags_vertical = Control.SIZE_SHRINK_END
-		b.size_flags_stretch_ratio = 1.4 if main_action else 1.0
+		b.size_flags_stretch_ratio = 1.3 if main_action else 1.0
 		b.set_meta("base_color", Palette.GOLD if main_action else Palette.BUTTON)
 		# Dentro: o ícone 3D grande em cima e o nome em negrito embaixo (montados à mão, para cada um ter o seu contraste).
 		var col := VBoxContainer.new()
 		col.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		col.offset_top = 10
-		col.offset_bottom = -18
+		col.offset_top = 8
+		col.offset_bottom = -16
 		col.alignment = BoxContainer.ALIGNMENT_CENTER
 		col.add_theme_constant_override("separation", 0)
 		col.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		b.add_child(col)
 		var ic := TextureRect.new()
 		ic.texture = _icon(k)
-		ic.custom_minimum_size = Vector2(0, 96 if main_action else 78)
+		ic.custom_minimum_size = Vector2(0, 66 if main_action else 54)
 		ic.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -1968,7 +2088,7 @@ func _build_bottom() -> void:
 			var lb := Label.new()
 			lb.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			lb.add_theme_font_override("font", Palette.font(700))
-			lb.add_theme_font_size_override("font_size", 30 if main_action else 24)
+			lb.add_theme_font_size_override("font_size", 26 if main_action else 21)
 			lb.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			col.add_child(lb)
 			b.set_meta("label", lb)
@@ -2010,7 +2130,7 @@ func _build_messages() -> void:
 	head.atlas = load("res://ui/icons/mike.png")
 	head.region = Rect2(300, 230, 290, 290)
 	face.texture = head
-	face.custom_minimum_size = Vector2(56, 56)
+	face.custom_minimum_size = Vector2(48, 48)
 	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	face.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -2027,7 +2147,7 @@ func _build_messages() -> void:
 	col.add_child(from)
 	_toast_label = Label.new()
 	_toast_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_toast_label.add_theme_font_size_override("font_size", 27)
+	_toast_label.add_theme_font_size_override("font_size", 24)
 	_toast_label.add_theme_color_override("font_color", Palette.INK)
 	col.add_child(_toast_label)
 
@@ -2284,6 +2404,8 @@ func _build_tube_scene(vp: SubViewport) -> void:
 		cap.material_override = metal
 		cap.position.y = y
 		_tube_node.add_child(cap)
+		if y > 0.0:
+			_tube_lid = cap
 	var rock := MeshInstance3D.new()
 	var r := SphereMesh.new()
 	r.radius = 0.22
@@ -2307,6 +2429,35 @@ func _build_tube_scene(vp: SubViewport) -> void:
 	_tube_q.pixel_size = 0.006
 	_tube_q.position = Vector3(0.0, 0.05, 0.6)
 	_tube_node.add_child(_tube_q)
+	# Anel de choque e facho de luz do estouro (escondidos até abrir).
+	_tube_ring = MeshInstance3D.new()
+	var torus := TorusMesh.new()
+	torus.inner_radius = 0.42
+	torus.outer_radius = 0.55
+	torus.rings = 32
+	_tube_ring.mesh = torus
+	var ring_mat := StandardMaterial3D.new()
+	ring_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	ring_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_tube_ring.material_override = ring_mat
+	_tube_ring.rotation_degrees.x = 70.0
+	_tube_ring.visible = false
+	_tube_node.get_parent().add_child(_tube_ring)
+	_tube_beam = MeshInstance3D.new()
+	var beam := CylinderMesh.new()
+	beam.top_radius = 0.65
+	beam.bottom_radius = 0.3
+	beam.height = 4.0
+	_tube_beam.mesh = beam
+	var beam_mat := StandardMaterial3D.new()
+	beam_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	beam_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	beam_mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	beam_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	_tube_beam.material_override = beam_mat
+	_tube_beam.position.y = 2.0
+	_tube_beam.visible = false
+	_tube_node.get_parent().add_child(_tube_beam)
 	_tube_light = OmniLight3D.new()
 	_tube_light.position = Vector3(0.0, 0.0, -0.9)
 	_tube_light.omni_range = 3.0

@@ -139,6 +139,7 @@ var cold_heated := false
 var nosignal_left := 0
 var nosignal_plan := ""
 var explore_left := 0            # sóis que faltam para o Mike voltar
+var storm_warned := false       # a antena já avisou a próxima tempestade
 var snack := ""                 # o lanche (uma colheita) que o Mike levou na expedição de agora
 var music_on := true
 var sounds_on := true
@@ -769,6 +770,7 @@ func choose_storm(raise_shield: bool) -> bool:
 
 
 func _start_storm() -> void:
+	storm_warned = false
 	if _donki.is_empty():
 		next_storm_sol = sol + STORM_EVERY.x
 		return
@@ -971,8 +973,9 @@ func _tick() -> void:
 				_end_storm()
 		elif tutorial < TUTORIAL_DONE:
 			pass   # durante o tutorial, nada de tempestade nem evento
-		elif count_items("antenna") > 0 and next_storm_sol - sol == STORM_WARN_SOLS and not event_active():
-			event_message.emit("STORM_WARNING", str(STORM_WARN_SOLS))   # a antena recebeu o aviso da NASA
+		elif count_items("antenna") > 0 and not storm_warned and next_storm_sol - sol <= STORM_WARN_SOLS and next_storm_sol > sol:
+			storm_warned = true   # a antena recebeu o aviso da NASA
+			event_message.emit("STORM_WARNING", str(next_storm_sol - sol))
 		elif sol >= next_storm_sol and not event_active():
 			_start_storm()
 		elif sol >= next_event_sol and not event_active() and not storm_active():

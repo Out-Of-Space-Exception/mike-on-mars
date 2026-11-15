@@ -34,6 +34,10 @@ func _ready() -> void:
 	ok(hud._tut_card.visible and hud._tut_card.size.y < 260.0, "o recado do tutorial é pequeno (%d px de altura)" % hud._tut_card.size.y)
 	ok(hud._tut_card.position.y >= hud._bars_bottom() - 1.0, "o recado fica abaixo das barras, não por cima")
 	State.finish_tutorial()
+	hud._show_toast("teste")
+	await get_tree().create_timer(1.5).timeout
+	ok(hud._toast.modulate.a > 0.9, "o aviso do Mike continua na tela depois de 1,5 s")
+	ok(hud._toast.size.x <= hud.MAX_W + 1.0, "o aviso fica na largura do meio, não na tela inteira")
 	print("RESULTADO: ", "TUDO OK" if falhas == 0 else "%d FALHA(S)" % falhas)
 	get_tree().quit(falhas)
 
@@ -407,6 +411,12 @@ func _regras_novas() -> void:
 	ok(is_equal_approx(State.storm_shield_cost(), State.STORM_SHIELD_COST), "sem antena, o escudo custa %d" % int(State.STORM_SHIELD_COST))
 	State.build("antenna", Vector2i(4, 3))
 	ok(is_equal_approx(State.storm_shield_cost(), State.STORM_SHIELD_COST_WARNED), "com a antena (aviso da NASA), o escudo sai mais barato")
+	State.storm_warned = false
+	State.next_storm_sol = State.sol + 7
+	State.next_event_sol = State.sol + 99
+	State._tick()
+	State._tick()
+	ok(State.storm_warned, "a antena avisa a tempestade alguns sóis antes")
 	# Lixeira pede confirmação.
 	hud._card.visible = false
 	hud._card_queue.clear()

@@ -177,6 +177,8 @@ REMOVE_NO,Não,No,No,Non
 BTN_OPEN,Abrir,Open,Abrir,Ouvrir
 TUBE_MYSTERY,O que será que tem aqui dentro?,What could be inside?,¿Qué habrá adentro?,Qu'est-ce qu'il y a dedans ?
 CARD_NEW_BADGE,NOVA!,NEW!,¡NUEVA!,NOUVELLE !
+BTN_SETTINGS,Ajustes,Settings,Ajustes,Réglages
+STORM_SOON,Tempestade solar em {n} sóis,Solar storm in {n} sols,Tormenta solar en {n} soles,Tempête solaire dans {n} sols
 INFO_GREENHOUSE,"As plantas crescem aqui. A luz gasta energia. Sem energia, elas crescem pela metade.","Plants grow here. The lights use energy. With no energy, they grow at half speed.","Aquí crecen las plantas. La luz gasta energía. Sin energía, crecen a la mitad.","Les plantes poussent ici. La lumière utilise de l'énergie. Sans énergie, elles poussent deux fois moins vite."
 INFO_SOLAR,"Na tempestade de poeira, a poeira cobre o painel e tapa a luz do Sol: ele faz só 30% por 15 sóis.","In a dust storm, dust covers the panel and blocks the sunlight: it makes only 30% for 15 sols.","En una tormenta de polvo, el polvo cubre el panel y tapa la luz del Sol: solo da 30% durante 15 soles.","Pendant une tempête de poussière, la poussière couvre le panneau et cache le Soleil : il ne fait que 30 % pendant 15 sols."
 INFO_RTG,"Pouca energia, mas não para nunca: nem de noite, nem na poeira. No nível 3 vira Kilopower: +4.","A little energy, but it never stops: not at night, not in dust. At level 3 it becomes Kilopower: +4.","Poca energía, pero nunca para: ni de noche, ni con polvo. En el nivel 3 se vuelve Kilopower: +4.","Peu d'énergie, mais elle ne s'arrête jamais : ni la nuit, ni dans la poussière. Au niveau 3, elle devient Kilopower : +4."
