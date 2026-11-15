@@ -12,7 +12,7 @@ signal event_started(type: String)      # dust, dust devil, cold, no signal (the
 signal event_message(key: String, extra: String)   # short notices (package arrived, new decoration...)
 
 # ───────────── BALANCE (all the game numbers live here) ─────────────
-const SOL_SECONDS := 2.5            # 1 sol (a Mars day) = 2.5 s of game time
+const SOL_SECONDS := 3.5            # 1 sol (a Mars day) = 3.5 s of game time (longer game, Design request)
 const SAVE_EVERY := 10.0
 const GRID_W := 10
 const GRID_H := 10
@@ -42,7 +42,9 @@ const BREAK_EVERY := Vector2i(110, 170)  # sols between one breakdown and the ne
 const BREAK_AFTER_STORM := 0.5           # without shield: chance that something breaks
 const REPAIR_FACTOR := 0.4               # repairing costs 40% of the build price (at least 6)
 const BREAKABLE := ["greenhouse", "solar", "rtg", "moxie", "antenna"]
-const SHIELD_RECHARGE := 2.0        # per sol, if energy is not low
+const SHIELD_RECHARGE := 2.0        # per sol, if energy is not low (and the shield is not full)
+const SHIELD_RADIATION := 1.0       # every sol, Mars radiation eats a little of the shield (it never stays full by itself)
+const SHIELD_ENERGY_COST := 0.5     # recharging the shield uses energy: the child chooses where the energy goes
 const OXYGEN_BREATH := 0.5          # Mike breathes: uses oxygen every sol
 const PLANT_OXYGEN := 0.3           # each plant growing in the greenhouse makes a little oxygen
 const EMERGENCY_ENERGY := 0.5       # the house's emergency battery, when energy is low
@@ -66,6 +68,9 @@ const ITEMS := {
 const BUILDABLE := ["greenhouse", "solar", "rtg", "moxie", "antenna", "pad", "flag", "lights", "pot", "shelf"]
 const CARD_KILOPOWER := 14          # RTG at level 3 becomes a mini power plant (Kilopower card)
 const KILOPOWER_ENERGY := 4.0       # the Kilopower (level 3 RTG) gives 4 energy per sol, day and night
+## Solar panel energy per level (it takes 1, 2 and 3 cells). It grows with the space it uses, so the panel
+## is the cheap choice that suffers with dust, and the RTG/Kilopower is the expensive one that never stops.
+const SOLAR_ENERGY := [3.0, 7.0, 12.0]
 # How many grid cells each level takes up (the design/03 models grow sideways: level 3 = 3 cells)
 const FOOTPRINT := {"habitat": [1, 2, 3], "greenhouse": [1, 2, 3], "solar": [1, 2, 3]}
 const GREENHOUSE_LEVEL_SPEED := 0.5 # bigger greenhouse: +50% speed per level above 1
@@ -114,7 +119,7 @@ const PACKAGE_CARDS := [4, 40]      # the package from Earth brings potato and t
 # Expedition: Mike leaves the base and comes back with a sample tube
 const EXPLORE_SOLS := 4             # stays out 4 sols (~10 s)
 const EXPLORE_OXYGEN := 30.0        # the suit uses oxygen (a lot: no going out all the time)
-const EXPLORE_EMPTY_CHANCE := 0.1   # sometimes Mike comes back with nothing (never twice in a row, never in the tutorial)
+const EXPLORE_EMPTY_CHANCE := 0.25  # sometimes Mike comes back with nothing (never twice in a row, never in the tutorial)
 const EXPLORE_MIN_SHIELD := 25.0     # with low shield, there is too much radiation outside
 const EXPLORE_RADIATION := 5.0      # outside, radiation eats a bit of the shield
 const TUBE_ODDS := {"common": 60, "rare": 27, "epic": 10, "legendary": 3}   # in %
@@ -1037,11 +1042,14 @@ func _end_cold() -> void:
 
 func _end_nosignal() -> void:
 	nosignal_plan = ""
+	# The package opens by itself: its card shows up on the screen right away (no need to look for it).
+	var brought := ""
 	for id in PACKAGE_CARDS:
 		if not cards.has(str(id)):
+			brought = tr("CARD_%d_NAME" % id)
 			add_card(id)
 			break
-	event_message.emit("EV_NOSIGNAL_BACK", "")
+	event_message.emit("EV_NOSIGNAL_BACK" if brought != "" else "EV_SIGNAL_BACK", brought)
 
 
 func _reward_once(id: int) -> void:
@@ -1078,6 +1086,9 @@ func _tick() -> void:
 			continue   # broken: makes no energy or oxygen, and the plant stops growing
 		var bonus := 1.0 + LEVEL_BONUS * (int(it.level) - 1)
 		var e: float = def.get("energy", 0.0)
+		if it.type == "solar":
+			e = SOLAR_ENERGY[clampi(int(it.level), 1, MAX_LEVEL) - 1]
+			bonus = 1.0
 		if it.type == "solar" and dust_left > 0:
 			e *= DUST_FACTOR
 		if it.type == "rtg" and int(it.level) >= MAX_LEVEL:
@@ -1112,8 +1123,11 @@ func _tick() -> void:
 			event_message.emit("OUT_ENERGY", "")
 		if had_oxygen and oxygen <= 0.0:
 			event_message.emit("OUT_OXYGEN", "")
-	if energy > low_e:
+	# Mars radiation eats the shield every sol; recharging it costs energy (only when it is not full).
+	shield = maxf(0.0, shield - SHIELD_RADIATION)
+	if energy > low_e and shield < bar_cap("shield"):
 		shield = minf(bar_cap("shield"), shield + SHIELD_RECHARGE)
+		energy = maxf(0.0, energy - SHIELD_ENERGY_COST)
 	sol += 1
 	if explore_left > 0:
 		explore_left -= 1
@@ -1221,6 +1235,9 @@ func item_rates(it: Dictionary) -> Dictionary:
 	var lv := int(it.level)
 	var bonus := 1.0 + LEVEL_BONUS * (lv - 1)
 	var e: float = def.get("energy", 0.0)
+	if it.type == "solar":
+		e = SOLAR_ENERGY[clampi(lv, 1, MAX_LEVEL) - 1]
+		bonus = 1.0
 	if it.type == "solar" and dust_left > 0:
 		e *= DUST_FACTOR
 	if it.type == "rtg" and lv >= MAX_LEVEL:
@@ -1236,15 +1253,16 @@ func item_rates(it: Dictionary) -> Dictionary:
 
 ## How much each bar gains (or loses) per sol, adding up the whole base and Mike breathing.
 func current_rates() -> Dictionary:
-	var r := {"energy": 0.0, "oxygen": -OXYGEN_BREATH, "shield": 0.0}
+	var r := {"energy": 0.0, "oxygen": -OXYGEN_BREATH, "shield": -SHIELD_RADIATION}
 	for k in items:
 		var ir := item_rates(items[k])
 		for b in r:
 			r[b] += ir[b]
 	if energy < low_line("energy"):
 		r.energy += EMERGENCY_ENERGY
-	else:
+	elif shield < bar_cap("shield"):
 		r.shield += SHIELD_RECHARGE
+		r.energy -= SHIELD_ENERGY_COST
 	return r
 
 
