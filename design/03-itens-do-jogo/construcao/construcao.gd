@@ -1,7 +1,8 @@
 extends Node3D
 ## Canteiro de obra: bloquinhos vão sendo empilhados enquanto a construção é feita.
 ## VALE PARA TODAS AS CONSTRUÇÕES da lista USA_OBRA (estufa, painel solar, bateria nuclear/RTG, MOXIE, antena,
-## pista do Ingenuity e luzinhas). O vaso e a bandeira NÃO usam esta animação: aparecem direto.
+## pista do Ingenuity e luzinhas). O vaso e a bandeira usam a versão curta: colocar() (lista USA_COLOCAR),
+## com o Mike tocando a animação "colocar" (se abaixa e põe no chão, 0,6 s) e o item saltando do chão, sem blocos.
 ## No fim, os blocos somem e a construção "brota" do chão (achatada -> tamanho normal, com quique).
 ## Uso (Dev):
 ##   var obra := preload("res://.../construcao.gd").new()
@@ -12,7 +13,23 @@ extends Node3D
 signal terminou(construcao: Node3D)
 
 ## Chaves do ITEMS do jogo/autoload/state.gd que passam pela obra (Mike martelando + blocos + erguer).
-const USA_OBRA := ["greenhouse", "solar", "rtg", "moxie", "antenna", "pad", "lights"]   # "flag" e "pot" não
+const USA_OBRA := ["greenhouse", "solar", "rtg", "moxie", "antenna", "pad", "lights"]
+## Itens pequenos: versão curta, sem blocos (Mike toca "colocar").
+const USA_COLOCAR := ["flag", "pot"]
+
+## Versão curta: espera o Mike se abaixar (0,35 s) e o item salta do chão com quique e um pouco de poeira.
+func colocar(cena: PackedScene) -> void:
+	em_obra = true
+	await get_tree().create_timer(0.35).timeout
+	var c: Node3D = cena.instantiate()
+	add_child(c)
+	var escala_final := c.scale
+	c.scale = escala_final * 0.01
+	var tw := c.create_tween()
+	tw.tween_property(c, "scale", escala_final, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_poeira(10)
+	em_obra = false
+	terminou.emit(c)
 
 const CORES := [Color("D96941"), Color("F2D091"), Color("E8B23A"), Color("73242A")]
 const BLOCO := 0.35
@@ -59,9 +76,9 @@ func _finalizar(cena: PackedScene) -> void:
 	em_obra = false
 	terminou.emit(c)
 
-func _poeira() -> void:
+func _poeira(qtd := 24) -> void:
 	var p := CPUParticles3D.new()
-	p.one_shot = true; p.amount = 24; p.lifetime = 0.6; p.explosiveness = 1.0
+	p.one_shot = true; p.amount = qtd; p.lifetime = 0.6; p.explosiveness = 1.0
 	p.direction = Vector3.UP; p.spread = 80.0; p.initial_velocity_min = 1.0; p.initial_velocity_max = 2.5
 	p.gravity = Vector3(0, -2, 0); p.scale_amount_min = 0.15; p.scale_amount_max = 0.3
 	var m := SphereMesh.new(); m.radius = 0.15; m.height = 0.3

@@ -1,4 +1,4 @@
-## Animação "construir" (martelada com o braço direito), somada às animações que o .glb já tem. Uso: blender -b --python mike-construir.py -- <entrada.glb> <saida.glb> [previa_prefixo]
+## Animações "construir" (martelada, loop) e "colocar" (abaixar e pôr no chão, 0,6 s), somadas às que o .glb já tem. Uso: blender -b --python mike-construir.py -- <entrada.glb> <saida.glb> [previa_prefixo]
 import bpy, sys, math, mathutils as M
 a=sys.argv[sys.argv.index('--')+1:]; IN,OUT=a[0],a[1]; PREV=a[2] if len(a)>2 else None
 bpy.ops.wm.read_factory_settings(use_empty=True); bpy.ops.import_scene.gltf(filepath=IN)
@@ -34,6 +34,14 @@ for fc in act.fcurves if hasattr(act,'fcurves') else []:
     for k in fc.keyframe_points: k.interpolation='BEZIER'
 bpy.context.scene.frame_start, bpy.context.scene.frame_end = 1, FR
 track=arm.animation_data.nla_tracks.new(); track.name='construir'; track.strips.new('construir',1,act); track.mute=True
+# ---- animação "colocar" (0,6 s, não repete): Mike se abaixa e põe a bandeira ou o vaso no chão ----
+arm.animation_data.action=None
+pe  =[('Spine',(0,0.02,1)),('RightArm',(-0.3,-0.15,-1)),('RightForeArm',(-0.2,-0.4,-1)),('LeftArm',(0.3,-0.15,-1)),('LeftForeArm',(0.2,-0.4,-1))]
+abaixa=[('Spine',(0,-0.6,1)),('Head',(0,-0.35,1)),('RightArm',(-0.2,-0.85,-0.8)),('RightForeArm',(-0.1,-0.55,-1)),('LeftArm',(0.2,-0.85,-0.8)),('LeftForeArm',(0.1,-0.55,-1))]
+for f,p in ((1,pe),(7,abaixa),(10,abaixa),(15,pe)): key(f,p)
+act2=arm.animation_data.action; act2.name='colocar'
+t2=arm.animation_data.nla_tracks.new(); t2.name='colocar'; t2.strips.new('colocar',1,act2); t2.mute=True
+arm.animation_data.action=act
 bpy.ops.object.mode_set(mode='OBJECT')
 print("ACTIONS",[a.name for a in bpy.data.actions])
 bpy.ops.export_scene.gltf(filepath=OUT, export_format='GLB', export_animation_mode='ACTIONS')
