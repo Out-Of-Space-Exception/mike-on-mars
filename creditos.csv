@@ -44,3 +44,5 @@ ia,Claude (Anthropic): traduziu para espanhol e francês os textos do jogo (text
 ia,Claude (Anthropic): escreveu com a dupla o texto da página do projeto (pagina.md) a partir do CONTEXTO.md + cartas.csv + creditos.csv,conteudo/06-pagina-do-projeto,Anthropic,-,https://claude.ai,Conteúdo
 ia,Claude (Anthropic): animação construir do Mike (mike-construir.py) e efeito de obra com bloquinhos (construcao.gd),design/01-mike e design/03-itens-do-jogo/construcao,Anthropic,-,https://claude.ai,Design
 ia,Claude (Anthropic): painel de informação da construção (telas + info_construcao.gd + textos),design/05-telas/info-construcao,Anthropic,-,https://claude.ai,Design
+imagem,Kenney Flag Pack (bandeiras BR + US + ES + FR),jogo/ui/flags (menu de idiomas),Kenney,CC0,https://kenney.nl/assets/flag-pack,Design
+ia,Claude (Anthropic): menu de idiomas com bandeiras na tela inicial (hud.gd),jogo/scenes/hud.gd e design/05-telas/previa-idiomas.png,Anthropic,-,https://claude.ai,Design

@@ -7,6 +7,9 @@ enum Mode { NONE, BUILD, MOVE }
 
 const LANGS := ["en", "pt_BR", "es", "fr"]
 const LANG_NAMES := {"en": "EN", "pt_BR": "PT", "es": "ES", "fr": "FR"}
+## Menu de idiomas: bandeira (Kenney Flag Pack, CC0) + nome escrito no próprio idioma.
+const LANG_FLAGS := {"en": "res://ui/flags/us.png", "pt_BR": "res://ui/flags/br.png", "es": "res://ui/flags/es.png", "fr": "res://ui/flags/fr.png"}
+const LANG_LABELS := {"en": "English", "pt_BR": "Português", "es": "Español", "fr": "Français"}
 const BAR_KEYS := {"energy": "BAR_ENERGY", "oxygen": "BAR_OXYGEN", "shield": "BAR_SHIELD"}
 const REVEAL_SOUND := {"comum": "revelar-comum", "raro": "revelar-raro", "épico": "revelar-epico", "lendário": "revelar-lendario"}
 const BAR_ICONS := {"energy": "res://ui/icons/ic-energia.svg", "oxygen": "res://ui/icons/ic-oxigenio.svg", "shield": "res://ui/icons/ic-escudo.svg"}
@@ -145,8 +148,38 @@ func on_mike_tapped() -> void:
 
 
 func _on_lang() -> void:
-	var i := LANGS.find(State.locale)
-	State.set_locale(LANGS[(i + 1) % LANGS.size()])
+	# Abre o menu de idiomas logo abaixo do botão.
+	var menu := _lang_menu()
+	var r := _start_lang.get_global_rect()
+	menu.popup(Rect2i(Vector2i(int(r.end.x) - 300, int(r.end.y) + 12), Vector2i(300, 0)))
+
+
+var _lang_popup: PopupMenu
+
+func _lang_menu() -> PopupMenu:
+	if _lang_popup == null:
+		_lang_popup = PopupMenu.new()
+		_lang_popup.add_theme_stylebox_override("panel", Palette.plate())
+		var sel := StyleBoxFlat.new()
+		sel.bg_color = Color("4a2226"); sel.border_color = Palette.GOLD
+		sel.set_border_width_all(3); sel.set_corner_radius_all(12)
+		_lang_popup.add_theme_stylebox_override("hover", sel)
+		_lang_popup.add_theme_color_override("font_color", Palette.TEXT)
+		_lang_popup.add_theme_color_override("font_hover_color", Palette.TEXT)
+		_lang_popup.add_theme_font_size_override("font_size", 32)
+		_lang_popup.add_theme_constant_override("icon_max_width", 52)
+		_lang_popup.add_theme_constant_override("v_separation", 22)
+		_lang_popup.add_theme_constant_override("h_separation", 16)
+		_lang_popup.id_pressed.connect(func(id: int):
+			Sfx.play("toque-botao")
+			State.set_locale(LANGS[id]))
+		add_child(_lang_popup)
+	_lang_popup.clear()
+	# Português primeiro (o time é do Brasil), depois os outros.
+	for l in ["pt_BR", "en", "es", "fr"]:
+		_lang_popup.add_icon_item(load(LANG_FLAGS[l]), LANG_LABELS[l], LANGS.find(l))
+	_lang_popup.set_focused_item(_lang_popup.get_item_index(LANGS.find(State.locale)))
+	return _lang_popup
 
 
 # ───────────── O que um toque na base faz ─────────────
@@ -576,6 +609,7 @@ func _refresh() -> void:
 		_bar_fill[bar].bg_color = Palette.ALERT if value < State.LOW else Palette.BAR[bar]
 	_sol_label.text = "%s  •  %s" % [tr("HUD_SOL").format({"n": State.sol}), tr("HUD_PLACE")]
 	_start_lang.text = LANG_NAMES.get(State.locale, "EN")
+	_start_lang.icon = load(LANG_FLAGS.get(State.locale, LANG_FLAGS.en))
 	_start_play.text = tr("BTN_PLAY")
 	_start_nasa.text = tr("BTN_NASA")
 	_buttons.build.text = tr("BTN_BUILD")
@@ -1192,7 +1226,9 @@ func _build_start() -> void:
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	corner.add_child(spacer)
 	_start_lang = _key_button(_on_lang, true)
-	_start_lang.custom_minimum_size = Vector2(120, 96)
+	_start_lang.custom_minimum_size = Vector2(170, 96)
+	_start_lang.expand_icon = true
+	_start_lang.add_theme_constant_override("icon_max_width", 48)
 	_start_lang.size_flags_horizontal = Control.SIZE_SHRINK_END
 	_start_lang.autowrap_mode = TextServer.AUTOWRAP_OFF
 	corner.add_child(_start_lang)
