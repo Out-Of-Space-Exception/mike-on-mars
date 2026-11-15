@@ -14,6 +14,8 @@ const MIKE_SUIT := "res://models/mike/mike-astronauta.glb"   # Mike in his suit,
 const MIKE_MODEL_HEIGHT := 4.0   # height of mike.glb in file units
 const MIKE_HEIGHT := 1.5         # Mike's height in the game (the camera gets close at the start)
 const DESIGN_MIKE := 2.2         # Design's tamanhos.csv measures everything with Mike = 2.2
+const GROW_MARK_GAP := 0.85      # space between the top of the greenhouse and the growing-plant ring
+const GROW_MARK_PIXEL := 0.013   # ring size (128 px texture): about 80 px on screen with the normal camera
 const INGENUITY := "res://models/nasa/ingenuity.glb"
 const INGENUITY_WIDTH := 1.3
 const CAM_MIN := 12.0            # closest camera (small base)
@@ -117,6 +119,8 @@ void fragment() {
 """
 var _sky: MeshInstance3D
 var _warn_tex: Texture2D       # the yellow "broken" warning (drawn once)
+var _plant_icons := {}         # plant -> texture rendered from its 3D model (greenhouse panel, seeds, inventory)
+var _mark_scale := 1.0         # the growing-plant ring grows a little when the camera moves away
 var _sky_mat: ShaderMaterial
 
 
@@ -158,6 +162,11 @@ func _process(delta: float) -> void:
 		var warn: Sprite3D = _nodes[k].get_node_or_null("Broken")
 		if warn and warn.visible:
 			warn.position.y = float(warn.get_meta("y", 2.0)) + sin(_time * 3.0) * 0.15
+	var mark := clampf(camera.size / 16.0, 1.0, 2.0)
+	if absf(mark - _mark_scale) > 0.02:
+		_mark_scale = mark
+		for k in _nodes:
+			_place_grow_mark(_nodes[k])
 	var show_names := camera.size < 14.5
 	for k in _nodes:
 		var label: Label3D = _nodes[k].get_node_or_null("Label")
@@ -1256,9 +1265,42 @@ func _make_item(type: String, level: int) -> Node3D:
 		ready_mark.pixel_size = 0.012
 		ready_mark.modulate = Palette.GOLD
 		ready_mark.outline_modulate = Palette.BG
-		ready_mark.position.y = maxf(h, 0.5) + 1.3
 		root.add_child(ready_mark)
+		# The growing plant floats above the greenhouse: its icon inside a ring that fills up (the same
+		# one as in the greenhouse panel), so the child sees what is growing without opening it.
+		# Drawn once per sol (not every frame): the 2D ring goes to a texture.
+		var view := SubViewport.new()
+		view.name = "GrowView"
+		view.size = Vector2i(128, 128)
+		view.transparent_bg = true
+		view.render_target_update_mode = SubViewport.UPDATE_DISABLED
+		root.add_child(view)
+		var ring := PlantRing.new()
+		ring.name = "Ring"
+		ring.size = Vector2(128, 128)
+		view.add_child(ring)
+		var grow := Sprite3D.new()
+		grow.name = "Growing"
+		grow.texture = view.get_texture()
+		grow.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		grow.no_depth_test = true
+		grow.visible = false
+		root.add_child(grow)
+		root.set_meta("top", maxf(h, 0.5))
+		_place_grow_mark(root)
 	return root
+
+
+## Ring and "!" above the greenhouse, at the size of the moment (the "!" sits on top of the ring).
+func _place_grow_mark(node: Node3D) -> void:
+	var grow: Sprite3D = node.get_node_or_null("Growing")
+	if grow == null:
+		return
+	grow.pixel_size = GROW_MARK_PIXEL * _mark_scale
+	grow.position.y = float(node.get_meta("top")) + GROW_MARK_GAP + 64.0 * grow.pixel_size
+	var ready_mark: Label3D = node.get_node("Ready")
+	ready_mark.pixel_size = 0.012 * _mark_scale
+	ready_mark.position.y = grow.position.y + (64.0 * grow.pixel_size + 0.7 * _mark_scale if grow.visible else 0.0)
 
 
 ## Placeholder shapes for what has no model yet (house, greenhouse, Ingenuity pad).
@@ -1363,6 +1405,19 @@ func _update_plant(node: Node3D, it: Dictionary) -> void:
 		p = clampf(it.growth / float(State.PLANTS[it.plant].sols), 0.0, 1.0)
 	holder.scale = Vector3.ONE * lerpf(0.25, 1.0, p)
 	ready_mark.visible = it.plant != "" and p >= 1.0
+	var grow: Sprite3D = node.get_node("Growing")
+	grow.visible = it.plant != "" and not it.get("broken", false)
+	_place_grow_mark(node)
+	var ring: PlantRing = node.get_node("GrowView/Ring")
+	if grow.visible and (ring.icon != plant_icon(it.plant) or ring.progress != p):
+		ring.icon = plant_icon(it.plant)
+		ring.progress = p
+		var view: SubViewport = node.get_node("GrowView")
+		view.render_target_update_mode = SubViewport.UPDATE_ONCE
+		# The plant icon is drawn in its own viewport: if it was not ready yet, draw the ring again in a moment.
+		get_tree().create_timer(0.2).timeout.connect(func() -> void:
+			if is_instance_valid(view):
+				view.render_target_update_mode = SubViewport.UPDATE_ONCE)
 
 
 ## Broken: a yellow warning floats above the building (tapping it opens "Fix").
@@ -1382,6 +1437,42 @@ func _update_broken(node: Node3D, it: Dictionary, label_y: float) -> void:
 		node.add_child(warn)
 	if warn:
 		warn.visible = broken
+
+
+## The plant as a small picture (rendered once from its 3D model).
+func plant_icon(p: String) -> Texture2D:
+	if _plant_icons.has(p):
+		return _plant_icons[p]
+	var file := State.model_file(State.PLANTS[p].model)
+	var vp := SubViewport.new()
+	vp.size = Vector2i(96, 96)
+	vp.transparent_bg = true
+	vp.own_world_3d = true
+	vp.render_target_update_mode = SubViewport.UPDATE_ONCE
+	add_child(vp)
+	var model: Node3D = _load_model(file, 1.0, 1.0)
+	if model == null and p == "potato":
+		model = potato_model()
+		model.position.y = -0.1
+	if model:
+		vp.add_child(model)
+	var env := WorldEnvironment.new()
+	env.environment = Environment.new()
+	env.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.environment.ambient_light_color = Color.WHITE
+	env.environment.ambient_light_energy = 0.7
+	vp.add_child(env)
+	var light := DirectionalLight3D.new()
+	light.rotation_degrees = Vector3(-50.0, 30.0, 0.0)
+	vp.add_child(light)
+	var cam := Camera3D.new()
+	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
+	cam.size = 1.4
+	vp.add_child(cam)
+	cam.position = Vector3(1.5, 1.6, 1.5)
+	cam.look_at(Vector3(0.0, 0.45, 0.0))
+	_plant_icons[p] = vp.get_texture()
+	return _plant_icons[p]
 
 
 ## Potato plant (made in code, Kenney does not have one): a little mound of soil, green leaves on top

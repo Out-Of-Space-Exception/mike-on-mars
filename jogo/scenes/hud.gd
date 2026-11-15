@@ -57,6 +57,8 @@ var _build_grid: GridContainer
 var _panel: PanelContainer
 var _panel_title: Label
 var _panel_info: Label
+var _panel_info_row: HBoxContainer   # the info text, with the growing plant ring on its left (greenhouse)
+var _panel_ring: PlantRing
 var _panel_buttons: VBoxContainer
 var _panel_level: Label
 var _panel_desc: Label
@@ -145,7 +147,6 @@ var _postcard_label: Label
 var _flash: ColorRect
 var _inventory: HFlowContainer
 var _inv_labels := {}         # plant -> Label "× n"
-var _icons := {}              # plant -> texture rendered from the 3D model
 
 
 func _ready() -> void:
@@ -443,6 +444,7 @@ func _refresh_panel() -> void:
 		if it.type == "greenhouse" and str(it.get("plant", "")) != "" and not State.plant_ready(selected):
 			_panel_info.text = tr("PLANT_GROWING").format({
 				"plant": tr(State.PLANTS[it.plant].name), "n": int(it.growth), "max": State.PLANTS[it.plant].sols})
+			_panel_ring.progress = it.growth / float(State.PLANTS[it.plant].sols)
 		if it.type == "antenna" and not it.get("broken", false):
 			_panel_info.text = _package_text()
 		return
@@ -484,7 +486,8 @@ func _refresh_panel() -> void:
 		row.add_child(n)
 		_panel_stats.add_child(chip)
 	_panel_stats.visible = _panel_stats.get_child_count() > 0
-	_panel_info.visible = false
+	_panel_info_row.visible = false
+	_panel_ring.visible = false
 	for b in _panel_buttons.get_children():
 		b.queue_free()
 	if it.type == "greenhouse":
@@ -510,16 +513,21 @@ func _refresh_panel() -> void:
 				pb.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 				pb.add_theme_constant_override("icon_max_width", 64)
 		elif State.plant_ready(selected):
-			_panel_info.visible = true
+			_panel_info_row.visible = true
 			_panel_info.text = tr("PLANT_READY").format({"plant": tr(State.PLANTS[it.plant].name)})
 			_add_panel_button(tr("BTN_HARVEST"), _on_harvest)
 		else:
-			_panel_info.visible = true
+			_panel_info_row.visible = true
 			_panel_info.text = tr("PLANT_GROWING").format({
 				"plant": tr(State.PLANTS[it.plant].name), "n": int(it.growth), "max": State.PLANTS[it.plant].sols})
+		# The plant inside a ring that fills up as it grows (the same one that floats above the greenhouse).
+		if it.plant != "":
+			_panel_ring.visible = true
+			_panel_ring.icon = _plant_icon(it.plant)
+			_panel_ring.progress = it.growth / float(State.PLANTS[it.plant].sols)
 	# Antenna: how many sols (and how much time) until the next package from Earth.
 	if it.type == "antenna":
-		_panel_info.visible = true
+		_panel_info_row.visible = true
 		_panel_info.text = _package_text()
 	# Shelf: the golden "View shelf" button (front camera and the slots to choose what to display).
 	if it.type == "shelf":
@@ -536,7 +544,8 @@ func _refresh_panel() -> void:
 	# Broken: the main action is to repair (and it can't be upgraded while broken).
 	var cost := State.upgrade_cost(selected)
 	if it.get("broken", false):
-		_panel_info.visible = true
+		_panel_info_row.visible = true
+		_panel_ring.visible = false
 		_panel_info.text = tr("BROKEN_TEXT")
 		var fix := _add_panel_button(tr("BTN_REPAIR"), _on_repair, true)
 		fix.custom_minimum_size.y = 88
@@ -1310,38 +1319,7 @@ func _refresh_inventory() -> void:
 
 ## Renders the plant model once in a small separate viewport and uses the image as the icon.
 func _plant_icon(p: String) -> Texture2D:
-	if _icons.has(p):
-		return _icons[p]
-	var file := State.model_file(State.PLANTS[p].model)
-	var vp := SubViewport.new()
-	vp.size = Vector2i(96, 96)
-	vp.transparent_bg = true
-	vp.own_world_3d = true
-	vp.render_target_update_mode = SubViewport.UPDATE_ONCE
-	add_child(vp)
-	var model: Node3D = base._load_model(file, 1.0, 1.0)
-	if model == null and p == "potato":
-		model = base.potato_model()
-		model.position.y = -0.1
-	if model:
-		vp.add_child(model)
-	var env := WorldEnvironment.new()
-	env.environment = Environment.new()
-	env.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.environment.ambient_light_color = Color.WHITE
-	env.environment.ambient_light_energy = 0.7
-	vp.add_child(env)
-	var light := DirectionalLight3D.new()
-	light.rotation_degrees = Vector3(-50.0, 30.0, 0.0)
-	vp.add_child(light)
-	var cam := Camera3D.new()
-	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
-	cam.size = 1.4
-	vp.add_child(cam)
-	cam.position = Vector3(1.5, 1.6, 1.5)
-	cam.look_at(Vector3(0.0, 0.45, 0.0))
-	_icons[p] = vp.get_texture()
-	return _icons[p]
+	return base.plant_icon(p)
 
 
 func _refresh_build_menu() -> void:
@@ -2246,10 +2224,20 @@ func _build_bottom() -> void:
 	_panel_stats = HBoxContainer.new()
 	_panel_stats.add_theme_constant_override("separation", 8)
 	pbox.add_child(_panel_stats)
+	_panel_info_row = HBoxContainer.new()
+	_panel_info_row.add_theme_constant_override("separation", 16)
+	pbox.add_child(_panel_info_row)
+	_panel_ring = PlantRing.new()
+	_panel_ring.custom_minimum_size = Vector2(96, 96)
+	_panel_ring.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_panel_ring.visible = false
+	_panel_info_row.add_child(_panel_ring)
 	_panel_info = _wrap_label("", 25)
 	_panel_info.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_panel_info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_panel_info.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_panel_info.add_theme_color_override("font_color", Palette.BG)
-	pbox.add_child(_panel_info)
+	_panel_info_row.add_child(_panel_info)
 	_panel_buttons = VBoxContainer.new()
 	_panel_buttons.add_theme_constant_override("separation", 16)
 	pbox.add_child(_panel_buttons)
