@@ -1013,6 +1013,9 @@ func _build_mike() -> void:
 		mike.add_child(model)
 		var player := _find_child_of_type(model, "AnimationPlayer") as AnimationPlayer
 		if player and player.has_animation("idle"):
+			var skel := model.find_children("*", "Skeleton3D", true, false)
+			if not skel.is_empty():
+				_arms_down(player, skel[0] as Skeleton3D)
 			for loop_anim in ["idle", "run"]:
 				if player.has_animation(loop_anim):
 					player.get_animation(loop_anim).loop_mode = Animation.LOOP_LINEAR
@@ -1034,6 +1037,34 @@ func _build_mike() -> void:
 	body.material_override = _mat(Palette.SUIT)
 	body.position.y = 0.6
 	mike.add_child(body)
+
+
+## As animações parado/correndo/pular do mike.glb vieram com os braços abertos (pose de T).
+## Aqui cada braço desce (aponta para o chão, um pouco para fora), mantendo o balanço da animação.
+## As animações novas do Design (construir, colocar) já vêm certas e ficam como estão.
+func _arms_down(player: AnimationPlayer, s: Skeleton3D) -> void:
+	for anim_name in ["idle", "run", "jump"]:
+		var a := player.get_animation(anim_name)
+		if a == null or a.has_meta("arms_down"):
+			continue
+		a.set_meta("arms_down", true)
+		for side in ["LeftArm", "RightArm"]:
+			var bi := s.find_bone(side)
+			if bi < 0:
+				continue
+			var g := s.get_bone_global_rest(bi)
+			var parent := s.get_bone_parent(bi)
+			var pg := s.get_bone_global_rest(parent) if parent >= 0 else Transform3D()
+			var d := g.basis.orthonormalized().y
+			var down := Vector3(signf(d.x) * 0.3, -1.0, 0.0).normalized()
+			var turned := Basis(Quaternion(d, down)) * g.basis.orthonormalized()
+			var new_local := (pg.basis.orthonormalized().inverse() * turned).get_rotation_quaternion()
+			var delta := s.get_bone_rest(bi).basis.get_rotation_quaternion().inverse() * new_local
+			for t in a.get_track_count():
+				if a.track_get_type(t) != Animation.TYPE_ROTATION_3D or String(a.track_get_path(t).get_concatenated_subnames()) != side:
+					continue
+				for k in a.track_get_key_count(t):
+					a.track_set_key_value(t, k, (a.track_get_key_value(t, k) as Quaternion) * delta)
 
 
 ## Traje de astronauta na expedição; roupa normal na base.

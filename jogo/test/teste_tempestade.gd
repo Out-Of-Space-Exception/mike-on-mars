@@ -303,6 +303,12 @@ func _caminho_do_mike(base: Node3D) -> void:
 	base._set_suit(false)
 	var anims: PackedStringArray = base._mike_anim.get_animation_list() if base._mike_anim else PackedStringArray()
 	ok("run" in anims and "idle" in anims, "o Mike tem as animações idle e run: %s" % ", ".join(anims))
+	var esq: Skeleton3D = base._mike_skins.casual[0].find_children("*", "Skeleton3D", true, false)[0]
+	var idle: Animation = base._mike_anim.get_animation("idle")
+	var braco := idle.find_track(NodePath("Root/Skeleton3D:LeftArm"), Animation.TYPE_ROTATION_3D)
+	var repouso := esq.get_bone_rest(esq.find_bone("LeftArm")).basis.get_rotation_quaternion()
+	var abaixou := rad_to_deg((idle.track_get_key_value(braco, 0) as Quaternion).angle_to(repouso))
+	ok(abaixou > 40.0, "o Mike fica com os braços para baixo, sem pose de T (%.0f°)" % abaixou)
 
 
 func _tutorial() -> void:
