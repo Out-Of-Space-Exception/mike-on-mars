@@ -46,7 +46,7 @@ EV_COLD_TITLE,Noite congelante!,Freezing night!,¡Noche helada!,Nuit glaciale !
 EV_COLD_Q,Aquecer a estufa?,Heat the greenhouse?,¿Calentamos el invernadero?,On chauffe la serre ?
 EV_NOSIGNAL_TITLE,Sem sinal da Terra!,No signal from Earth!,¡Sin señal de la Tierra!,Pas de signal de la Terre !
 EV_NOSIGNAL_Q,"Enquanto isso, o que o piloto automático faz?","Meanwhile, what should the autopilot do?","Mientras tanto, ¿qué hace el piloto automático?","En attendant, que fait le pilote automatique ?"
-EV_NOSIGNAL_BACK,O sinal voltou! Chegou um pacote da Terra.,The signal is back! A package came from Earth.,¡Volvió la señal! Llegó un paquete de la Tierra.,Le signal est revenu ! Un colis est arrivé de la Terre.
+EV_NOSIGNAL_BACK,O sinal voltou! A Terra mandou um pacote com {name}. Ele já abriu: veja sua carta nova!,The signal is back! Earth sent a package with {name}. It's already open: see your new card!,¡Volvió la señal! La Tierra mandó un paquete con {name}. Ya se abrió: ¡mira tu carta nueva!,Le signal est revenu ! La Terre a envoyé un colis avec {name}. Il est déjà ouvert : regarde ta nouvelle carte !
 LOCK_OXYGEN,Pouco oxigênio para sair. O Mike espera em casa.,Not enough oxygen to go out. Mike waits at home.,Poco oxígeno para salir. Mike espera en casa.,Pas assez d'oxygène pour sortir. Mike attend à la maison.
 AWAY_TITLE,Enquanto você estava fora…,While you were away…,Mientras no estabas…,Pendant ton absence…
 AWAY_PLANTS,{n} plantas ficaram prontas!,{n} plants are ready!,¡{n} plantas están listas!,{n} plantes sont prêtes !
@@ -56,7 +56,7 @@ TUT_EXPLORE,Toque em Explorar para achar amostras de Marte.,Tap Explore to find 
 LEVEL,Nível {n},Level {n},Nivel {n},Niveau {n}
 NEED_ENERGY,Ainda falta energia. Espere a barra amarela encher.,Not enough energy yet. Wait for the yellow bar to fill.,Aún falta energía. Espera a que se llene la barra amarilla.,Pas encore assez d'énergie. Attends que la barre jaune se remplisse.
 MOVE_HINT,Agora toque no lugar novo.,Now tap the new spot.,Ahora toca el nuevo lugar.,"Maintenant, touche le nouvel endroit."
-TUTO_HELLO,Oi! Eu sou o Mike. Vamos fazer energia? Toque em Construir.,Hi! I'm Mike. Let's make some energy! Tap Build.,¡Hola! Soy Mike. ¿Hacemos energía? Toca Construir.,Salut ! Je suis Mike. On fait de l'énergie ? Touche Construire.
+TUTO_HELLO,"Oi! Eu sou o Mike, e este é o Ingenuity, o helicóptero que voou em Marte! Vamos fazer energia? Toque em Construir.","Hi! I'm Mike, and this is Ingenuity, the helicopter that flew on Mars! Let's make energy. Tap Build.","¡Hola! Soy Mike y este es Ingenuity, ¡el helicóptero que voló en Marte! ¿Hacemos energía? Toca Construir.","Salut ! Je suis Mike, et voici Ingenuity, l’hélicoptère qui a volé sur Mars ! On fait de l’énergie ? Touche Construire."
 TUTO_PICK,Escolha: {name}.,Pick: {name}.,Elige: {name}.,Choisis : {name}.
 TUTO_CONFIRM,Agora toque em Construir.,Now tap Build.,Ahora toca Construir.,"Maintenant, touche Construire."
 TUTO_PLACE,Toque num quadrado claro para construir.,Tap a light square to build.,Toca un cuadrado claro para construir.,Touche une case claire pour construire.
@@ -180,3 +180,4 @@ TUTO_WAIT_ENERGY,Falta energia. Espere a barra amarela encher um pouco!,Not enou
 NEED_BIGGER_BAR,A barra de energia ainda é pequena. Melhore a Casa do Mike!,The energy bar is still small. Upgrade Mike's House!,La barra de energía aún es pequeña. ¡Mejora la Casa de Mike!,La barre d'énergie est encore petite. Améliore la Maison de Mike !
 COST_ENERGY,gasta {n} de energia,uses {n} energy,gasta {n} de energía,coûte {n} d'énergie
 SHELF_ADD,Escolher,Choose,Elegir,Choisir
+EV_SIGNAL_BACK,O sinal voltou!,The signal is back!,¡Volvió la señal!,Le signal est revenu !
