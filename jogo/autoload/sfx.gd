@@ -1,6 +1,6 @@
 extends Node
-## Toca um som pelo nome do arquivo (sem extensão), se ele existir em res://sounds/.
-## Os nomes são os da coluna "arquivo" do conteudo/01-sons/sons.csv (ex.: Sfx.play("construir")).
+## Plays a sound by its file name (without extension), if it exists in res://sounds/.
+## The names are those in the "arquivo" column of conteudo/01-sons/sons.csv (e.g. Sfx.play("construir")).
 
 var _players: Array[AudioStreamPlayer] = []
 var _cache := {}
@@ -27,7 +27,7 @@ func play(sound_name: String) -> void:
 			return
 
 
-## Música de fundo em loop (começa no "Jogar": o navegador só deixa tocar som depois de um toque).
+## Looping background music (starts on "Play": the browser only allows sound after a tap).
 func play_music(sound_name: String) -> void:
 	var stream := _load(sound_name)
 	if stream == null:
@@ -42,7 +42,7 @@ func play_music(sound_name: String) -> void:
 	apply_settings()
 
 
-## Liga ou desliga a música (configurações). O som dos botões é conferido a cada play().
+## Turns the music on or off (settings). The button sound is checked on every play().
 func apply_settings() -> void:
 	if _music:
 		_music.stream_paused = not State.music_on

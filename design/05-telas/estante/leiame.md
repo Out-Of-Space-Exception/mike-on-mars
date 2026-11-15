@@ -1,5 +1,7 @@
 # Estante de exposição
 
+> **Já está no jogo:** [jogo/scenes/shelf.gd](../../../jogo/scenes/shelf.gd). O passo a passo abaixo é o histórico da entrega; no código os nomes agora estão em inglês (`vestir` virou `dress`, `vagas_liberadas` virou `open_slots`, `abrir` virou `open` e o que fica exposto mora em `display`).
+
 Uma construção nova: uma estante espacial onde a criança expõe as plantas que colheu e as pedras que achou explorando.
 
 | 1. Painel normal do item | 2. "Ver estante": zoom de frente, com o céu do jogo | 3. Escolher o que expor |

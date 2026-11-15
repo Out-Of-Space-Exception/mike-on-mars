@@ -1,13 +1,13 @@
-class_name PoeiraFlutuando
+class_name FloatingDust
 extends CPUParticles3D
-## Poeirinha dourada e creme flutuando devagar no ar da base (efeito lúdico do cenário).
-## Uso: adicione na cena da base, no centro. Ajuste `area` para o tamanho do mapa.
+## Golden and cream dust slowly floating in the air of the base (a playful scenery effect).
+## Usage: add it to the base scene, in the center. Adjust `area` to the size of the map.
 
 @export var area := Vector3(30.0, 6.0, 30.0)
-@export var quantidade := 160
+@export var particle_count := 160
 
 func _ready() -> void:
-	amount = quantidade
+	amount = particle_count
 	lifetime = 9.0
 	preprocess = 9.0
 	emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
@@ -20,12 +20,12 @@ func _ready() -> void:
 	initial_velocity_max = 0.45
 	scale_amount_min = 0.5
 	scale_amount_max = 1.4
-	var cores := Gradient.new()
-	cores.set_color(0, Color(0.95, 0.82, 0.57, 0.0))
-	cores.add_point(0.2, Color(0.91, 0.70, 0.23, 0.9))
-	cores.add_point(0.8, Color(0.95, 0.82, 0.57, 0.7))
-	cores.set_color(cores.get_point_count() - 1, Color(0.95, 0.82, 0.57, 0.0))
-	color_ramp = cores
+	var colors := Gradient.new()
+	colors.set_color(0, Color(0.95, 0.82, 0.57, 0.0))
+	colors.add_point(0.2, Color(0.91, 0.70, 0.23, 0.9))
+	colors.add_point(0.8, Color(0.95, 0.82, 0.57, 0.7))
+	colors.set_color(colors.get_point_count() - 1, Color(0.95, 0.82, 0.57, 0.0))
+	color_ramp = colors
 	var m := QuadMesh.new(); m.size = Vector2(0.08, 0.08)
 	var mat := StandardMaterial3D.new()
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED

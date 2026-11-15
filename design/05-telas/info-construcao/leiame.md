@@ -1,5 +1,7 @@
 # Painel de informação da construção
 
+> **Já está no jogo:** [jogo/scenes/build_info.gd](../../../jogo/scenes/build_info.gd). O passo a passo abaixo é o histórico da entrega; no código os nomes agora estão em inglês (o sinal `construir` virou `build_pressed`, `abrir` virou `open`).
+
 Ao tocar num botão da barra de construção, abre um painel por cima da tela. Ele mostra o que o item faz, com os ícones da barra de cima e números `+` verde ou `-` vermelho. A barra de construção continua aberta por baixo.
 
 - **Fechar:** fecha o painel e volta para a barra.

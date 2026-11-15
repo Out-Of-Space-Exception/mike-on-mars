@@ -1,6 +1,6 @@
-# Pedras das descobertas (low-poly, cores chapadas por face, no estilo Kenney).
-# Feito pelo time com IA (Claude), a partir de fotos da NASA (links no descobertas.md).
-# Uso: blender -b -P descobertas.py -- PASTA_DE_SAIDA
+# Discovery rocks (low-poly, flat colors per face, Kenney style).
+# Made by the team with AI (Claude), from NASA photos (links in descobertas.md).
+# Usage: blender -b -P descobertas.py -- OUTPUT_FOLDER
 import bpy, bmesh, sys, os, math, random
 from mathutils import Vector, noise
 out = os.path.abspath(sys.argv[sys.argv.index("--") + 1])
@@ -104,24 +104,24 @@ def join(name, objs):
 
 models = []
 
-# 1. Veios brancos (Sheepbed, PIA16705): pilha de lajes claras, com veios brancos em cima e entre as camadas
+# 1. White veins (Sheepbed, PIA16705): stack of light slabs, with white veins on top and between the layers
 parts = []; z = 0.0
-LAJES = [(0.75, 0.55, 0.22, 0, 0, 0.0), (0.62, 0.46, 0.18, 0.05, -0.03, 0.25), (0.48, 0.36, 0.16, -0.04, 0.04, -0.2)]
-for k, (rx, ry, h, cx, cy, rot) in enumerate(LAJES):
+SLABS = [(0.75, 0.55, 0.22, 0, 0, 0.0), (0.62, 0.46, 0.18, 0.05, -0.03, 0.25), (0.48, 0.36, 0.16, -0.04, 0.04, -0.2)]
+for k, (rx, ry, h, cx, cy, rot) in enumerate(SLABS):
     pts = blob(9, rx, ry, 40 + k, 0.12, cx, cy, rot)
     s = prism(f"laje{k}", pts, z, z + h, 0.015, k); two_tone(s, "#C4A27E", "#9E7F60"); parts.append(s)
-    if k < 2:  # veio branco entre as camadas (aparece como uma linha branca na lateral)
-        v = prism(f"veio-camada{k}", blob(9, LAJES[k + 1][0] * 1.06, LAJES[k + 1][1] * 1.06, 41 + k, 0.12, *LAJES[k + 1][3:]), z + h - 0.02, z + h + 0.004); two_tone(v, "#F7F4EC", "#F7F4EC"); parts.append(v)
+    if k < 2:  # white vein between the layers (shows up as a white line on the side)
+        v = prism(f"veio-camada{k}", blob(9, SLABS[k + 1][0] * 1.06, SLABS[k + 1][1] * 1.06, 41 + k, 0.12, *SLABS[k + 1][3:]), z + h - 0.02, z + h + 0.004); two_tone(v, "#F7F4EC", "#F7F4EC"); parts.append(v)
     for j, (ang, off) in enumerate([((0.35, 0.12), (2.3, -0.2), (1.1, 0.05))[k]]):
         v = strip(f"veio{k}{j}", cx + off * math.cos(ang + 1.57), cy + off * math.sin(ang + 1.57), ang + rot, 1.7 * min(rx, ry), 0.045, z + h - 0.01, z + h + 0.02); two_tone(v, "#F7F4EC", "#F7F4EC"); parts.append(v)
     z += h
 models.append(join("veios-brancos", parts))
 
-# 2. Rocknest 3 (PIA16452): rocha comprida e chata, em camadas cinza-azuladas, ponta fina à direita, pó em cima e frestas escuras na frente
-contorno = [(-0.85, -0.22), (-0.3, -0.3), (0.4, -0.28), (0.95, -0.05), (0.6, 0.15), (0.0, 0.25), (-0.7, 0.22), (-0.92, 0.0)]
+# 2. Rocknest 3 (PIA16452): long flat rock, in blue-gray layers, thin tip on the right, dust on top and dark cracks in front
+outline = [(-0.85, -0.22), (-0.3, -0.3), (0.4, -0.28), (0.95, -0.05), (0.6, 0.15), (0.0, 0.25), (-0.7, 0.22), (-0.92, 0.0)]
 parts = []; z = 0.0
 for k, (sc, dx, h) in enumerate([(1.0, 0.0, 0.17), (0.94, -0.05, 0.16), (0.86, -0.11, 0.15), (0.74, -0.2, 0.13)]):
-    pts = [(x * sc + dx, y * sc) for x, y in contorno]
+    pts = [(x * sc + dx, y * sc) for x, y in outline]
     s = prism(f"camada{k}", pts, z, z + h, 0.006, k)
     paint(s, (lambda kk: lambda c, n: ("#A3A7AE",) if n.z > 0.5 and kk == 3 else (("#6F7683",) if n.z > 0.5 else (("#5E6571",) if kk % 2 else ("#757C89",))))(k))
     parts.append(s); z += h
@@ -129,19 +129,19 @@ for j, x in enumerate((-0.45, -0.2, 0.05, 0.22, 0.38)):
     sl = strip(f"fresta{j}", x, -0.285, 0.0, 0.035, 0.05, 0.08 + 0.05 * (j % 2), 0.36); two_tone(sl, "#2E3238", "#2E3238"); parts.append(sl)
 models.append(join("rocknest-3", parts))
 
-# 3. Óxido de manganês (Windjana, PIA20752): lasca chata e angulosa, clara, com a mancha escura azulada em degradê
+# 3. Manganese oxide (Windjana, PIA20752): flat angular light chip, with the dark bluish stain in a gradient
 plate = [(-0.5, -0.35), (0.0, -0.42), (0.5, -0.3), (0.35, 0.05), (0.1, 0.45), (-0.15, 0.4), (-0.45, 0.05)]
 p = prism("lasca", plate, 0.0, 0.2, 0.03, 3)
-# textura com degradê: escuro azulado no meio -> azul -> bege da pedra (sem buraco)
+# gradient texture: dark bluish in the middle -> blue -> rock beige (no hole)
 S = 256; img = bpy.data.images.new("oxido-de-manganes-cor", S, S)
 def srgb(h): return [int(h[i:i+2], 16) / 255 for i in (1, 3, 5)]
 def mix(a, b, t): return [a[i] + (b[i] - a[i]) * t for i in range(3)]
-CA, CB, CC, LADO = srgb("#2A3150"), srgb("#5A6990"), srgb("#D0AC84"), srgb("#A88160")
+CA, CB, CC, SIDE = srgb("#2A3150"), srgb("#5A6990"), srgb("#D0AC84"), srgb("#A88160")
 MX, MY, UV0, UVS = -0.02, -0.06, -0.6, 1.2
 px = []
 for j in range(S):
     for i in range(S):
-        if i >= S - 16 and j >= S - 16: col = LADO
+        if i >= S - 16 and j >= S - 16: col = SIDE
         else:
             x = UV0 + UVS * i / (S - 17); y = UV0 + UVS * j / (S - 17)
             xr = (x - MX) * math.cos(0.4) + (y - MY) * math.sin(0.4); yr = -(x - MX) * math.sin(0.4) + (y - MY) * math.cos(0.4)
@@ -167,7 +167,7 @@ c2 = rock("lasca-pedrinha2", (0.09, 0.08, 0.06), 53, amp=0.3, sub=1); two_tone(c
 for v in c2.data.vertices: v.co += Vector((-0.6, -0.45, 0))
 models.append(join("oxido-de-manganes", [p, c1, c2]))
 
-# 4. Pedras perto da John Klein (PIA16568): A, B e C da foto
+# 4. Rocks near John Klein (PIA16568): A, B and C from the photo
 o = rock("john-klein-a", (0.9, 0.75, 0.7), 17, amp=0.22, box=True, cuts=3)
 pa = [((0, 0, 0.3), (0.2, 0.1, 1)), ((0.1, 0, 0), (1, 0.4, 0.2))]
 paint(o, lambda c, n: ("#50545D",) if near_planes(c, pa, 0.05) else (("#A9ADB5",) if n.z > 0.6 else ("#8B9099",)))
@@ -179,7 +179,7 @@ o = rock("john-klein-c", (0.6, 0.5, 0.45), 29, amp=0.3, box=True, cuts=2, taper=
 paint(o, lambda c, n: ("#4E525B", 0.2, 0.6) if n.z > 0.6 else ("#3B3F47", 0.2, 0.6))
 models.append(o)
 
-# 5. Meteorito Lebanon (PIA18387): ferro cinza brilhante, cheio de buracos, com um pedaço do lado
+# 5. Lebanon meteorite (PIA18387): shiny gray iron, full of pits, with a piece on the side
 o = rock("meteorito-lebanon", (1.5, 1.0, 0.55), 31, amp=0.12, sub=4)
 cs = pits(o, 16, 0.22, 0.10, 1)
 paint(o, lambda c, n: ("#4A4E57", 0.8, 0.45) if min((c - p).length for p in cs) < 0.14 else (("#9A9EA6", 0.8, 0.35) if n.z > 0.5 else ("#7E828B", 0.8, 0.4)))
@@ -195,7 +195,7 @@ for o in models:
     bpy.ops.object.select_all(action="DESELECT"); o.select_set(True); bpy.context.view_layer.objects.active = o
     bpy.ops.export_scene.gltf(filepath=os.path.join(out, o.name + ".glb"), export_format="GLB", use_selection=True)
 
-# prévia
+# preview
 for i, o in enumerate(models): o.location.x = i * 1.5
 sc = bpy.context.scene
 cam = bpy.data.objects.new("cam", bpy.data.cameras.new("cam")); sc.collection.objects.link(cam); sc.camera = cam
@@ -206,7 +206,7 @@ sc.world = bpy.data.worlds.new("w"); sc.world.color = lin("#D9A066")
 sc.world.use_nodes = True; bg = next(n for n in sc.world.node_tree.nodes if n.type == "BACKGROUND"); bg.inputs["Color"].default_value = (*lin("#D9A066"), 1); bg.inputs["Strength"].default_value = 0.8
 sc.render.resolution_x, sc.render.resolution_y = 1800, 520; sc.render.film_transparent = False
 sc.render.filepath = os.path.join(out, "descobertas-previa.png"); bpy.ops.render.render(write_still=True)
-# close das 3 primeiras
+# close-up of the first 3
 cam.data.ortho_scale = 5.2; cam.location = (1.5, -4.2, 4.6); sc.render.resolution_x, sc.render.resolution_y = 1500, 560
 sc.render.filepath = os.path.join(out, "descobertas-previa-1a3.png"); bpy.ops.render.render(write_still=True)
 

@@ -1,5 +1,13 @@
 # Mike on Mars 🚀
 
+**Mike on Mars** is a free web game for kids aged 7 to 12, made by team **Out of Space Exception** for the NASA Space Apps Challenge 2026 (*Junior Astronaut Mission Trainer*). Kids build Mike's base in Gale Crater, grow plants like the ones astronauts grew in space, face solar storms taken from NASA's DONKI space weather data and collect 35 science cards, each with its NASA source. It plays in the browser, on phones and computers, in English, Portuguese, Spanish and French.
+
+🎮 **Play:** https://out-of-space-exception.github.io/mike-on-mars/
+
+---
+
+## Para o time (PT-BR)
+
 Jogo do time **Out of Space Exception** para o NASA Space Apps Challenge 2026 (desafio *Junior Astronaut Mission Trainer*).
 
 - 🎮 **Jogar a versão do momento:** https://out-of-space-exception.github.io/mike-on-mars/ (no celular, aponte a câmera para o QR abaixo)

@@ -1,7 +1,7 @@
 class_name Icons3D
 extends RefCounted
-## Ícones em 3D, feitos pelo time em código (estilo Kenney: formas grossas, cores chapadas, luz de cima).
-## Cada ícone é montado com formas simples e desenhado uma vez numa SubViewport; o botão usa a textura.
+## 3D icons, made by the team in code (Kenney style: chunky shapes, flat colors, light from above).
+## Each icon is built from simple shapes and drawn once in a SubViewport; the button uses the texture.
 
 const BG := Color("73242a")
 const GOLD := Color("e8b23a")
@@ -15,8 +15,8 @@ const PAPER := Color("f6e6c4")
 const TERRA := Color("d96941")
 
 
-## Desenha "model" (um Node3D com ~1 de altura, no meio) numa textura quadrada.
-## spin = continua desenhando (para quem gira na tela); senão desenha uma vez só.
+## Draws "model" (a Node3D about 1 tall, in the middle) onto a square texture.
+## spin = keeps drawing (for things that rotate on screen); otherwise draws only once.
 static func render(host: Node, model: Node3D, px := 160, cam_size := 1.7, spin := false, view := Vector3(1.0, 0.9, 2.2)) -> ViewportTexture:
 	var vp := SubViewport.new()
 	vp.size = Vector2i(px, px)
@@ -52,8 +52,8 @@ static func render(host: Node, model: Node3D, px := 160, cam_size := 1.7, spin :
 static var _outline: StandardMaterial3D
 
 
-## Contorno de figurinha: uma casca escura um pouco maior, desenhada por trás da peça.
-## Assim o ícone não some no botão nem no céu (contraste de 4 a 8 vezes, em vez de 1 a 2).
+## Sticker outline: a slightly bigger dark shell, drawn behind the piece.
+## This way the icon does not vanish on the button or the sky (4 to 8 times contrast, instead of 1 to 2).
 static func outline() -> StandardMaterial3D:
 	if _outline == null:
 		_outline = StandardMaterial3D.new()
@@ -109,7 +109,7 @@ static func ball(r: float, half := false) -> SphereMesh:
 	return s
 
 
-## Uma forma 2D (y para cima) virando peça 3D com espessura.
+## A 2D shape (y up) turned into a 3D piece with thickness.
 static func extrude(poly: PackedVector2Array, depth: float, color: Color) -> MeshInstance3D:
 	var area := 0.0
 	for i in poly.size():
@@ -139,7 +139,7 @@ static func extrude(poly: PackedVector2Array, depth: float, color: Color) -> Mes
 	var m := mat(color)
 	m.cull_mode = BaseMaterial3D.CULL_DISABLED
 	mi.material_override = m
-	# Peça achatada: o contorno vem de uma cópia escura um pouco maior, logo atrás.
+	# Flat piece: the outline comes from a slightly bigger dark copy, right behind it.
 	var back := MeshInstance3D.new()
 	var shape := PackedVector2Array()
 	var c := Vector2.ZERO
@@ -164,7 +164,7 @@ static func extrude(poly: PackedVector2Array, depth: float, color: Color) -> Mes
 	return mi
 
 
-# ───────────── Os ícones ─────────────
+# ───────────── The icons ─────────────
 static func energy() -> Node3D:
 	var root := Node3D.new()
 	var bolt := PackedVector2Array([Vector2(0.14, 0.62), Vector2(-0.32, -0.04), Vector2(-0.03, -0.04), Vector2(-0.16, -0.62), Vector2(0.32, 0.07), Vector2(0.03, 0.07)])

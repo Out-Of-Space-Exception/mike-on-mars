@@ -12,8 +12,8 @@ func region(img, r, target):
 func _init():
 	var a = OS.get_cmdline_user_args()
 	var img = Image.load_from_file(a[0]); img.convert(Image.FORMAT_RGBA8)
-	region(img, Rect2i(160,384,32,128), Color("#E9D2A6"))  # parede principal: creme/pedra clara
-	region(img, Rect2i(32,384,32,128), Color("#E8B23A"))   # acabamento/borda: ouro
-	region(img, Rect2i(96,384,32,128), Color("#73242A"))   # detalhes: vinho
-	region(img, Rect2i(224,384,32,128), Color("#A87C2A"))  # sombra/porta: ouro escuro
+	region(img, Rect2i(160,384,32,128), Color("#E9D2A6"))  # main wall: cream/light stone
+	region(img, Rect2i(32,384,32,128), Color("#E8B23A"))   # trim/edge: gold
+	region(img, Rect2i(96,384,32,128), Color("#73242A"))   # details: wine
+	region(img, Rect2i(224,384,32,128), Color("#A87C2A"))  # shadow/door: dark gold
 	print("save ", img.save_png(a[1])); quit()

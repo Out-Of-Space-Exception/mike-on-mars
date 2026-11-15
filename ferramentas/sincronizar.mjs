@@ -1,15 +1,15 @@
-// Copia o conteúdo das duplas para dentro do jogo. Nunca edite jogo/data/ à mão: rode este script.
-// Uso (na raiz do repositório): node ferramentas/sincronizar.mjs
-//  - conteudo/03-textos/textos.csv  → jogo/data/textos.csv (idioma vazio = usa o inglês)
-//    + o nome e o fato de cada carta viram as chaves CARD_<id>_NAME e CARD_<id>_FACT
-//  - conteudo/02-cartas/cartas.csv  → jogo/data/cartas.json (o resto dos dados das cartas)
+// Copies the teams' content into the game. Never edit jogo/data/ by hand: run this script.
+// Usage (from the repository root): node ferramentas/sincronizar.mjs
+//  - conteudo/03-textos/textos.csv  → jogo/data/textos.csv (empty language = uses English)
+//    + each card's name and fact become the keys CARD_<id>_NAME and CARD_<id>_FACT
+//  - conteudo/02-cartas/cartas.csv  → jogo/data/cartas.json (the rest of the card data)
 //  - conteudo/01-sons/sons/*         → jogo/sounds/
 //  - conteudo/02-cartas/fotos/*      → jogo/ui/cards/
 import {readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, copyFileSync} from 'node:fs';
 import {join, dirname, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
-const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const LANGS = ['pt_BR', 'en', 'es', 'fr'];
 const parse = t => { const rows = []; let r = [], f = '', q = false;
   for (let i = 0; i < t.length; i++) { const c = t[i];
@@ -18,133 +18,133 @@ const parse = t => { const rows = []; let r = [], f = '', q = false;
     else if (c === '\n') { r.push(f); rows.push(r); r = []; f = ''; } else if (c !== '\r') f += c; }
   if (f || r.length) { r.push(f); rows.push(r); } return rows.filter(x => x.some(v => v !== '')); };
 const esc = v => /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
-const objetos = rows => rows.slice(1).map(r => Object.fromEntries(rows[0].map((h, i) => [h, r[i] ?? ''])));
+const toObjects = rows => rows.slice(1).map(r => Object.fromEntries(rows[0].map((h, i) => [h, r[i] ?? ''])));
 
-// 1. Textos (+ textos das cartas)
-const textos = objetos(parse(readFileSync(join(RAIZ, 'conteudo/03-textos/textos.csv'), 'utf8')));
-const cartas = objetos(parse(readFileSync(join(RAIZ, 'conteudo/02-cartas/cartas.csv'), 'utf8')));
-const linhas = [['keys', ...LANGS].join(',')];
-const add = (key, porIdioma) => {
-  const en = porIdioma.en || porIdioma.pt_BR || key;
-  linhas.push([key, ...LANGS.map(l => porIdioma[l] || en)].map(esc).join(','));
+// 1. Texts (+ the card texts)
+const texts = toObjects(parse(readFileSync(join(ROOT, 'conteudo/03-textos/textos.csv'), 'utf8')));
+const cardRows = toObjects(parse(readFileSync(join(ROOT, 'conteudo/02-cartas/cartas.csv'), 'utf8')));
+const lines = [['keys', ...LANGS].join(',')];
+const add = (key, byLang) => {
+  const en = byLang.en || byLang.pt_BR || key;
+  lines.push([key, ...LANGS.map(l => byLang[l] || en)].map(esc).join(','));
 };
-for (const t of textos) add(t.keys, t);
-// Textos que vêm junto com uma tela do Design (ex.: painel de informação da construção)
-for (const tela of ['info-construcao', 'estante']) {
-  const textosDesign = join(RAIZ, 'design/05-telas', tela, 'textos.csv');
-  if (existsSync(textosDesign)) for (const t of objetos(parse(readFileSync(textosDesign, 'utf8')))) add(t.keys, t);
+for (const t of texts) add(t.keys, t);
+// Texts that come with a Design screen (e.g. the building info panel)
+for (const screen of ['info-construcao', 'estante']) {
+  const designTexts = join(ROOT, 'design/05-telas', screen, 'textos.csv');
+  if (existsSync(designTexts)) for (const t of toObjects(parse(readFileSync(designTexts, 'utf8')))) add(t.keys, t);
 }
-for (const c of cartas) {
+for (const c of cardRows) {
   add(`CARD_${c.id}_NAME`, {pt_BR: c.nome_pt, en: c.nome_en, es: c.nome_es, fr: c.nome_fr});
   add(`CARD_${c.id}_FACT`, {pt_BR: c.fato_pt, en: c.fato_en, es: c.fato_es, fr: c.fato_fr});
 }
-mkdirSync(join(RAIZ, 'jogo/data'), {recursive: true});
-writeFileSync(join(RAIZ, 'jogo/data/textos.csv'), linhas.join('\n') + '\n');
+mkdirSync(join(ROOT, 'jogo/data'), {recursive: true});
+writeFileSync(join(ROOT, 'jogo/data/textos.csv'), lines.join('\n') + '\n');
 
-// 2. Dados das cartas (sem os textos, que já estão no textos.csv). Cartas de lugares "em breve" ficam fora do jogo.
+// 2. Card data (without the texts, which are already in textos.csv). Cards from "coming soon" places stay out of the game.
 // The game reads English ids; the Content team's sheet stays in Portuguese.
 const CATEGORY = {'Plantas': 'plants', 'Minerais': 'minerals', 'Tecnologias': 'tech', 'Robôs': 'robots', 'Céu e clima': 'sky', 'Descobertas': 'discoveries'};
 const RARITY = {'comum': 'common', 'raro': 'rare', 'épico': 'epic', 'lendário': 'legendary'};
 const HOW = {'colher na estufa': 'harvest', 'tubo de amostra': 'tube', 'construir': 'build', 'explorar': 'explore', 'aguentar o evento': 'event'};
-const dados = cartas.filter(c => !/em breve/i.test(c.onde)).map(c => ({
+const cards = cardRows.filter(c => !/em breve/i.test(c.onde)).map(c => ({
   id: Number(c.id), category: CATEGORY[c.categoria] ?? c.categoria, rarity: RARITY[c.raridade] ?? c.raridade, how: HOW[c.como_ganha] ?? c.como_ganha, place: c.onde,
   number: c.numero_real, source: c.fonte, photo: c.foto_nasa,
 }));
-writeFileSync(join(RAIZ, 'jogo/data/cartas.json'), JSON.stringify(dados, null, 1) + '\n');
+writeFileSync(join(ROOT, 'jogo/data/cartas.json'), JSON.stringify(cards, null, 1) + '\n');
 
-// 3. Sons e fotos (só se a pasta já existir)
-const copiar = (de, para) => {
-  const origem = join(RAIZ, de);
-  if (!existsSync(origem)) return 0;
-  mkdirSync(join(RAIZ, para), {recursive: true});
+// 3. Sounds and photos (only if the folder already exists)
+const copyFiles = (from, to) => {
+  const source = join(ROOT, from);
+  if (!existsSync(source)) return 0;
+  mkdirSync(join(ROOT, to), {recursive: true});
   let n = 0;
-  for (const f of readdirSync(origem)) if (/\.(ogg|wav|jpg|png)$/i.test(f)) { copyFileSync(join(origem, f), join(RAIZ, para, f)); n++; }
+  for (const f of readdirSync(source)) if (/\.(ogg|wav|jpg|png)$/i.test(f)) { copyFileSync(join(source, f), join(ROOT, to, f)); n++; }
   return n;
 };
-const sons = copiar('conteudo/01-sons/sons', 'jogo/sounds');
-// Fotos: só as das cartas que estão no jogo
-const ids = new Set(dados.map(d => String(d.id).padStart(2, '0')));
-let fotos = 0;
-if (existsSync(join(RAIZ, 'conteudo/02-cartas/fotos'))) {
-  mkdirSync(join(RAIZ, 'jogo/ui/cards'), {recursive: true});
-  for (const f of readdirSync(join(RAIZ, 'conteudo/02-cartas/fotos'))) {
-    if (/\.(jpg|png)$/i.test(f) && ids.has(f.slice(0, 2))) { copyFileSync(join(RAIZ, 'conteudo/02-cartas/fotos', f), join(RAIZ, 'jogo/ui/cards', f)); fotos++; }
+const sounds = copyFiles('conteudo/01-sons/sons', 'jogo/sounds');
+// Photos: only those of the cards that are in the game
+const ids = new Set(cards.map(d => String(d.id).padStart(2, '0')));
+let photos = 0;
+if (existsSync(join(ROOT, 'conteudo/02-cartas/fotos'))) {
+  mkdirSync(join(ROOT, 'jogo/ui/cards'), {recursive: true});
+  for (const f of readdirSync(join(ROOT, 'conteudo/02-cartas/fotos'))) {
+    if (/\.(jpg|png)$/i.test(f) && ids.has(f.slice(0, 2))) { copyFileSync(join(ROOT, 'conteudo/02-cartas/fotos', f), join(ROOT, 'jogo/ui/cards', f)); photos++; }
   }
 }
 
-// 4. O Mike do design/01 (o mike.glb já traz as animações idle, run e jump)
-mkdirSync(join(RAIZ, 'jogo/models/mike'), {recursive: true});
+// 4. Mike from design/01 (mike.glb already comes with the idle, run and jump animations)
+mkdirSync(join(ROOT, 'jogo/models/mike'), {recursive: true});
 let mike = 0;
 for (const f of ['mike.glb', 'mike-astronauta.glb']) {
-  const de = join(RAIZ, 'design/01-mike', f);
-  if (existsSync(de)) { copyFileSync(de, join(RAIZ, 'jogo/models/mike', f)); mike++; }
+  const src = join(ROOT, 'design/01-mike', f);
+  if (existsSync(src)) { copyFileSync(src, join(ROOT, 'jogo/models/mike', f)); mike++; }
 }
 
-// 5. O nome da foto de cada carta (NN-nome.jpg), se já existir
-const fotosNoJogo = existsSync(join(RAIZ, 'jogo/ui/cards')) ? readdirSync(join(RAIZ, 'jogo/ui/cards')) : [];
-for (const d of dados) d.photo_file = fotosNoJogo.find(f => f.startsWith(String(d.id).padStart(2, '0') + '-')) || '';
-writeFileSync(join(RAIZ, 'jogo/data/cartas.json'), JSON.stringify(dados, null, 1) + '\n');
-console.log(`textos: ${textos.length} + ${cartas.length * 2} das cartas · cartas: ${dados.length} · sons: ${sons} · fotos: ${fotos} · mike: ${mike} arquivo(s)`);
+// 5. The photo file name of each card (NN-name.jpg), if it already exists
+const photosInGame = existsSync(join(ROOT, 'jogo/ui/cards')) ? readdirSync(join(ROOT, 'jogo/ui/cards')) : [];
+for (const d of cards) d.photo_file = photosInGame.find(f => f.startsWith(String(d.id).padStart(2, '0') + '-')) || '';
+writeFileSync(join(ROOT, 'jogo/data/cartas.json'), JSON.stringify(cards, null, 1) + '\n');
+console.log(`texts: ${texts.length} + ${cardRows.length * 2} from cards · cards: ${cards.length} · sounds: ${sounds} · photos: ${photos} · mike: ${mike} file(s)`);
 
-// 6. Tela de carregamento e fonte do design/05 (a página web usa a nave e a fonte; o jogo usa a fonte)
-const carregamento = join(RAIZ, 'design/05-telas/carregamento');
-mkdirSync(join(RAIZ, 'jogo/web'), {recursive: true});
-mkdirSync(join(RAIZ, 'jogo/ui/fonts'), {recursive: true});
-for (const f of ['nave.png', 'rubik.ttf']) if (existsSync(join(carregamento, f))) copyFileSync(join(carregamento, f), join(RAIZ, 'jogo/web', f));
-if (existsSync(join(carregamento, 'rubik.ttf'))) copyFileSync(join(carregamento, 'rubik.ttf'), join(RAIZ, 'jogo/ui/fonts/rubik.ttf'));
+// 6. Loading screen and font from design/05 (the web page uses the ship and the font; the game uses the font)
+const loading = join(ROOT, 'design/05-telas/carregamento');
+mkdirSync(join(ROOT, 'jogo/web'), {recursive: true});
+mkdirSync(join(ROOT, 'jogo/ui/fonts'), {recursive: true});
+for (const f of ['nave.png', 'rubik.ttf']) if (existsSync(join(loading, f))) copyFileSync(join(loading, f), join(ROOT, 'jogo/web', f));
+if (existsSync(join(loading, 'rubik.ttf'))) copyFileSync(join(loading, 'rubik.ttf'), join(ROOT, 'jogo/ui/fonts/rubik.ttf'));
 
-// 7. Modelos dos itens (design/03 e design/04), pelo itens.csv do Design → jogo/models/items/ + data/itens.json
-const itensCsv = join(RAIZ, 'design/03-itens-do-jogo/itens.csv');
-const itens = {};
-if (existsSync(itensCsv)) {
-  mkdirSync(join(RAIZ, 'jogo/models/items'), {recursive: true});
-  for (const it of objetos(parse(readFileSync(itensCsv, 'utf8')))) {
-    const citado = (it.observacao.match(/design\/[\w\-/]+\.(glb|png)/) || [])[0];
+// 7. Item models (design/03 and design/04), from Design's itens.csv → jogo/models/items/ + data/itens.json
+const itemsCsv = join(ROOT, 'design/03-itens-do-jogo/itens.csv');
+const items = {};
+if (existsSync(itemsCsv)) {
+  mkdirSync(join(ROOT, 'jogo/models/items'), {recursive: true});
+  for (const it of toObjects(parse(readFileSync(itemsCsv, 'utf8')))) {
+    const cited = (it.observacao.match(/design\/[\w\-/]+\.(glb|png)/) || [])[0];
     const kebab = it.arquivo_do_modelo.replace(/_/g, '-').replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-    const nivel1 = (it.observacao.match(/niveis\/[\w-]+-n1\.glb/) || [])[0];
-    const candidatos = [nivel1 && `design/03-itens-do-jogo/${nivel1}`, `design/03-itens-do-jogo/${it.arquivo_do_modelo}`, citado, `design/03-itens-do-jogo/kenney/${kebab}`].filter(Boolean);
-    const achado = candidatos.find(c => existsSync(join(RAIZ, c)));
-    if (!achado) continue;
-    const nome = achado.split('/').pop();
-    copyFileSync(join(RAIZ, achado), join(RAIZ, 'jogo/models/items', nome));
-    itens[it.item_do_jogo] = nome;
+    const level1 = (it.observacao.match(/niveis\/[\w-]+-n1\.glb/) || [])[0];
+    const candidates = [level1 && `design/03-itens-do-jogo/${level1}`, `design/03-itens-do-jogo/${it.arquivo_do_modelo}`, cited, `design/03-itens-do-jogo/kenney/${kebab}`].filter(Boolean);
+    const found = candidates.find(c => existsSync(join(ROOT, c)));
+    if (!found) continue;
+    const name = found.split('/').pop();
+    copyFileSync(join(ROOT, found), join(ROOT, 'jogo/models/items', name));
+    items[it.item_do_jogo] = name;
   }
 }
-// Os 3 níveis (niveis/<item>-n1.glb, -n2, -n3) e a altura de cada item (tamanhos.csv, com o Mike = 2,2)
-const niveis = join(RAIZ, 'design/03-itens-do-jogo/niveis');
-if (existsSync(niveis)) for (const f of readdirSync(niveis)) if (f.endsWith('.glb')) copyFileSync(join(niveis, f), join(RAIZ, 'jogo/models/items', f));
-// A estante de exposição e as pedras das descobertas (design/03: estante/ e descobertas/)
-for (const [pasta, quais] of [['estante', /^estante\.glb$/], ['descobertas', /\.glb$/]]) {
-  const dir = join(RAIZ, 'design/03-itens-do-jogo', pasta);
+// The 3 levels (niveis/<item>-n1.glb, -n2, -n3) and each item's height (tamanhos.csv, with Mike = 2.2)
+const levels = join(ROOT, 'design/03-itens-do-jogo/niveis');
+if (existsSync(levels)) for (const f of readdirSync(levels)) if (f.endsWith('.glb')) copyFileSync(join(levels, f), join(ROOT, 'jogo/models/items', f));
+// The display shelf and the discovery rocks (design/03: estante/ and descobertas/)
+for (const [folder, which] of [['estante', /^estante\.glb$/], ['descobertas', /\.glb$/]]) {
+  const dir = join(ROOT, 'design/03-itens-do-jogo', folder);
   if (!existsSync(dir)) continue;
-  for (const f of readdirSync(dir)) if (quais.test(f)) {
-    copyFileSync(join(dir, f), join(RAIZ, 'jogo/models/items', f));
-    itens[f.replace(/\.glb$/, '')] = f;
+  for (const f of readdirSync(dir)) if (which.test(f)) {
+    copyFileSync(join(dir, f), join(ROOT, 'jogo/models/items', f));
+    items[f.replace(/\.glb$/, '')] = f;
   }
 }
-const alturas = {shelf: 1.8};
-const tamanhosCsv = join(RAIZ, 'design/03-itens-do-jogo/tamanhos.csv');
-if (existsSync(tamanhosCsv)) {
-  for (const t of objetos(parse(readFileSync(tamanhosCsv, 'utf8')))) {
-    if (t.chave_no_jogo && t.chave_no_jogo !== '-') alturas[t.chave_no_jogo] = Number(t.altura);
+const heights = {shelf: 1.8};
+const sizesCsv = join(ROOT, 'design/03-itens-do-jogo/tamanhos.csv');
+if (existsSync(sizesCsv)) {
+  for (const t of toObjects(parse(readFileSync(sizesCsv, 'utf8')))) {
+    if (t.chave_no_jogo && t.chave_no_jogo !== '-') heights[t.chave_no_jogo] = Number(t.altura);
   }
 }
-writeFileSync(join(RAIZ, 'jogo/data/itens.json'), JSON.stringify({files: itens, heights: alturas}, null, 1) + '\n');
+writeFileSync(join(ROOT, 'jogo/data/itens.json'), JSON.stringify({files: items, heights}, null, 1) + '\n');
 
-// 7b. Molduras das cartas e imagens do painel de informação da construção (design/05)
-mkdirSync(join(RAIZ, 'jogo/ui/frames'), {recursive: true});
-for (const f of readdirSync(join(RAIZ, 'design/05-telas'))) if (/^moldura-carta-.*\.png$/.test(f)) copyFileSync(join(RAIZ, 'design/05-telas', f), join(RAIZ, 'jogo/ui/frames', f));
-const info = join(RAIZ, 'design/05-telas/info-construcao');
+// 7b. Card frames and the building info panel images (design/05)
+mkdirSync(join(ROOT, 'jogo/ui/frames'), {recursive: true});
+for (const f of readdirSync(join(ROOT, 'design/05-telas'))) if (/^moldura-carta-.*\.png$/.test(f)) copyFileSync(join(ROOT, 'design/05-telas', f), join(ROOT, 'jogo/ui/frames', f));
+const info = join(ROOT, 'design/05-telas/info-construcao');
 if (existsSync(info)) {
-  mkdirSync(join(RAIZ, 'jogo/ui/info-construcao'), {recursive: true});
-  for (const f of readdirSync(info)) if (/^(item-.*|placa-titulo|ornamento-luas|ic-carta)\.png$/.test(f)) copyFileSync(join(info, f), join(RAIZ, 'jogo/ui/info-construcao', f));
+  mkdirSync(join(ROOT, 'jogo/ui/info-construcao'), {recursive: true});
+  for (const f of readdirSync(info)) if (/^(item-.*|placa-titulo|ornamento-luas|ic-carta)\.png$/.test(f)) copyFileSync(join(info, f), join(ROOT, 'jogo/ui/info-construcao', f));
 }
 
-// 7c. Logo do design/06 (tela inicial)
-if (existsSync(join(RAIZ, 'design/06-logo-e-icone/logo.png'))) copyFileSync(join(RAIZ, 'design/06-logo-e-icone/logo.png'), join(RAIZ, 'jogo/ui/logo.png'));
+// 7c. Logo from design/06 (start screen)
+if (existsSync(join(ROOT, 'design/06-logo-e-icone/logo.png'))) copyFileSync(join(ROOT, 'design/06-logo-e-icone/logo.png'), join(ROOT, 'jogo/ui/logo.png'));
 
-// 8. Ícones do design/05
-const icones = join(RAIZ, 'design/05-telas/telas-godot');
-mkdirSync(join(RAIZ, 'jogo/ui/icons'), {recursive: true});
-if (existsSync(icones)) for (const f of readdirSync(icones)) if (/^ic-.*\.png$/.test(f) || f === 'mike.png') copyFileSync(join(icones, f), join(RAIZ, 'jogo/ui/icons', f));
-console.log(`modelos de itens: ${Object.keys(itens).length} (${Object.keys(itens).join(', ')})`);
+// 8. Icons from design/05
+const icons = join(ROOT, 'design/05-telas/telas-godot');
+mkdirSync(join(ROOT, 'jogo/ui/icons'), {recursive: true});
+if (existsSync(icons)) for (const f of readdirSync(icons)) if (/^ic-.*\.png$/.test(f) || f === 'mike.png') copyFileSync(join(icons, f), join(ROOT, 'jogo/ui/icons', f));
+console.log(`item models: ${Object.keys(items).length} (${Object.keys(items).join(', ')})`);

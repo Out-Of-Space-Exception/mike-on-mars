@@ -1,8 +1,8 @@
 class_name Plate
 extends PanelContainer
-## Painel com cara de peça da base: chapa de metal com 4 parafusos nos cantos.
-## Com `stripe`, ganha a faixa de perigo listrada no topo (usada só nos avisos de evento).
-## (pesquisa/anti-ai-slop.md, item 4: forma com motivo, não o mesmo retângulo em tudo)
+## Panel that looks like a part of the base: a metal plate with 4 screws in the corners.
+## With `stripe`, it gets the striped hazard band on top (used only in event notices).
+## (pesquisa/anti-ai-slop.md, item 4: a shape with a purpose, not the same rectangle everywhere)
 
 @export var stripe := false
 
@@ -20,7 +20,7 @@ func _draw() -> void:
 		draw_circle(p, r, Palette.RIVET)
 		draw_circle(p + Vector2(-1.5, -1.5), r * 0.45, Palette.RIVET.lightened(0.35))
 	if stripe:
-		# Faixa de perigo: listras amarelas e escuras em diagonal.
+		# Hazard band: diagonal yellow and dark stripes.
 		var w := 26.0
 		var x := -Palette.STRIPE_H
 		while x < size.x:

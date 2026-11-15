@@ -1,13 +1,13 @@
 extends CanvasLayer
-## A interface (telas do design/05): tela inicial, barras, sol, botões Construir/Explorar/Álbum/Foto,
-## janelas de eventos, carta, tubo, álbum, dados da NASA e cartão-postal.
-## Decide o que um toque na base faz, conforme o modo atual (nada, construir ou mover).
+## The UI (design/05 screens): start screen, bars, sol, Build/Explore/Album/Photo buttons,
+## event windows, card, tube, album, NASA data and postcard.
+## Decides what a tap on the base does, depending on the current mode (nothing, build or move).
 
 enum Mode { NONE, BUILD, MOVE }
 
 const LANGS := ["en", "pt_BR", "es", "fr"]
 const LANG_NAMES := {"en": "EN", "pt_BR": "PT", "es": "ES", "fr": "FR"}
-## Menu de idiomas: bandeira (Kenney Flag Pack, CC0) + nome escrito no próprio idioma.
+## Language menu: flag (Kenney Flag Pack, CC0) + name written in its own language.
 const LANG_FLAGS := {"en": "res://ui/flags/us.png", "pt_BR": "res://ui/flags/br.png", "es": "res://ui/flags/es.png", "fr": "res://ui/flags/fr.png"}
 const LANG_LABELS := {"en": "English", "pt_BR": "Português", "es": "Español", "fr": "Français"}
 const BAR_KEYS := {"energy": "BAR_ENERGY", "oxygen": "BAR_OXYGEN", "shield": "BAR_SHIELD"}
@@ -26,7 +26,7 @@ var _bars := {}
 var _bar_labels := {}
 var _bar_fill := {}
 var _bar_box: Control
-var _btn_labels := {}         # texto de cada botão de baixo (o botão é montado com ícone + texto)
+var _btn_labels := {}         # text of each bottom button (the button is built from icon + text)
 var _hint_chip: PanelContainer
 var _card_rarity_pill: PanelContainer
 var _card_rays: Control
@@ -39,9 +39,9 @@ var _tube_beam: MeshInstance3D
 var _top_box: Control
 var _bottom_box: Control
 var _popups: Array[PanelContainer] = []
-const MAX_W := 680.0          # largura máxima da interface; em tela larga fica no meio, com respiro dos lados
-var _bar_nums := {}           # o número de agora dentro da barra
-var _bar_rates := {}          # quanto ganha ou perde por sol
+const MAX_W := 680.0          # max UI width; on a wide screen it stays in the middle, with margins on the sides
+var _bar_nums := {}           # the current number inside the bar
+var _bar_rates := {}          # how much it gains or loses per sol
 var _sol_label: Label
 var _hint: Label
 var _toast: PanelContainer
@@ -63,7 +63,7 @@ var _panel_desc: Label
 var _panel_stats: HBoxContainer
 var _panel_tail: Polygon2D
 var _panel_pos := Vector2.INF
-var _panel_sig := ""          # o que o menu flutuante mostra; só remonta os botões quando isso muda
+var _panel_sig := ""          # what the floating menu shows; only rebuilds the buttons when this changes
 var _build_sig := ""
 var _dim: ColorRect
 var _choice: PanelContainer
@@ -85,7 +85,7 @@ var _card_fact: Label
 var _card_photo: TextureRect
 var _card_frame: TextureRect
 var _build_info: Control
-var _icon_cache := {}         # ícones 3D já desenhados
+var _icon_cache := {}         # 3D icons already rendered
 var _settings: PanelContainer
 var _set_title: Label
 var _set_lang: Label
@@ -95,22 +95,22 @@ var _set_sounds: Button
 var _set_tutorial: Button
 var _set_nasa: Button
 var _gear: Button
-# Tutorial do primeiro minuto: recado fixo do Mike no topo + seta dourada em cima do que tocar.
+# First-minute tutorial: fixed message from Mike at the top + golden arrow over what to tap.
 var _tut_card: PanelContainer
 var _tut_label: Label
 var _tut_skip: Button
 var _tut_arrow: TextureRect
-var _tut_ring: Panel          # moldura dourada pulsando em volta do botão que o Mike pediu (não cobre nada)
+var _tut_ring: Panel          # golden frame pulsing around the button Mike asked for (covers nothing)
 var _tut_done_at := -1.0
 var _pc_hint_shown := false
-const CARD_W := 560.0          # a carta com a moldura do Design (1066 x 1280) nesta largura
+const CARD_W := 560.0          # the card with the Design frame (1066 x 1280) at this width
 const FRAME := {"common": "comum", "rare": "raro", "epic": "epico", "legendary": "lendario"}   # card frame file names (Design team)
 var _card_source := ""
 var _card_queue: Array[int] = []
 var _card_new: Array[bool] = []
 var _card_reveal := false
-var _card_badge: PanelContainer   # selo "NOVA!" inclinado no canto da carta
-var _badge_tween: Tween       # a carta que acabou de sair do tubo entra com festa    # "Carta nova!" só quando a criança acabou de ganhar
+var _card_badge: PanelContainer   # tilted "NEW!" badge in the corner of the card
+var _badge_tween: Tween       # the card that just came out of the tube enters with a party    # "New card!" only when the child just won it
 var _tube: PanelContainer
 var _tube_node: Node3D
 var _tube_glass: StandardMaterial3D
@@ -130,7 +130,7 @@ var _album_page := 0
 var _album_badge: PanelContainer
 var _album_box: StyleBoxFlat
 var _shelf: Control
-const ALBUM_MAX_W := 1000.0   # no PC o álbum fica no meio, no máximo desta largura   # bolinha vermelha no botão Álbum: quantas cartas novas
+const ALBUM_MAX_W := 1000.0   # on PC the album stays in the middle, at most this wide   # red dot on the Album button: how many new cards
 var _nasa: PanelContainer
 var _nasa_text: Label
 var _start: Control
@@ -141,8 +141,8 @@ var _postcard: Control
 var _postcard_label: Label
 var _flash: ColorRect
 var _inventory: HFlowContainer
-var _inv_labels := {}         # planta -> Label "× n"
-var _icons := {}              # planta -> textura desenhada do modelo 3D
+var _inv_labels := {}         # plant -> Label "× n"
+var _icons := {}              # plant -> texture rendered from the 3D model
 
 
 func _ready() -> void:
@@ -156,7 +156,7 @@ func _ready() -> void:
 	_build_messages()
 	_build_album()
 	_build_popups()
-	# Painel de informação da construção (Design 05): abre ao tocar num item do menu Construir.
+	# Building info panel (Design 05): opens when tapping an item in the Build menu.
 	_build_info = preload("res://scenes/build_info.gd").new()
 	_build_info.icons = {"energy": _icon("energy"), "oxygen": _icon("oxygen"), "shield": _icon("shield"), "card": _icon("card")}
 	_build_info.model_for = func(type: String) -> Node3D: return _item_model(type, 1.25)
@@ -188,7 +188,7 @@ func _on_event_message(key: String, extra: String) -> void:
 		Sfx.play("alerta")
 
 
-# ───────────── Tela inicial ─────────────
+# ───────────── Start screen ─────────────
 func _on_play() -> void:
 	Sfx.play("toque-botao")
 	Sfx.play_music("musica-base")
@@ -205,7 +205,7 @@ func _on_play() -> void:
 		var text := _sols(tr("AWAY_SOLS").format({"n": away.sols}))
 		if int(away.get("plants", 0)) > 0:
 			text += "\n" + tr("AWAY_PLANTS").format({"n": away.plants})
-		# Uma janela de cada vez: primeiro o "enquanto você estava fora", depois o que estava esperando.
+		# One window at a time: first the "while you were away" one, then whatever was waiting.
 		_show_info(tr("AWAY_TITLE"), text, _after_welcome)
 		Sfx.play("bem-vindo")
 		State.away = {}
@@ -219,7 +219,7 @@ func _after_welcome() -> void:
 		_show_tube()
 
 
-## Se o jogo foi fechado no meio de uma escolha, mostra a janela de novo.
+## If the game was closed in the middle of a choice, shows the window again.
 func _resume_pending() -> void:
 	match State.pending_event:
 		"storm":
@@ -228,8 +228,8 @@ func _resume_pending() -> void:
 			_show_event(State.pending_event)
 
 
-## O Mike reage quando a criança toca nele (pesquisa, item 17).
-## Ele sempre pula; fala no máximo uma vez a cada 8 segundos, e cada vez uma frase diferente.
+## Mike reacts when the child taps him (research, item 17).
+## He always jumps; he talks at most once every 8 seconds, and a different line each time.
 func on_mike_tapped() -> void:
 	base.jump()
 	Sfx.play("bem-vindo")
@@ -242,7 +242,7 @@ func on_mike_tapped() -> void:
 
 
 func _on_lang() -> void:
-	# Abre o menu de idiomas logo abaixo do botão.
+	# Opens the language menu right below the button.
 	var menu := _lang_menu()
 	var r := _start_lang.get_global_rect()
 	menu.popup(Rect2i(Vector2i(int(r.end.x) - 300, int(r.end.y) + 12), Vector2i(300, 0)))
@@ -269,14 +269,14 @@ func _lang_menu() -> PopupMenu:
 			State.set_locale(LANGS[id]))
 		add_child(_lang_popup)
 	_lang_popup.clear()
-	# Português primeiro (o time é do Brasil), depois os outros.
+	# Portuguese first (the team is from Brazil), then the others.
 	for l in ["pt_BR", "en", "es", "fr"]:
 		_lang_popup.add_icon_item(_icon("flag_" + l), LANG_LABELS[l], LANGS.find(l))
 	_lang_popup.set_focused_item(_lang_popup.get_item_index(LANGS.find(State.locale)))
 	return _lang_popup
 
 
-# ───────────── O que um toque na base faz ─────────────
+# ───────────── What a tap on the base does ─────────────
 func on_cell_tapped(c: Vector2i) -> void:
 	if _build_menu.visible:
 		_build_menu.visible = false
@@ -285,7 +285,7 @@ func on_cell_tapped(c: Vector2i) -> void:
 	if mode == Mode.NONE and _tut_blocks("greenhouse" if State.item_at(c).get("type", "") == "greenhouse" else "base"):
 		return
 	var free: bool = c != base.OUTSIDE and State.item_at(c).is_empty()
-	# Área ainda fechada: abre quando a Casa do Mike sobe de nível.
+	# Area still closed: opens when Mike's House levels up.
 	if c != base.OUTSIDE and free and not State.cell_open(c) and mode != Mode.MOVE:
 		_show_toast(tr("MAP_LOCKED"), true)
 		Sfx.play("travado")
@@ -326,7 +326,7 @@ func _set_mode(m: Mode) -> void:
 	_refresh()
 
 
-# ───────────── Botões de baixo ─────────────
+# ───────────── Bottom buttons ─────────────
 func _on_build() -> void:
 	if _tut_blocks("build"):
 		return
@@ -382,7 +382,7 @@ func _on_album() -> void:
 	State.save_game()
 
 
-## Cartão-postal: esconde a interface, põe "Sol N · Gale Crater" e baixa a foto da base.
+## Postcard: hides the UI, shows "Sol N · Gale Crater" and saves the photo of the base.
 func _on_photo() -> void:
 	if _tut_blocks("photo"):
 		return
@@ -408,7 +408,7 @@ func _on_photo() -> void:
 	_show_toast(tr("PHOTO_SAVED"))
 
 
-# ───────────── Painel do item tocado ─────────────
+# ───────────── Tapped item panel ─────────────
 func _open_panel(c: Vector2i) -> void:
 	var was_open := _panel.visible and selected == c
 	_panel_sig = ""
@@ -433,7 +433,7 @@ func _refresh_panel() -> void:
 	if it.is_empty():
 		_close_panel()
 		return
-	# A cada sol só muda o "Alface · 12/33 sóis": os botões ficam como estão (antes piscavam).
+	# Each sol only the "Lettuce · 12/33 sols" text changes: the buttons stay as they are (they used to blink).
 	var sig := "%s|%s|%d|%s|%s|%s|%s|%s|%s|%s" % [selected, it.type, int(it.level), it.get("plant", ""), State.plant_ready(selected), it.get("broken", false),
 		State.base_locked_reason(), State.upgrade_block_reason(selected), State.unlocked_plants(), TranslationServer.get_locale()]
 	if sig == _panel_sig:
@@ -448,7 +448,7 @@ func _refresh_panel() -> void:
 	_panel_level.get_parent().visible = State.upgrade_cost(selected) >= 0 or int(it.level) > 1
 	_panel_desc.text = State.item_text(State.item_name(it))
 	_panel_desc.visible = _panel_desc.text != ""
-	# Quanto ela faz por sol, com os ícones das barras de cima.
+	# How much it makes per sol, with the icons from the top bars.
 	for c in _panel_stats.get_children():
 		c.queue_free()
 	var rates: Dictionary = State.item_rates(it)
@@ -484,7 +484,7 @@ func _refresh_panel() -> void:
 		b.queue_free()
 	if it.type == "greenhouse":
 		if it.plant == "":
-			# Sementes em 2 colunas, para o menu não ficar comprido demais.
+			# Seeds in 2 columns, so the menu doesn't get too long.
 			var seeds := GridContainer.new()
 			seeds.columns = 2
 			seeds.add_theme_constant_override("h_separation", 16)
@@ -496,7 +496,7 @@ func _refresh_panel() -> void:
 				pb.reparent(seeds)
 				pb.custom_minimum_size = Vector2(0, 128)
 				pb.add_theme_font_size_override("font_size", 23)
-				pb.icon = _plant_icon(p)   # Design: a planta junto do nome, mais visual
+				pb.icon = _plant_icon(p)   # Design: the plant next to the name, more visual
 				pb.expand_icon = true
 				pb.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
 				pb.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -509,19 +509,19 @@ func _refresh_panel() -> void:
 			_panel_info.visible = true
 			_panel_info.text = tr("PLANT_GROWING").format({
 				"plant": tr(State.PLANTS[it.plant].name), "n": int(it.growth), "max": State.PLANTS[it.plant].sols})
-	# Estante: o botão dourado "Ver estante" (câmera de frente e as vagas para escolher o que expor).
+	# Shelf: the golden "View shelf" button (front camera and the slots to choose what to display).
 	if it.type == "shelf":
 		var shelf_key := State.key(State.anchor_of(selected))
-		var ver := _add_panel_button(tr("BTN_SHELF"), func() -> void:
+		var view_btn := _add_panel_button(tr("BTN_SHELF"), func() -> void:
 			Sfx.play("abrir-menu")
 			_close_panel()
 			_shelf.open(shelf_key), true)
-		ver.custom_minimum_size.y = 88
-		ver.set_meta("base_color", Palette.GOLD)
-		_style_key(ver, true)
+		view_btn.custom_minimum_size.y = 88
+		view_btn.set_meta("base_color", Palette.GOLD)
+		_style_key(view_btn, true)
 	if State.base_locked_reason() != "":
 		return
-	# Quebrada: a ação principal é consertar (e ela não melhora enquanto estiver quebrada).
+	# Broken: the main action is to repair (and it can't be upgraded while broken).
 	var cost := State.upgrade_cost(selected)
 	if it.get("broken", false):
 		_panel_info.visible = true
@@ -540,7 +540,7 @@ func _refresh_panel() -> void:
 		up.custom_minimum_size.y = 88
 		up.set_meta("base_color", Palette.GOLD)
 		_style_key(up, State.upgrade_block_reason(selected) == "")
-	# Mover, girar e remover: só os ícones (setas em cruz, seta em curva e lixeira), lado a lado.
+	# Move, rotate and remove: icons only (cross arrows, curved arrow and trash can), side by side.
 	var tools := HBoxContainer.new()
 	tools.add_theme_constant_override("separation", 16)
 	_panel_buttons.add_child(tools)
@@ -574,8 +574,8 @@ func _add_panel_button(text: String, action: Callable, main := false) -> Button:
 	return b
 
 
-## O menu flutuante segue a construção (se a câmera mexer) e fica dentro da tela,
-## entre as barras de cima e os botões de baixo. A pontinha sempre aponta para a construção.
+## The floating menu follows the building (if the camera moves) and stays inside the screen,
+## between the top bars and the bottom buttons. The little tail always points at the building.
 func _place_panel(delta: float) -> void:
 	if not _panel.visible:
 		return
@@ -583,7 +583,7 @@ func _place_panel(delta: float) -> void:
 	if anchor == Vector2.INF:
 		return
 	var vp := get_viewport().get_visible_rect().size
-	_panel.size = _panel.get_combined_minimum_size()   # 3 botões ou 4: o cartão tem o tamanho certo
+	_panel.size = _panel.get_combined_minimum_size()   # 3 buttons or 4: the card gets the right size
 	var sz := _panel.size
 	var target := Vector2(anchor.x - sz.x / 2.0, anchor.y - sz.y - 34.0)
 	target.x = clampf(target.x, 12.0, vp.x - sz.x - 12.0)
@@ -666,7 +666,7 @@ func _on_harvest() -> void:
 		base.jump()
 
 
-# ───────────── Eventos ─────────────
+# ───────────── Events ─────────────
 func _show_storm(event: Dictionary) -> void:
 	var lines := [tr("EV_SOLAR_REAL").format({"date": _nice_date(str(event.get("date", "")))})]
 	if event.get("curiosity", false):
@@ -678,7 +678,7 @@ func _show_storm(event: Dictionary) -> void:
 	Sfx.play("alerta")
 
 
-## "Sim, levantar (gasta 30 de energia)": the choice button says how much energy it uses.
+## "Yes, raise it (costs 30 energy)": the choice button says how much energy it uses.
 func _with_cost(text: String, cost: float) -> String:
 	return "%s (%s)" % [text, tr("COST_ENERGY").format({"n": int(cost)})]
 
@@ -752,11 +752,11 @@ func _on_info_ok() -> void:
 		_info_action.call()
 
 
-# ───────────── Tubo de amostra ─────────────
+# ───────────── Sample tube ─────────────
 func _show_tube() -> void:
 	if State.tube_card == 0 or _tube.visible or _start.visible:
 		return
-	# Suspense: tudo cinza e um "?". A cor da raridade só aparece quando abre.
+	# Suspense: all grey and a "?". The rarity color only shows when it opens.
 	var grey := Color(0.72, 0.72, 0.76)
 	_tube_glass.albedo_color = Color(grey, 0.6)
 	_tube_glass.emission = grey.darkened(0.4)
@@ -781,7 +781,7 @@ func _show_tube() -> void:
 	_update_dim()
 	_tut_update()
 	Sfx.play("tubo-abrir")
-	# O tubo gira devagar e dá tremidinhas, como se a amostra quisesse sair.
+	# The tube slowly turns and shivers a little, as if the sample wanted to get out.
 	if _tube_tween:
 		_tube_tween.kill()
 	_tube_node.rotation = Vector3.ZERO
@@ -793,8 +793,8 @@ func _show_tube() -> void:
 	_tube_tween.tween_property(_tube_node, "rotation:z", -0.06, 0.9).set_trans(Tween.TRANS_SINE)
 
 
-## Abrir (como abrir um baú): o tubo dá 3 pulinhos, cada um mais alto, piscando de leve; no último ele
-## sobe girando e brilha; um clarão cobre a tela e a carta sai de uma fumacinha na cor dela.
+## Open (like opening a chest): the tube makes 3 hops, each higher, blinking lightly; on the last one it
+## rises spinning and glows; a flash covers the screen and the card comes out of a puff of smoke in its color.
 func _on_tube_tap() -> void:
 	if _tube_opening or State.tube_card == 0:
 		return
@@ -821,7 +821,7 @@ func _on_tube_tap() -> void:
 		t.tween_property(_tube_node, "scale", Vector3.ONE, 0.1)
 		t.parallel().tween_property(_tube_glass, "emission_energy_multiplier", 0.8, 0.1)
 		t.tween_interval(0.16)
-	# O último: sobe girando e acende inteiro.
+	# The last one: rises spinning and lights up completely.
 	t.tween_callback(func() -> void: Sfx.play("tubo-abrir"))
 	t.tween_property(_tube_node, "position:y", 0.3, 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	t.parallel().tween_property(_tube_node, "rotation:y", TAU * 2.0, 0.45).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
@@ -831,7 +831,7 @@ func _on_tube_tap() -> void:
 	t.tween_callback(_tube_reveal.bind(color))
 
 
-## Clarão branco na tela inteira; atrás dele o tubo some e a carta aparece saindo de uma fumacinha.
+## White flash over the whole screen; behind it the tube disappears and the card appears coming out of a puff of smoke.
 func _tube_reveal(color: Color) -> void:
 	_flash.color = Color.WHITE
 	_flash.modulate.a = 1.0
@@ -847,7 +847,7 @@ func _tube_reveal(color: Color) -> void:
 	f.tween_property(_flash, "modulate:a", 0.0, 0.5).set_ease(Tween.EASE_OUT)
 
 
-## Fumacinha 2D na cor da carta: bolinhas que saem do meio da tela, crescem e somem (atrás da carta).
+## 2D puff of smoke in the card color: little balls that leave the middle of the screen, grow and fade (behind the card).
 func _smoke_puffs(color: Color) -> void:
 	var center := get_viewport().get_visible_rect().size / 2.0
 	for i in 18:
@@ -872,7 +872,7 @@ func _smoke_puffs(color: Color) -> void:
 		t.chain().tween_callback(puff.queue_free)
 
 
-## Fumaça colorida saindo do tubo (bolinhas que crescem e somem).
+## Colored smoke coming out of the tube (little balls that grow and fade).
 func _tube_smoke(color: Color) -> void:
 	var p := CPUParticles3D.new()
 	p.one_shot = true
@@ -910,7 +910,7 @@ func _tube_smoke(color: Color) -> void:
 	get_tree().create_timer(1.6).timeout.connect(p.queue_free)
 
 
-# ───────────── Carta ─────────────
+# ───────────── Card ─────────────
 func _queue_card(id: int, is_new: bool = true) -> void:
 	_card_queue.append(id)
 	_card_new.append(is_new)
@@ -930,7 +930,7 @@ func _show_next_card() -> void:
 	var info := State.card_info(id)
 	var rarity: String = info.get("rarity", "common")
 	var color: Color = Palette.RARITY.get(rarity, Palette.TEXT)
-	_card_title.text = ""          # o selo "NOVA!" na carta já diz isso
+	_card_title.text = ""          # the "NEW!" badge on the card already says that
 	_card_title.visible = false
 	var frame := "res://ui/frames/moldura-carta-%s.png" % FRAME.get(rarity, "comum")
 	if ResourceLoader.exists(frame):
@@ -955,7 +955,7 @@ func _show_next_card() -> void:
 	_card_photo.texture = load(photo) if str(info.get("photo_file", "")) != "" and ResourceLoader.exists(photo) else null
 	_card.visible = true
 	_update_dim()
-	# Festa de recompensa: raios na cor da raridade girando atrás, e a carta chega girando e quicando.
+	# Reward party: rays in the rarity color spinning behind, and the card arrives spinning and bouncing.
 	var brand_new: bool = is_new_card and int(State.cards.get(str(id), 0)) <= 1
 	_card_badge.visible = brand_new
 	if _badge_tween:
@@ -979,7 +979,7 @@ func _show_next_card() -> void:
 	_card_rays.set_meta("color", color)
 	_card_rays.queue_redraw()
 	if festive:
-		# Os raios ficam logo atrás da carta (nunca por cima dela).
+		# The rays stay right behind the card (never on top of it).
 		if _card_rays.get_index() > _card.get_index():
 			_root.move_child(_card_rays, _card.get_index())
 		_card.scale = Vector2(0.3, 0.3)
@@ -999,7 +999,7 @@ func _on_card_source() -> void:
 		OS.shell_open(_card_source)
 
 
-# ───────────── Álbum ─────────────
+# ───────────── Album ─────────────
 func _refresh_album() -> void:
 	_album_title.text = tr("ALBUM_TITLE")
 	var total := State.cards_total()
@@ -1018,7 +1018,7 @@ func _refresh_album() -> void:
 		_album_next.text = tr("ALBUM_DONE")
 	_album_tabs.visible = false
 	_album_page_title.visible = false
-	# Abas (guardadas para quando houver mais cartas; hoje o álbum mostra tudo junto)
+	# Tabs (kept for when there are more cards; today the album shows everything together)
 	for c in _album_tabs.get_children():
 		c.queue_free()
 	for p in State.ALBUM_PAGES.size():
@@ -1054,7 +1054,7 @@ func _refresh_album() -> void:
 		col.add_child(lb)
 		tab.set_meta("label", lb)
 		_style_key(tab, true)
-		# Página com carta nova ainda não vista: bolinha vermelha na aba.
+		# Page with a new card not yet seen: red dot on the tab.
 		for id in State.page_cards(p):
 			if State.cards.has(str(id)) and not State.seen_cards.has(str(id)) and p != _album_page:
 				var dot := Panel.new()
@@ -1073,15 +1073,15 @@ func _refresh_album() -> void:
 			_refresh_album())
 		_juice(tab)
 		_album_tabs.add_child(tab)
-	# Página aberta
+	# Open page
 	var page_owned := State.page_owned(_album_page)
 	var page_ids := State.page_cards(_album_page)
 	_album_page_title.text = "%s  %d/%d%s" % [tr(State.ALBUM_PAGES[_album_page][1]), page_owned, page_ids.size(), "  ★" if page_owned == page_ids.size() else ""]
-	# Todas as cartas juntas, grandes: 2 colunas no celular e mais colunas em tela larga.
+	# All the cards together, big: 2 columns on phones and more columns on wide screens.
 	for c in _album_grid.get_children():
 		c.queue_free()
-	# O álbum ocupa uma coluna no meio da tela (como o resto da interface): 2 cartas por linha
-	# no celular e até 3 no PC, sempre grandes.
+	# The album takes one column in the middle of the screen (like the rest of the UI): 2 cards per row
+	# on phones and up to 3 on PC, always big.
 	var vw := get_viewport().get_visible_rect().size.x
 	var side := maxf(32.0, (vw - ALBUM_MAX_W) / 2.0)
 	_album_box.content_margin_left = side
@@ -1093,13 +1093,13 @@ func _refresh_album() -> void:
 	var all_ids := State.card_ids()
 	for id in all_ids:
 		_album_grid.add_child(_album_tile(id, tile_w))
-	# Viu o álbum: as cartas novas deixam de ser novas (o selo some na próxima vez).
+	# Saw the album: new cards stop being new (the badge goes away next time).
 	for id in all_ids:
 		if State.cards.has(str(id)):
 			State.seen_cards[str(id)] = true
 
 
-# ───────────── Dados da NASA ─────────────
+# ───────────── NASA data ─────────────
 func _on_nasa() -> void:
 	Sfx.play("abrir-menu")
 	_nasa_text.text = "%s\n\n%s\n\n%s" % [tr("NASA_DONKI").format({"n": State.donki_count()}), tr("NASA_CARDS"), tr("NASA_MODEL")]
@@ -1107,7 +1107,7 @@ func _on_nasa() -> void:
 	_update_dim()
 
 
-# ───────────── Atualizar a tela ─────────────
+# ───────────── Refresh the screen ─────────────
 func _refresh() -> void:
 	var rates: Dictionary = State.current_rates()
 	for bar in BAR_KEYS:
@@ -1154,14 +1154,14 @@ func _refresh() -> void:
 		_refresh_build_menu()
 
 
-## "1 sóis" vira "1 sol" (e "1 sols", "1 soles" também).
+## "1 sóis" becomes "1 sol" (and "1 sols", "1 soles" too).
 func _sols(text: String) -> String:
 	var re := RegEx.new()
 	re.compile("(^|[^0-9/])1 (sóis|sols|soles)")
 	return re.sub(text, "${1}1 sol", true)
 
 
-## Data da NASA (2024-05-20) do jeito que a criança lê: 20/05/2024 (em inglês, May 20, 2024).
+## NASA date (2024-05-20) the way the child reads it: 20/05/2024 (in English, May 20, 2024).
 func _nice_date(iso: String) -> String:
 	var p := iso.split("-")
 	if p.size() != 3:
@@ -1205,7 +1205,7 @@ func _status_raw() -> String:
 	return ""
 
 
-## Quantas de cada planta a criança já colheu, com o próprio modelo 3D como ícone.
+## How many of each plant the child has harvested, with its own 3D model as the icon.
 func _refresh_inventory() -> void:
 	if base == null:
 		return
@@ -1242,7 +1242,7 @@ func _refresh_inventory() -> void:
 		(_inv_labels[p] as Label).get_parent().get_parent().visible = int(State.inventory.get(p, 0)) > 0
 
 
-## Desenha o modelo da planta uma vez numa telinha separada e usa a imagem como ícone.
+## Renders the plant model once in a small separate viewport and uses the image as the icon.
 func _plant_icon(p: String) -> Texture2D:
 	if _icons.has(p):
 		return _icons[p]
@@ -1283,7 +1283,7 @@ func _refresh_build_menu() -> void:
 	for type in State.BUILDABLE:
 		sig += "|%s%s%s" % [type, State.is_unlocked(type), State.build_block_reason(type)]
 	if sig == _build_sig and _build_grid.get_child_count() > 0:
-		return   # nada mudou: não remonta (não pisca)
+		return   # nothing changed: don't rebuild (no blinking)
 	_build_sig = sig
 	for c in _build_grid.get_children():
 		c.queue_free()
@@ -1376,16 +1376,16 @@ func _update_dim() -> void:
 	_dim.visible = _choice.visible or _info.visible or _card.visible or _tube.visible or _nasa.visible or (_settings != null and _settings.visible)
 
 
-## Recado do Mike no topo da tela, como notificação de celular: desce, fica um pouco e sobe.
-## Quando é bloqueio (falta algo), a borda fica vermelha e o recado treme de leve.
+## Message from Mike at the top of the screen, like a phone notification: slides down, stays a bit and slides up.
+## When it is a block (something is missing), the border turns red and the message shakes slightly.
 func _show_toast(text: String, shake := false) -> void:
 	_toast_label.text = text
-	move_child(_toast, get_child_count() - 1)   # sempre por cima de tudo
-	# Na mesma largura das barras e dos botões (no meio da tela), não na tela inteira.
+	move_child(_toast, get_child_count() - 1)   # always on top of everything
+	# Same width as the bars and buttons (in the middle of the screen), not the whole screen.
 	var vw := get_viewport().get_visible_rect().size.x
 	var w := minf(vw - 40.0, MAX_W)
 	var x0 := (vw - w) / 2.0
-	_toast_label.custom_minimum_size.x = w - 40.0 - 48.0 - 18.0   # respiro (16 + 24), rosto (48), espaço (16)
+	_toast_label.custom_minimum_size.x = w - 40.0 - 48.0 - 18.0   # margin (16 + 24), face (48), gap (16)
 	_toast_style.border_color = Palette.ALERT if shake else Palette.INK
 	_toast.custom_minimum_size.x = w
 	_toast.reset_size()
@@ -1393,7 +1393,7 @@ func _show_toast(text: String, shake := false) -> void:
 	if _toast_tween:
 		_toast_tween.kill()
 	_toast_tween = create_tween()
-	# Aparece logo abaixo das barras (nunca por cima delas): desce um pouquinho e some sozinho.
+	# Appears right below the bars (never on top of them): slides down a little and disappears on its own.
 	var y := _toast_top()
 	if not _toast_down:
 		_toast.position.y = y - 24.0
@@ -1401,7 +1401,7 @@ func _show_toast(text: String, shake := false) -> void:
 		_toast_tween.set_parallel()
 		_toast_tween.tween_property(_toast, "position:y", y, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		_toast_tween.tween_property(_toast, "modulate:a", 1.0, 0.2)
-		_toast_tween.set_parallel(false)   # o resto (esperar 5 s, depois sumir) vem um depois do outro
+		_toast_tween.set_parallel(false)   # the rest (wait 5 s, then fade) comes one after the other
 	else:
 		_toast.position.y = y
 		_toast.modulate.a = 1.0
@@ -1414,10 +1414,10 @@ func _show_toast(text: String, shake := false) -> void:
 	_toast_tween.tween_property(_toast, "modulate:a", 0.0, 0.3)
 
 
-## Barras e botões no meio da tela, no máximo MAX_W de largura, com respiro dos lados.
+## Bars and buttons in the middle of the screen, at most MAX_W wide, with margins on the sides.
 func _fit_layout() -> void:
 	var vw := get_viewport().get_visible_rect().size.x
-	var side := maxf(32.0, (vw - MAX_W) / 2.0)   # margem de 16 dp no celular
+	var side := maxf(32.0, (vw - MAX_W) / 2.0)   # 16 dp margin on phones
 	for box in [_top_box, _bottom_box]:
 		if box:
 			box.offset_left = side
@@ -1432,7 +1432,7 @@ func _toast_top() -> float:
 	return _bars_bottom() + (_tut_card.size.y + 8.0 if _tut_card and _tut_card.visible else 0.0)
 
 
-# ───────────── Tutorial do primeiro minuto ─────────────
+# ───────────── First-minute tutorial ─────────────
 func _build_tutorial() -> void:
 	_tut_card = PanelContainer.new()
 	var box := Palette.paper()
@@ -1503,8 +1503,8 @@ func _build_tutorial() -> void:
 	add_child(_tut_ring)
 
 
-## Avança o tutorial pelo que a criança já fez e escolhe o recado do passo de agora.
-## Passos: 0 painel solar · 1 estufa · 2 plantar · 3 explorar · 4 abrir o tubo · 5 parabéns.
+## Advances the tutorial based on what the child has already done and picks the message for the current step.
+## Steps: 0 solar panel · 1 greenhouse · 2 plant · 3 explore · 4 open the tube · 5 congratulations.
 func _tut_update() -> void:
 	var s := State.tutorial
 	if s >= State.TUTORIAL_DONE or _start.visible:
@@ -1565,8 +1565,8 @@ func _tut_update() -> void:
 		create_tween().tween_property(_tut_card, "modulate:a", 1.0, 0.3)
 
 
-## O que o tutorial pede para tocar agora: um botão (ganha a moldura dourada), um ponto da base
-## (ganha a seta, bem acima da construção) ou nada.
+## What the tutorial asks to tap now: a button (gets the golden frame), a point on the base
+## (gets the arrow, well above the building) or nothing.
 func _tut_target() -> Variant:
 	if not _tut_card.visible or _choice.visible or _info.visible or _card.visible or _nasa.visible or _album.visible:
 		return null
@@ -1603,7 +1603,7 @@ func _tut_target() -> Variant:
 	return null
 
 
-## O ponto que o tutorial aponta (para os testes): o meio de cima do botão, o ponto da base, ou INF.
+## The point the tutorial indicates (for the tests): the top middle of the button, the base point, or INF.
 func _tut_point() -> Vector2:
 	var t: Variant = _tut_target()
 	if t is Control:
@@ -1614,7 +1614,7 @@ func _tut_point() -> Vector2:
 	return Vector2.INF
 
 
-## O nome do que o Mike pediu para tocar (para o "Primeiro, toque em ...").
+## The name of what Mike asked to tap (for the "First, tap ...").
 func _tut_target_name() -> String:
 	match State.tutorial:
 		0, 1:
@@ -1633,7 +1633,7 @@ func _tut_target_name() -> String:
 	return ""
 
 
-## No tutorial, só vale tocar no que o Mike pediu. Tocou em outra coisa: ele lembra o que é (e nada acontece).
+## In the tutorial, only tapping what Mike asked counts. Tapped something else: he reminds what it is (and nothing happens).
 func _tut_blocks(what: String) -> bool:
 	if State.tutorial >= State.TUTORIAL_DONE or _start.visible:
 		return false
@@ -1698,8 +1698,8 @@ func _process(delta: float) -> void:
 		_tut_arrow.position = (target as Vector2) - Vector2(_tut_arrow.size.x / 2.0, _tut_arrow.size.y + 6.0 + bob)
 
 
-# ───────────── Ícones em 3D ─────────────
-## Todos os ícones do jogo são pecinhas 3D (scripts/icons3d.gd), desenhadas uma vez e guardadas.
+# ───────────── 3D icons ─────────────
+## All the game icons are little 3D pieces (scripts/icons3d.gd), rendered once and cached.
 func _icon(key: String) -> Texture2D:
 	if _icon_cache.has(key):
 		return _icon_cache[key]
@@ -1748,7 +1748,7 @@ func _frames(names: Array) -> Array:
 	return out
 
 
-## O modelo 3D de uma construção (nível 1), no meio, para miniatura e para o painel que gira.
+## The 3D model of a building (level 1), centered, for the thumbnail and for the spinning panel.
 func _item_model(type: String, fit := 1.0) -> Node3D:
 	var holder := Node3D.new()
 	var file := State.model_file(State.ITEMS[type].get("model", ""), 1)
@@ -1760,7 +1760,7 @@ func _item_model(type: String, fit := 1.0) -> Node3D:
 	return holder
 
 
-## Miniatura 3D de cada item do menu Construir (a criança vê o que é antes de tocar).
+## 3D thumbnail of each item in the Build menu (the child sees what it is before tapping).
 func _thumb(type: String) -> Texture2D:
 	var k := "thumb_" + type
 	if not _icon_cache.has(k):
@@ -1768,7 +1768,7 @@ func _thumb(type: String) -> Texture2D:
 	return _icon_cache[k]
 
 
-# ───────────── Configurações (engrenagem no canto) ─────────────
+# ───────────── Settings (gear in the corner) ─────────────
 func _build_settings() -> void:
 	_settings = _popup(620, "paper")
 	var sbox: VBoxContainer = _settings.get_child(0)
@@ -1864,7 +1864,7 @@ func _refresh_settings() -> void:
 	_set_nasa.add_theme_constant_override("icon_max_width", 64)
 
 
-## Botão redondo vermelho com X: fecha a janela (fica no canto de cima, à direita, longe do botão principal).
+## Round red button with X: closes the window (sits in the top right corner, away from the main button).
 func _red_x(action: Callable) -> Button:
 	var x := Button.new()
 	x.text = "X"
@@ -1883,8 +1883,8 @@ func _red_x(action: Callable) -> Button:
 	return x
 
 
-## Tecla ligada (cor dela, texto escuro) ou desligada (vinho escuro, texto creme e ícone apagado).
-## Desligada não fica transparente: continua bem visível sobre o chão de Marte.
+## Key on (its color, dark text) or off (dark wine, cream text and dimmed icon).
+## Off is not transparent: it stays clearly visible over the Mars ground.
 func _style_key(b: Button, enabled: bool) -> void:
 	var color: Color = b.get_meta("base_color", Palette.BUTTON) if enabled else Palette.OFF
 	for s in ["normal", "hover", "focus", "disabled"]:
@@ -1901,7 +1901,7 @@ func _style_key(b: Button, enabled: bool) -> void:
 		ic.modulate = Color.WHITE if enabled else Color(0.6, 0.6, 0.6)
 
 
-## O nome de cada botão de baixo cabe numa linha (diminui a letra se precisar, como em "Construire").
+## Each bottom button name fits on one line (shrinks the font if needed, as in "Construire").
 func _fit_button_texts() -> void:
 	for k in _btn_labels:
 		if not _buttons.has(k):
@@ -1909,7 +1909,7 @@ func _fit_button_texts() -> void:
 		var lb: Label = _btn_labels[k]
 		var room: float = _buttons[k].size.x - 18.0
 		if room < 40.0:
-			continue   # o botão ainda não tem largura (antes do primeiro desenho)
+			continue   # the button has no width yet (before the first draw)
 		var size := 26 if k == "explore" else 21
 		var f: Font = Palette.font(700)
 		while size > 16 and room > 0.0 and f.get_string_size(lb.text, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x > room:
@@ -1917,7 +1917,7 @@ func _fit_button_texts() -> void:
 		lb.add_theme_font_size_override("font_size", size)
 
 
-## Todo botão responde na hora: afunda quando aperta e quica quando solta (pesquisa, item 16).
+## Every button responds right away: sinks when pressed and bounces when released (research, item 16).
 func _juice(b: Button) -> void:
 	b.resized.connect(func() -> void: b.pivot_offset = b.size / 2.0)
 	b.button_down.connect(func() -> void: create_tween().tween_property(b, "scale", Vector2(0.93, 0.93), 0.06))
@@ -1925,7 +1925,7 @@ func _juice(b: Button) -> void:
 		create_tween().tween_property(b, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT))
 
 
-# ───────────── Montagem da tela ─────────────
+# ───────────── Screen assembly ─────────────
 func _build_top() -> void:
 	var top := VBoxContainer.new()
 	_top_box = top
@@ -1937,7 +1937,7 @@ func _build_top() -> void:
 	top.add_theme_constant_override("separation", 16)
 	_root.add_child(top)
 
-	# As 3 barras são tubos de vidro soltos na tela (sem chapa escura atrás): a base aparece mais.
+	# The 3 bars are loose glass tubes on the screen (no dark plate behind): more of the base shows.
 	var rows := VBoxContainer.new()
 	rows.add_theme_constant_override("separation", 8)
 	rows.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -1954,7 +1954,7 @@ func _build_top() -> void:
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon.texture = _icon(bar)
 		row.add_child(icon)
-		var label := Label.new()   # o nome fica guardado (some da tela: o ícone já diz o que é)
+		var label := Label.new()   # the name is kept (hidden on screen: the icon already says what it is)
 		label.visible = false
 		row.add_child(label)
 		var pb := TubeBar.new()
@@ -1966,7 +1966,7 @@ func _build_top() -> void:
 		row.add_child(pb)
 		_bars[bar] = pb
 		_bar_labels[bar] = label
-		# Dentro da barra: quanto tem agora (à esquerda) e quanto muda por sol (à direita).
+		# Inside the bar: how much there is now (left) and how much it changes per sol (right).
 		var num := Label.new()
 		num.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		num.offset_left = 18
@@ -1995,7 +1995,7 @@ func _build_top() -> void:
 		_bar_nums[bar] = num
 		_bar_rates[bar] = rate
 
-	# O "Sol N · Cratera Gale" é uma placa no canto, um pouco torta (nada de tudo centralizado).
+	# The "Sol N · Gale Crater" is a plate in the corner, slightly crooked (nothing all centered).
 	var pill := PanelContainer.new()
 	pill.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	pill.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
@@ -2058,9 +2058,9 @@ func _build_bottom() -> void:
 	_build_grid.add_theme_constant_override("v_separation", 16)
 	_build_menu.add_child(_build_grid)
 
-	# Menu da construção: um cartão de papel flutuando EM CIMA da construção tocada, com uma
-	# pontinha apontando para ela. Nome e nível, uma frase do que ela faz, quanto faz por sol
-	# e as ações em lista (uma embaixo da outra). Tocar fora ou em outra construção fecha.
+	# Building menu: a paper card floating ON TOP of the tapped building, with a
+	# little tail pointing at it. Name and level, a sentence about what it does, how much it makes per sol
+	# and the actions as a list (one under the other). Tapping outside or on another building closes it.
 	_panel = PanelContainer.new()
 	var card := Palette.paper()
 	card.set_corner_radius_all(14)
@@ -2127,7 +2127,7 @@ func _build_bottom() -> void:
 	_panel_buttons.add_theme_constant_override("separation", 16)
 	pbox.add_child(_panel_buttons)
 
-	# Embaixo, no alcance do polegar. Explorar é a ação principal: maior, dourada e mais alta que as outras.
+	# At the bottom, within thumb reach. Explore is the main action: bigger, golden and taller than the others.
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 16)
 	row.alignment = BoxContainer.ALIGNMENT_END
@@ -2135,13 +2135,13 @@ func _build_bottom() -> void:
 	for k in ["build", "album", "explore", "photo", "settings"]:
 		var main_action: bool = k == "explore"
 		var b := Button.new()
-		var gear := false   # a engrenagem agora é um botão igual aos outros, com o nome embaixo
-		b.custom_minimum_size = Vector2(0, 136 if main_action else 112)   # 56 dp: toque fácil para criança
+		var gear := false   # the gear is now a button like the others, with the name below
+		b.custom_minimum_size = Vector2(0, 136 if main_action else 112)   # 56 dp: easy tap for a child
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.size_flags_vertical = Control.SIZE_SHRINK_END
 		b.size_flags_stretch_ratio = 1.3 if main_action else 1.0
 		b.set_meta("base_color", Palette.GOLD if main_action else Palette.BUTTON)
-		# Dentro: o ícone 3D grande em cima e o nome em negrito embaixo (montados à mão, para cada um ter o seu contraste).
+		# Inside: the big 3D icon on top and the bold name below (built by hand, so each one has its own contrast).
 		var col := VBoxContainer.new()
 		col.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		col.offset_top = 12
@@ -2169,7 +2169,7 @@ func _build_bottom() -> void:
 			b.set_meta("label", lb)
 			_btn_labels[k] = lb
 		_style_key(b, true)
-		b.resized.connect(_fit_button_texts)   # o texto se ajusta quando o botão ganha a largura de verdade
+		b.resized.connect(_fit_button_texts)   # the text adjusts when the button gets its real width
 		_juice(b)
 		row.add_child(b)
 		_buttons[k] = b
@@ -2217,7 +2217,7 @@ func _build_messages() -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 16)
 	_toast.add_child(row)
-	# O rostinho do Mike, como a foto de quem mandou a mensagem.
+	# Mike's little face, like the photo of whoever sent the message.
 	var face := TextureRect.new()
 	var head := AtlasTexture.new()
 	head.atlas = load("res://ui/icons/mike.png")
@@ -2245,8 +2245,8 @@ func _build_messages() -> void:
 	col.add_child(_toast_label)
 
 
-## Álbum como um livro de figurinhas: 5 páginas (uma por tema), cada uma com o seu progresso.
-## A carta que falta mostra a moldura da raridade e um "?" (dá vontade de achar); a nova ganha o selo NOVA.
+## Album as a sticker book: 5 pages (one per theme), each with its own progress.
+## A missing card shows the rarity frame and a "?" (makes you want to find it); the new one gets the NEW badge.
 func _build_album() -> void:
 	_album = PanelContainer.new()
 	_album.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -2262,7 +2262,7 @@ func _build_album() -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 16)
 	_album.add_child(box)
-	# Cabeçalho: nome do álbum, NASA e o X.
+	# Header: album name, NASA and the X.
 	var head := HBoxContainer.new()
 	head.add_theme_constant_override("separation", 16)
 	box.add_child(head)
@@ -2280,7 +2280,7 @@ func _build_album() -> void:
 	head.add_child(_red_x(func() -> void:
 		_album.visible = false
 		_refresh()))
-	# Progresso: tubo dourado com "17 / 35" e o próximo prêmio.
+	# Progress: golden tube with "17 / 35" and the next reward.
 	var prog := VBoxContainer.new()
 	prog.add_theme_constant_override("separation", 8)
 	box.add_child(prog)
@@ -2305,7 +2305,7 @@ func _build_album() -> void:
 	_album_next.add_theme_font_size_override("font_size", 22)
 	_album_next.add_theme_color_override("font_color", Palette.TEXT)
 	prog.add_child(_album_next)
-	# Abas: uma por página, com o ícone 3D do tema e "4/7" (estrela quando completa).
+	# Tabs: one per page, with the 3D icon of the theme and "4/7" (star when complete).
 	_album_tabs = HBoxContainer.new()
 	_album_tabs.add_theme_constant_override("separation", 8)
 	box.add_child(_album_tabs)
@@ -2318,7 +2318,7 @@ func _build_album() -> void:
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	box.add_child(scroll)
-	# A grade fica no meio (antes ia toda para a esquerda no PC).
+	# The grid stays in the middle (before, it all went to the left on PC).
 	var center := CenterContainer.new()
 	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(center)
@@ -2353,13 +2353,13 @@ func _page_icon(page: int) -> Texture2D:
 	return null
 
 
-## Figurinha do álbum: a carta em miniatura (moldura da raridade, foto, número e nome).
+## Album sticker: the card in miniature (rarity frame, photo, number and name).
 func _album_tile(id: int, w := 192.0) -> Control:
 	var info := State.card_info(id)
 	var owned := State.cards.has(str(id))
 	var rarity: String = info.get("rarity", "common")
 	var k := w / 1066.0
-	var f := w / 192.0          # as letras crescem junto com a carta
+	var f := w / 192.0          # the letters grow along with the card
 	var b := Button.new()
 	b.custom_minimum_size = Vector2(w, 1280.0 * k)
 	b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
@@ -2369,7 +2369,7 @@ func _album_tile(id: int, w := 192.0) -> Control:
 	var window := Rect2(Vector2(60, 236) * k, Vector2(944, 614) * k)
 	if owned:
 		var photo := TextureRect.new()
-		photo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE   # antes do tamanho: senão a imagem força o tamanho dela
+		photo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE   # before the size: otherwise the image forces its own size
 		photo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		var file := "res://ui/cards/%s" % info.get("photo_file", "")
 		if str(info.get("photo_file", "")) != "" and ResourceLoader.exists(file):
@@ -2380,7 +2380,7 @@ func _album_tile(id: int, w := 192.0) -> Control:
 		photo.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		b.add_child(photo)
 	else:
-		# Ainda não tem: a janela fica escura com um "?" dourado (a moldura já mostra a raridade).
+		# Not owned yet: the window is dark with a golden "?" (the frame already shows the rarity).
 		var dark := ColorRect.new()
 		dark.color = Palette.PLATE
 		dark.position = window.position
@@ -2399,7 +2399,7 @@ func _album_tile(id: int, w := 192.0) -> Control:
 		q.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		b.add_child(q)
 	var frame := TextureRect.new()
-	frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE   # antes do tamanho: senão a moldura fica do tamanho da imagem
+	frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE   # before the size: otherwise the frame takes the image's size
 	frame.stretch_mode = TextureRect.STRETCH_SCALE
 	var frame_file := "res://ui/frames/moldura-carta-%s.png" % FRAME.get(rarity, "comum")
 	if ResourceLoader.exists(frame_file):
@@ -2409,7 +2409,7 @@ func _album_tile(id: int, w := 192.0) -> Control:
 	if not owned:
 		frame.modulate = Color(0.8, 0.8, 0.8)
 	b.add_child(frame)
-	# Número da figurinha no topo; nome embaixo (no lugar do fato).
+	# Sticker number at the top; name below (in place of the fact).
 	var num := Label.new()
 	num.text = tr("CARD_NUMBER").format({"n": id})
 	num.position = Vector2(107, 92) * k
@@ -2433,7 +2433,7 @@ func _album_tile(id: int, w := 192.0) -> Control:
 	name_label.add_theme_color_override("font_color", Color("3a261c"))
 	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	b.add_child(name_label)
-	# Carta nova (ainda não vista no álbum): selo NOVA inclinado.
+	# New card (not yet seen in the album): tilted NEW badge.
 	if owned and not State.seen_cards.has(str(id)):
 		var badge := PanelContainer.new()
 		var bb := Palette._box(Palette.ALERT, 10)
@@ -2454,7 +2454,7 @@ func _album_tile(id: int, w := 192.0) -> Control:
 		bt.add_theme_color_override("font_color", Color.WHITE)
 		badge.add_child(bt)
 		b.add_child(badge)
-	# Lendária que a criança tem: brilha devagar.
+	# Legendary that the child owns: glows slowly.
 	if owned and rarity == "legendary":
 		var glow := create_tween().set_loops()
 		glow.tween_property(frame, "modulate", Color(1.35, 1.25, 0.9), 0.8).set_trans(Tween.TRANS_SINE)
@@ -2474,7 +2474,7 @@ func _build_popups() -> void:
 	_dim.visible = false
 	_root.add_child(_dim)
 
-	# Escolha (tempestade, noite fria, sem sinal): chapa da base com a faixa de perigo listrada.
+	# Choice (storm, cold night, no signal): base plate with the striped danger band.
 	_choice = _popup(640, "alert")
 	var cbox: VBoxContainer = _choice.get_child(0)
 	_choice_title = _title_label(40)
@@ -2485,7 +2485,7 @@ func _build_popups() -> void:
 	_choice_a = _popup_button(cbox, _on_choice.bind(0))
 	_choice_b = _popup_button(cbox, _on_choice.bind(1), true)
 
-	# Aviso com OK (poeira, redemoinho, enquanto você estava fora): chapa da base.
+	# Notice with OK (dust, whirlwind, while you were away): base plate.
 	_info = _popup(620)
 	var ibox: VBoxContainer = _info.get_child(0)
 	_info_title = _title_label(40)
@@ -2495,8 +2495,8 @@ func _build_popups() -> void:
 	ibox.add_child(_info_text)
 	_popup_button(ibox, _on_info_ok).text = "OK"
 
-	# Carta: papel creme com a borda na cor da raridade, um pouco torta, como uma carta de verdade.
-	# Raios atrás da carta (só quando ela é nova): giram devagar, na cor da raridade.
+	# Card: cream paper with the border in the rarity color, slightly crooked, like a real card.
+	# Rays behind the card (only when it is new): spin slowly, in the rarity color.
 	_card_rays = Control.new()
 	_card_rays.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_card_rays.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -2512,8 +2512,8 @@ func _build_popups() -> void:
 			var w := 0.11
 			_card_rays.draw_colored_polygon(PackedVector2Array([c, c + Vector2(cos(a - w), sin(a - w)) * reach, c + Vector2(cos(a + w), sin(a + w)) * reach]), Color(col, 0.28))
 		_card_rays.draw_circle(c, 260.0, Color(col.lightened(0.4), 0.25)))
-	# A carta é a moldura do Design 05 (uma por raridade) com a foto da NASA por baixo,
-	# o nome no título e o fato embaixo, nos retângulos do design/05-telas/moldura-carta.md.
+	# The card is the Design 05 frame (one per rarity) with the NASA photo underneath,
+	# the name in the title and the fact below, in the rectangles from design/05-telas/moldura-carta.md.
 	_card = _popup(int(CARD_W))
 	_card_style = StyleBoxFlat.new()
 	_card_style.bg_color = Color(0, 0, 0, 0)
@@ -2543,7 +2543,7 @@ func _build_popups() -> void:
 	_card_frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_card_frame.stretch_mode = TextureRect.STRETCH_SCALE
 	face.add_child(_card_frame)
-	# Selo "NOVA!": inclinado no canto de cima, à esquerda, pulsando (só em carta que a criança ainda não tinha).
+	# "NEW!" badge: tilted in the top left corner, pulsing (only on a card the child did not have yet).
 	_card_badge = PanelContainer.new()
 	var badge_box := Palette._box(Palette.ALERT, 14)
 	badge_box.border_color = Palette.INK
@@ -2599,7 +2599,7 @@ func _build_popups() -> void:
 	ok.text = "OK"
 	crow.add_child(ok)
 
-	# Tubo de amostra em 3D (o mesmo material do jogo): gira e treme na cor da raridade até a criança tocar.
+	# 3D sample tube (same material as the game): spins and shivers in the rarity color until the child taps.
 	_tube = _popup(460)
 	var tbox: VBoxContainer = _tube.get_child(0)
 	tbox.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -2622,7 +2622,7 @@ func _build_popups() -> void:
 	tbox.add_child(_tube_label)
 	_tube_btn = _popup_button(tbox, _on_tube_tap)
 
-	# Dados da NASA
+	# NASA data
 	_nasa = _popup(640)
 	var nbox: VBoxContainer = _nasa.get_child(0)
 	var ntitle := _title_label(36)
@@ -2635,7 +2635,7 @@ func _build_popups() -> void:
 	_nasa.visibility_changed.connect(func() -> void: ntitle.text = tr("NASA_TITLE"))
 
 
-## O tubo de amostra: vidro na cor da raridade, tampas de metal, uma pedrinha dentro e uma luz da mesma cor.
+## The sample tube: glass in the rarity color, metal caps, a little rock inside and a light of the same color.
 func _build_tube_scene(vp: SubViewport) -> void:
 	var env := WorldEnvironment.new()
 	env.environment = Environment.new()
@@ -2691,7 +2691,7 @@ func _build_tube_scene(vp: SubViewport) -> void:
 	rock.material_override = rock_mat
 	rock.position.y = -0.45
 	_tube_node.add_child(rock)
-	# O "?" na frente do tubo: ninguém sabe a raridade até abrir.
+	# The "?" in front of the tube: nobody knows the rarity until it opens.
 	_tube_q = Label3D.new()
 	_tube_q.text = "?"
 	_tube_q.font = Palette.font(800)
@@ -2702,7 +2702,7 @@ func _build_tube_scene(vp: SubViewport) -> void:
 	_tube_q.pixel_size = 0.006
 	_tube_q.position = Vector3(0.0, 0.05, 0.6)
 	_tube_node.add_child(_tube_q)
-	# Anel de choque e facho de luz do estouro (escondidos até abrir).
+	# Shock ring and light beam of the burst (hidden until it opens).
 	_tube_ring = MeshInstance3D.new()
 	var torus := TorusMesh.new()
 	torus.inner_radius = 0.42
@@ -2760,7 +2760,7 @@ func _build_postcard() -> void:
 	_postcard.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_postcard.visible = false
 	add_child(_postcard)
-	# Cartão-postal: uma etiqueta de papel torta no canto, com o lugar e o sol.
+	# Postcard: a crooked paper label in the corner, with the place and the sol.
 	var strip := PanelContainer.new()
 	strip.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
 	strip.offset_left = 36
@@ -2789,7 +2789,7 @@ func _build_start() -> void:
 	_start = Control.new()
 	_start.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(_start)
-	# Fundo: a própria base (a câmera gira devagar atrás), só escurecida. Nada de degradê genérico.
+	# Background: the base itself (the camera slowly turns behind), just darkened. No generic gradient.
 	var shade := ColorRect.new()
 	shade.color = Color(0.12, 0.03, 0.05, 0.42)
 	shade.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -2803,7 +2803,7 @@ func _build_start() -> void:
 	col.add_theme_constant_override("separation", 6)
 	col.theme = _root.theme
 	_start.add_child(col)
-	# O logo do Design 06 (o nome, Marte e o foguete), balançando de leve.
+	# The Design 06 logo (the name, Mars and the rocket), swaying lightly.
 	var logo := TextureRect.new()
 	logo.texture = load("res://ui/logo.png") if ResourceLoader.exists("res://ui/logo.png") else load("res://ui/icons/mike.png")
 	logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -2842,9 +2842,9 @@ func _build_start() -> void:
 	_start_lang.size_flags_horizontal = Control.SIZE_SHRINK_END
 	_start_lang.autowrap_mode = TextServer.AUTOWRAP_OFF
 	corner.add_child(_start_lang)
-	# A interface do jogo só aparece depois do Jogar.
+	# The game UI only shows up after Play.
 	_root.visible = false
-	# A janela de dados da NASA também abre na tela inicial: fica por cima de tudo.
+	# The NASA data window also opens on the start screen: it stays on top of everything.
 	_nasa.reparent(self)
 	_nasa.theme = _root.theme
 	move_child(_nasa, -1)
@@ -2853,7 +2853,7 @@ func _build_start() -> void:
 	move_child(_toast, -1)
 
 
-## Janela no meio da tela. "plate" = chapa da base; "alert" = chapa com faixa de perigo; "paper" = papel.
+## Window in the middle of the screen. "plate" = base plate; "alert" = plate with danger stripe; "paper" = paper.
 func _popup(width: int, kind := "plate") -> PanelContainer:
 	var p: PanelContainer
 	if kind == "paper":
@@ -2877,7 +2877,7 @@ func _popup(width: int, kind := "plate") -> PanelContainer:
 	return p
 
 
-## Botão-tecla. O principal é dourado; o secundário, terracota.
+## Key button. The main one is golden; the secondary one, terracotta.
 func _key_button(action: Callable, secondary := false) -> Button:
 	var b := Button.new()
 	b.custom_minimum_size = Vector2(0, 104)
@@ -2898,7 +2898,7 @@ func _popup_button(box: VBoxContainer, action: Callable, secondary := false) -> 
 	return b
 
 
-## Título com a Rubik bem grossa, alinhado à esquerda (nada de tudo centralizado).
+## Title with very bold Rubik, left-aligned (nothing all centered).
 func _title_label(size: int) -> Label:
 	var l := _wrap_label("", size)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT

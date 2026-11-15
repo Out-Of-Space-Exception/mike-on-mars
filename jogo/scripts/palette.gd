@@ -1,13 +1,13 @@
 class_name Palette
-## Cores do jogo. Vêm de design/02-cores-e-fonte/cores.csv e de design/04-cores-das-coisas.
-## Nenhuma cor fica solta no código: use sempre estas constantes.
+## Game colors. They come from design/02-cores-e-fonte/cores.csv and design/04-cores-das-coisas.
+## No color is left loose in the code: always use these constants.
 
 # design/02 (cores.csv)
-const BG := Color("73242a")       # vinho: fundo
-const BUTTON := Color("d96941")   # terracota: botão principal
-const TEXT := Color("f2d091")     # creme: texto
-const GOLD := Color("e8b23a")     # ouro: destaque e raro
-const ALERT := Color("bf2a2a")    # vermelho: alerta
+const BG := Color("73242a")       # wine: background
+const BUTTON := Color("d96941")   # terracotta: main button
+const TEXT := Color("f2d091")     # cream: text
+const GOLD := Color("e8b23a")     # gold: highlight and rare
+const ALERT := Color("bf2a2a")    # red: alert
 
 const FONT := "res://ui/fonts/rubik.ttf"   # design/02 (Rubik, OFL)
 
@@ -15,42 +15,42 @@ const FONT := "res://ui/fonts/rubik.ttf"   # design/02 (Rubik, OFL)
 const SUIT := Color("f4f4f8")
 const SUIT_STRIPE := Color("3fa7c9")
 
-# Provisórias até o design/04 chegar (céu caramelo, chão de Marte)
+# Provisional until design/04 arrives (caramel sky, Mars ground)
 const SKY := Color("d9a066")
 const GROUND := Color("b4532a")
 const TILE := Color("c46a3c")
 const TILE_HI := Color("f4d39b")
 const PLANT := Color("6cc04a")
 
-# Raridade (design/04, cores-das-coisas.csv): cinza, azul, roxo, dourado.
+# Rarity (design/04, cores-das-coisas.csv): gray, blue, purple, gold.
 const RARITY := {"common": Color("9aa0a8"), "rare": Color("3b82d6"), "epic": Color("8e4fd8"), "legendary": Color("e8b23a")}
 const RARITY_KEY := {"common": "RARITY_COMMON", "rare": "RARITY_RARE", "epic": "RARITY_EPIC", "legendary": "RARITY_LEGEND"}
 
-# Tempestade solar
+# Solar storm
 const STORM_SKY := Color("8a5a8c")
 const DOME := Color(0.45, 0.75, 1.0, 0.18)
 
-# Barras
+# Bars
 const BAR := {"energy": GOLD, "oxygen": Color("7cc6e0"), "shield": SUIT_STRIPE}
 
 
-# Peças da interface (pesquisa/anti-ai-slop.md): cada tipo tem forma própria.
-#  - tecla: botão que "afunda" (borda grossa embaixo), é o que a criança toca;
-#  - chapa: painel de metal da base, com parafusos (scripts/plate.gd);
-#  - papel: a carta e o aviso curto, cor creme, como papel de verdade.
+# Interface pieces (pesquisa/anti-ai-slop.md): each type has its own shape.
+#  - key: a button that "sinks" (thick border at the bottom), it is what the child taps;
+#  - plate: metal panel of the base, with screws (scripts/plate.gd);
+#  - paper: the card and the short notice, cream color, like real paper.
 const PLATE := Color("3b1a1e")
 const PLATE_EDGE := Color("5c2d31")
 const RIVET := Color("8a5a4e")
 const PAPER := Color("f2e3c2")
 const INK := Color("3b1a1e")
-const INK_DEEP := Color("2a1215")   # texto escuro sobre o terracota (5:1, a INK fica no limite)
-const OFF := Color("5c2d31")        # botão que ainda não dá para usar (no lugar de deixar transparente)
+const INK_DEEP := Color("2a1215")   # dark text on terracotta (5:1, INK is at the limit)
+const OFF := Color("5c2d31")        # button that cannot be used yet (instead of leaving it transparent)
 const UP := Color("9be27a")         # "+3/sol"
 const DOWN := Color("ff9a8a")       # "-1/sol"
 static var _fonts := {}
 
 
-## A Rubik é uma fonte variável: sem dizer o peso, ela sai fininha (300). Texto 400, botões 700, títulos 800.
+## Rubik is a variable font: without setting the weight, it comes out thin (300). Text 400, buttons 700, titles 800.
 static func font(weight: int) -> Font:
 	if not _fonts.has(weight) and ResourceLoader.exists(FONT):
 		var f := FontVariation.new()
@@ -82,7 +82,7 @@ static func make_theme() -> Theme:
 	return t
 
 
-## Tecla: cantos pouco arredondados e uma borda grossa e mais escura embaixo; apertada, ela "afunda".
+## Key: slightly rounded corners and a thick, darker border at the bottom; when pressed, it "sinks".
 static func key(color: Color, pressed := false) -> StyleBoxFlat:
 	var b := _box(color, 18)
 	b.border_color = INK
@@ -97,7 +97,7 @@ static func key(color: Color, pressed := false) -> StyleBoxFlat:
 	return b
 
 
-## Chapa de metal: cantos quase retos, borda fina mais clara (os parafusos vêm do plate.gd).
+## Metal plate: almost square corners, thin lighter border (the screws come from plate.gd).
 static func plate(stripe := false) -> StyleBoxFlat:
 	var b := _box(PLATE, 8)
 	b.set_border_width_all(3)
@@ -109,7 +109,7 @@ static func plate(stripe := false) -> StyleBoxFlat:
 	return b
 
 
-## Papel: creme, canto pequeno e uma sombra dura deslocada (como um cartão apoiado na mesa).
+## Paper: cream, small corner and a hard offset shadow (like a card resting on a table).
 static func paper(edge: Color = INK) -> StyleBoxFlat:
 	var b := _box(PAPER, 8)
 	b.set_border_width_all(3 if edge == INK else 5)

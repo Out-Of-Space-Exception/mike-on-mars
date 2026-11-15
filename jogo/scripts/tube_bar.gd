@@ -1,12 +1,12 @@
 class_name TubeBar
 extends Control
-## Barra em forma de tubo de vidro (parece 3D): vidro escuro transparente, líquido colorido com
-## sombra embaixo e brilho em cima, e um reflexo no vidro. O líquido desliza até o valor novo.
+## Bar shaped like a glass tube (looks 3D): transparent dark glass, colored liquid with
+## shadow at the bottom and shine on top, and a reflection on the glass. The liquid slides to the new value.
 
-var value := 0.0:          # 0 a 100
+var value := 0.0:          # 0 to 100
 	set(v):
 		value = clampf(v, 0.0, 100.0)
-var cap := 100.0:          # acima do teto, o tubo fica trancado (listrado)
+var cap := 100.0:          # above the cap, the tube is locked (striped)
 	set(c):
 		if not is_equal_approx(c, cap):
 			cap = clampf(c, 0.0, 100.0)
@@ -42,12 +42,12 @@ func _cap(c: Color, top := true, bottom := true) -> StyleBoxFlat:
 
 func _draw() -> void:
 	var h := size.y
-	# Vidro: escuro e transparente, com borda clara.
+	# Glass: dark and transparent, with a light border.
 	var glass := _cap(Color(0.12, 0.03, 0.05, 0.62))
 	glass.border_color = Color(1, 1, 1, 0.35)
 	glass.set_border_width_all(2)
 	draw_style_box(glass, Rect2(Vector2.ZERO, size))
-	# Líquido: a cor da barra, mais escura embaixo e com brilho em cima.
+	# Liquid: the bar color, darker at the bottom and shiny on top.
 	var w := (size.x - 6.0) * _shown / 100.0
 	if w > 2.0:
 		w = maxf(w, h - 6.0)
@@ -57,7 +57,7 @@ func _draw() -> void:
 		draw_style_box(_cap(color.darkened(0.22), false, true), low)
 		if fill.size.x > h:
 			draw_style_box(_cap(Color(1, 1, 1, 0.38)), Rect2(fill.position + Vector2(h * 0.35, 3.0), Vector2(fill.size.x - h * 0.7, fill.size.y * 0.26)))
-	# Acima do teto (a Casa do Mike ainda é pequena): o tubo fica trancado, escuro e listrado.
+	# Above the cap (Mike's House is still small): the tube is locked, dark and striped.
 	if cap < 99.5:
 		var x0 := 3.0 + (size.x - 6.0) * cap / 100.0
 		var lock := Rect2(Vector2(x0, 3.0), Vector2(size.x - 3.0 - x0, h - 6.0))
@@ -69,5 +69,5 @@ func _draw() -> void:
 			draw_line(Vector2(x, h - 5.0), Vector2(minf(x + h * 0.5, size.x - h * 0.5), 5.0), Color(1, 1, 1, 0.16), 3.0, true)
 			x += step
 		draw_line(Vector2(x0, 2.0), Vector2(x0, h - 2.0), Color(1, 1, 1, 0.75), 3.0)
-	# Reflexo do vidro por cima de tudo.
+	# Glass reflection on top of everything.
 	draw_style_box(_cap(Color(1, 1, 1, 0.12)), Rect2(Vector2(h * 0.5, 3.0), Vector2(maxf(size.x - h, 0.0), h * 0.2)))

@@ -1,5 +1,5 @@
-// Servidor local para testar o export web no PC e no celular (mesmo Wi-Fi).
-// Uso: node ferramentas/servir.mjs   → abre em http://localhost:8060 e mostra o endereço para o celular.
+// Local server to test the web export on the PC and on a phone (same Wi-Fi).
+// Usage: node ferramentas/servir.mjs   → opens at http://localhost:8060 and shows the address for the phone.
 import {createServer} from 'node:http';
 import {readFile, stat} from 'node:fs/promises';
 import {networkInterfaces} from 'node:os';
@@ -7,7 +7,7 @@ import {extname, join, normalize} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {gzipSync} from 'node:zlib';
 
-const cache = new Map(); // arquivo -> versão gzip (como o GitHub Pages faz)
+const cache = new Map(); // file -> gzip version (like GitHub Pages does)
 
 const ROOT = join(fileURLToPath(new URL('..', import.meta.url)), 'build');
 const PORT = 8060;
@@ -21,19 +21,19 @@ createServer(async (req, res) => {
     let data = await readFile(file);
     const headers = {'Content-Type': TYPES[extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-store'};
     if (/gzip/.test(req.headers['accept-encoding'] || '') && ['.wasm', '.js', '.pck', '.html'].includes(extname(file))) {
-      const chave = `${file}:${(await stat(file)).mtimeMs}`;  // exportou de novo? a chave muda
-      if (!cache.has(chave)) cache.set(chave, gzipSync(data, {level: 9}));
-      data = cache.get(chave);
+      const cacheKey = `${file}:${(await stat(file)).mtimeMs}`;  // exported again? the key changes
+      if (!cache.has(cacheKey)) cache.set(cacheKey, gzipSync(data, {level: 9}));
+      data = cache.get(cacheKey);
       headers['Content-Encoding'] = 'gzip';
     }
     res.writeHead(200, headers);
     res.end(data);
   } catch {
-    res.writeHead(404).end('nao encontrado');
+    res.writeHead(404).end('not found');
   }
 }).listen(PORT, '0.0.0.0', () => {
-  console.log(`PC:      http://localhost:${PORT}`);
+  console.log(`PC:    http://localhost:${PORT}`);
   for (const nets of Object.values(networkInterfaces())) {
-    for (const n of nets || []) if (n.family === 'IPv4' && !n.internal) console.log(`Celular: http://${n.address}:${PORT}`);
+    for (const n of nets || []) if (n.family === 'IPv4' && !n.internal) console.log(`Phone: http://${n.address}:${PORT}`);
   }
 });

@@ -1,6 +1,6 @@
 extends Node3D
-## A base em 3D: chão, grade, itens (modelos do design/03 e 04), plantas, Mike, Ingenuity e câmera.
-## Só desenha o que está no State. Quem decide o que um toque faz é o HUD (recebe cell_tapped).
+## The 3D base: ground, grid, items (models from design/03 and 04), plants, Mike, Ingenuity and camera.
+## Only draws what is in State. The HUD decides what a tap does (it receives cell_tapped).
 
 signal cell_tapped(cell: Vector2i)
 signal mike_tapped
@@ -10,16 +10,16 @@ const OUTSIDE := Vector2i(-1, -1)
 const ITEMS_DIR := "res://models/items/"
 const Shelf := preload("res://scenes/shelf.gd")
 const MIKE_SCENE := "res://models/mike/mike.glb"
-const MIKE_SUIT := "res://models/mike/mike-astronauta.glb"   # o Mike de traje, para a expedição
-const MIKE_MODEL_HEIGHT := 4.0   # altura do mike.glb em unidades do arquivo
-const MIKE_HEIGHT := 1.5         # altura do Mike no jogo (a câmera chega perto no começo)
-const DESIGN_MIKE := 2.2         # o tamanhos.csv do Design mede tudo com o Mike = 2,2
+const MIKE_SUIT := "res://models/mike/mike-astronauta.glb"   # Mike in his suit, for the expedition
+const MIKE_MODEL_HEIGHT := 4.0   # height of mike.glb in file units
+const MIKE_HEIGHT := 1.5         # Mike's height in the game (the camera gets close at the start)
+const DESIGN_MIKE := 2.2         # Design's tamanhos.csv measures everything with Mike = 2.2
 const INGENUITY := "res://models/nasa/ingenuity.glb"
 const INGENUITY_WIDTH := 1.3
-const CAM_MIN := 12.0            # câmera mais perto (base pequena)
-const CAM_START := 26.0          # na tela inicial: o planetinha inteiro, com o céu em volta
-const CAM_MAX := 30.0            # câmera mais longe (a grade inteira, 10 x 10)
-# Cores do Ingenuity (design/04): corpo branco, faixas azul e vermelha, detalhes dourados
+const CAM_MIN := 12.0            # closest camera (small base)
+const CAM_START := 26.0          # on the start screen: the whole little planet, with the sky around it
+const CAM_MAX := 30.0            # farthest camera (the whole 10 x 10 grid)
+# Ingenuity colors (design/04): white body, blue and red stripes, golden details
 const INGENUITY_COLORS := {
 	"aluminum": Palette.SUIT, "grey_brushed": Palette.SUIT, "chopper_sp": Palette.SUIT, "foil_silver": Palette.SUIT,
 	"binoculars": Palette.SUIT, "gunmetal": Palette.SUIT_STRIPE, "gunmetal_dark": Color("2e2a33"),
@@ -29,64 +29,64 @@ const INGENUITY_COLORS := {
 var camera: Camera3D
 var mike: Node3D
 var _mike_anim: AnimationPlayer
-var _mike_skins := {}       # "casual" / "suit" -> [modelo, AnimationPlayer, martelo]
-var build_fx := false       # o HUD liga ao construir: a construção nova passa pela obra (Mike martelando)
-# Obra do design/03 (construcao.gd, da Thais): bloquinhos caem e quicam, e a construção brota do chão.
-const OBRA_COLORS := [Color("D96941"), Color("F2D091"), Color("E8B23A"), Color("73242A")]
-const OBRA_WORK := 1.3          # segundos martelando depois que o Mike chega
-const PLACE_ONLY := ["flag", "pot"]   # coisas pequenas: o Mike só se abaixa e coloca
+var _mike_skins := {}       # "casual" / "suit" -> [model, AnimationPlayer, hammer]
+var build_fx := false       # the HUD turns this on when building: the new building goes through the construction site (Mike hammering)
+# Construction site from design/03 (construcao.gd, by Thais): little blocks fall and bounce, and the building sprouts from the ground.
+const SITE_COLORS := [Color("D96941"), Color("F2D091"), Color("E8B23A"), Color("73242A")]
+const BUILD_WORK_TIME := 1.3          # seconds of hammering after Mike arrives
+const PLACE_ONLY := ["flag", "pot"]   # small things: Mike just crouches and places them
 var _walking_out := false
 var _env: Environment
 var _sun: DirectionalLight3D
 var _dome: MeshInstance3D
 var _tiles := {}    # "x,y" -> MeshInstance3D
-var _nodes := {}    # "x,y" -> Node3D do item
+var _nodes := {}    # "x,y" -> the item's Node3D
 var _tile_mat: StandardMaterial3D
 var _tile_hi_mat: StandardMaterial3D
-var _scenes := {}   # cache de PackedScene
+var _scenes := {}   # PackedScene cache
 var _pet: Node3D
 var _rotors: Array[Node3D] = []
 var _rotor_axes: Array[Vector3] = []
 var _time := 0.0
-var _type_scale := {}       # escala de cada construção com níveis (a mesma em todos os níveis)
-var whole_grid := false     # o HUD liga ao construir ou mover: a câmera mostra a grade inteira
+var _type_scale := {}       # scale of each building with levels (the same at every level)
+var whole_grid := false     # the HUD turns this on when building or moving: the camera shows the whole grid
 var _cam_goal := Vector3(INF, INF, INF)
-# A câmera nunca pula: os dedos mudam o "alvo" e ela desliza até lá, amortecida.
+# The camera never jumps: fingers change the "goal" and it glides there, damped.
 const CAM_SMOOTH := 9.0
-const TURN_DEADZONE := 0.09     # radianos que os dois dedos precisam girar antes de o mundo girar
-const ZOOM_DEADZONE := 0.05     # 5% de pinça antes de dar zoom
+const TURN_DEADZONE := 0.09     # radians the two fingers must turn before the world turns
+const ZOOM_DEADZONE := 0.05     # 5% of pinch before zooming
 var _yaw_goal := deg_to_rad(45.0)
 var _pos_goal := Vector3.ZERO
 var _size_goal := CAM_START
-var _cam_snap := true           # a 1ª vez, vai direto (sem deslizar)
-var _multi := false             # dois dedos na tela: só solta quando todos saírem
+var _cam_snap := true           # the first time, go straight there (no gliding)
+var _multi := false             # two fingers on screen: only released when all are lifted
 var _turn_sum := 0.0
 var _zoom_sum := 1.0
 var _turning := false
 var _zooming := false
 var _rig: Node3D
-var orbit := true:           # o HUD desliga quando a criança toca em Jogar
+var orbit := true:           # the HUD turns this off when the child taps Play
 	set(v):
 		orbit = v
 		_cam_goal = Vector3(INF, INF, INF)
 		if is_inside_tree():
 			_frame_camera()
-var _built_once := false    # depois da 1ª montagem, construção nova "pula" para o lugar
+var _built_once := false    # after the first build, a new building "pops" into place
 var _manual_cam := false
-var _touches := {}          # dedo -> posição na tela
+var _touches := {}          # finger -> screen position
 var _press_pos := Vector2.ZERO
 var _dragging := false
 
-const DRAG_START := 14.0    # pixels: menos que isso é toque, mais é arrastar
+const DRAG_START := 14.0    # pixels: less than this is a tap, more is a drag
 const ZOOM_MIN := 6.0
-const ZOOM_MAX := 50.0           # de longe dá para ver o planetinha inteiro, como uma bola
+const ZOOM_MAX := 50.0           # from far away you can see the whole little planet, like a ball
 
-# Caminho do Mike: uma grade fina (4 x 4 por casa da base) onde as construções são parede.
-const NAV_STEP := 0.5           # metros por quadradinho
-const NAV_MARGIN := 10.0        # metros livres em volta da base para o Mike dar a volta
-const WALK_SPEED := 4.5         # metros por segundo
-const CORNER := 0.6             # raio das curvas: o Mike nunca vira em quina reta
-const CLEARANCE := 0.2          # folga do Mike até a parede, ao cortar caminho
+# Mike's path: a fine grid (4 x 4 per base cell) where buildings are walls.
+const NAV_STEP := 0.5           # meters per little square
+const NAV_MARGIN := 10.0        # free meters around the base so Mike can walk around
+const WALK_SPEED := 4.5         # meters per second
+const CORNER := 0.6             # radius of the curves: Mike never turns at a sharp corner
+const CLEARANCE := 0.2          # Mike's gap to the wall when cutting corners
 var _nav := AStarGrid2D.new()
 var _path := PackedVector3Array()
 var _path_i := 0
@@ -94,16 +94,16 @@ var _speed := WALK_SPEED
 var _face := 0.0
 var _look := Vector3.INF
 var _arrive := Callable()
-var _hi := {}               # casas acesas (onde dá para construir ou mover)
+var _hi := {}               # lit cells (where you can build or move)
 var _tile_lock_mat: StandardMaterial3D
 
-# Planetinha: o chão é plano onde fica a base e faz a curva para baixo depois, como uma bola.
-# Ele cresce junto com a Casa do Mike (a área aberta sempre cabe no plano).
-const FLAT_BY_LEVEL := {1: 6.0, 2: 10.5, 3: 14.5}   # metros do meio até onde o chão é plano (a área aberta cabe)
-const PLANET := 14.0            # raio da curva depois do plano (grande: o planeta fica redondo como uma bola)
+# Little planet: the ground is flat where the base is and curves down after that, like a ball.
+# It grows with Mike's House (the open area always fits on the flat part).
+const FLAT_BY_LEVEL := {1: 6.0, 2: 10.5, 3: 14.5}   # meters from the center to where the ground is flat (the open area fits)
+const PLANET := 14.0            # radius of the curve after the flat part (large: the planet looks round like a ball)
 var _flat_r := 6.0
-const JOIN := 0.7071            # o terreno termina onde a curva chega a 45° (sen 45°)
-var _terrain_src: Array = []    # [MeshInstance3D, transform, [arrays de cada superfície], [materiais]]
+const JOIN := 0.7071            # the terrain ends where the curve reaches 45° (sin 45°)
+var _terrain_src: Array = []    # [MeshInstance3D, transform, [arrays of each surface], [materials]]
 const SKY_SHADER := """
 shader_type spatial;
 render_mode unshaded, cull_disabled, shadows_disabled, fog_disabled;
@@ -116,7 +116,7 @@ void fragment() {
 }
 """
 var _sky: MeshInstance3D
-var _warn_tex: Texture2D       # o aviso amarelo de "quebrado" (desenhado uma vez)
+var _warn_tex: Texture2D       # the yellow "broken" warning (drawn once)
 var _sky_mat: ShaderMaterial
 
 
@@ -137,10 +137,10 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_time += delta
-	# Na tela inicial, a câmera dá uma volta devagar pela base.
+	# On the start screen, the camera slowly circles the base.
 	if orbit and not _manual_cam:
 		_yaw_goal += delta * 0.08
-	# No computador: Q/E ou as setas giram; + e - dão zoom.
+	# On a computer: Q/E or the arrow keys turn; + and - zoom.
 	var spin := float(Input.is_key_pressed(KEY_E) or Input.is_key_pressed(KEY_RIGHT)) - float(Input.is_key_pressed(KEY_Q) or Input.is_key_pressed(KEY_LEFT))
 	if spin != 0.0:
 		_turn(spin * delta * 1.6)
@@ -153,7 +153,7 @@ func _process(delta: float) -> void:
 	camera.size = lerpf(camera.size, _size_goal, ease_k)
 	_fit_sky()
 	_step_mike(delta)
-	# O aviso de quebrado sobe e desce devagar.
+	# The broken warning slowly floats up and down.
 	for k in _nodes:
 		var warn: Sprite3D = _nodes[k].get_node_or_null("Broken")
 		if warn and warn.visible:
@@ -165,7 +165,7 @@ func _process(delta: float) -> void:
 			label.visible = show_names
 	if _pet == null:
 		return
-	# O Ingenuity voa atrás do Mike, balançando, com as hélices girando em sentidos opostos.
+	# Ingenuity flies behind Mike, bobbing, with the rotors spinning in opposite directions.
 	var target := mike.position + Vector3(1.1, 2.6 + sin(_time * 2.0) * 0.15, 0.7)
 	_pet.position = _pet.position.lerp(target, 1.0 - exp(-delta * 1.8))
 	for i in _rotors.size():
@@ -187,8 +187,8 @@ func highlight(cells: Array) -> void:
 	_frame_camera()
 
 
-## Casas abertas (pela Casa do Mike) ficam normais; a próxima área aparece apagada; o resto some.
-## Quando a casa sobe de nível, as casas novas "brotam" do chão.
+## Open cells (from Mike's House) look normal; the next area appears dimmed; the rest disappears.
+## When the house levels up, the new cells "sprout" from the ground.
 func _paint_tiles() -> void:
 	var open := State.zone()
 	var next := State.zone(State.house_level() + 1)
@@ -207,13 +207,13 @@ func _paint_tiles() -> void:
 		t.set_meta("open", is_open)
 
 
-## A câmera enquadra a base: perto quando ela é pequena, a grade inteira ao construir ou mover.
-## Depois que a criança mexe na câmera com os dedos, ela só se ajusta sozinha ao construir ou mover.
+## The camera frames the base: close when it is small, the whole grid when building or moving.
+## After the child moves the camera with their fingers, it only adjusts itself when building or moving.
 func _frame_camera() -> void:
 	if _manual_cam and not whole_grid:
 		return
 	if orbit:
-		# Tela inicial: o topo de Marte com a base, como no jogo, só que um pouco mais longe.
+		# Start screen: the top of Mars with the base, as in the game, just a bit farther.
 		var far := _zoom_max()
 		_cam_goal = Vector3(0.0, 0.0, far)
 		_pos_goal = Vector3.ZERO
@@ -239,7 +239,7 @@ func _frame_camera() -> void:
 	var b := cell_center(hi) + Vector3(CELL / 2.0, 0.0, CELL / 2.0)
 	var center := (a + b) / 2.0
 	var size := clampf(((b.x - a.x) + (b.z - a.z)) / sqrt(2.0) * 1.08, CAM_MIN, CAM_MAX)
-	# A base fica um pouco abaixo do meio da tela: sobra lugar para o céu aparecer atrás do planeta.
+	# The base sits a little below the middle of the screen: leaves room for the sky to show behind the planet.
 	var vp := get_viewport().get_visible_rect().size
 	var far := -_rig.global_transform.basis.z
 	far = Vector3(far.x, 0.0, far.z).normalized()
@@ -256,7 +256,7 @@ func _frame_camera() -> void:
 		camera.size = size
 
 
-# ───────────── Dedos na tela: arrastar mexe, pinça dá zoom, dois dedos girando giram o mundo ─────────────
+# ───────────── Fingers on screen: drag pans, pinch zooms, two fingers twisting turn the world ─────────────
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
 		_on_touch(event)
@@ -300,7 +300,7 @@ func _on_drag(event: InputEventScreenDrag) -> void:
 	var before: Vector2 = _touches.get(event.index, event.position - event.relative)
 	_touches[event.index] = event.position
 	if _touches.size() == 1:
-		# Depois de usar dois dedos, o dedo que sobrou não arrasta (evita o tranco).
+		# After using two fingers, the leftover finger does not drag (avoids a jolt).
 		if _multi:
 			return
 		if not _dragging and event.position.distance_to(_press_pos) > DRAG_START:
@@ -308,8 +308,8 @@ func _on_drag(event: InputEventScreenDrag) -> void:
 		if _dragging:
 			_pan(before, event.position)
 		return
-	# Dois dedos: a distância entre eles dá o zoom, o ângulo entre eles gira o mundo.
-	# Cada um só começa depois de uma folguinha, para o tremido dos dedos não mexer a tela.
+	# Two fingers: the distance between them zooms, the angle between them turns the world.
+	# Each one only starts after a small deadzone, so shaky fingers do not move the screen.
 	_dragging = true
 	var ids := _touches.keys()
 	var a: Vector2 = _touches[ids[0]]
@@ -338,7 +338,7 @@ func _on_mouse_button(event: InputEventMouseButton) -> void:
 		MOUSE_BUTTON_WHEEL_DOWN:
 			if event.pressed:
 				_zoom(1.1)
-		# Rolagem para o lado (touchpad do notebook) gira o mundo.
+		# Sideways scrolling (laptop touchpad) turns the world.
 		MOUSE_BUTTON_WHEEL_LEFT:
 			if event.pressed:
 				_turn(0.06 * maxf(event.factor, 1.0))
@@ -353,8 +353,8 @@ func _on_mouse_button(event: InputEventMouseButton) -> void:
 				_tap(event.position)
 
 
-## Toque rápido: no Mike, ele reage; numa construção (em qualquer parte dela), abre o menu dela;
-## no chão, escolhe a casa da grade. Ao escolher onde construir ou mover, vale só o chão.
+## Quick tap: on Mike, he reacts; on a building (any part of it), opens its menu;
+## on the ground, picks the grid cell. When choosing where to build or move, only the ground counts.
 func _tap(p: Vector2) -> void:
 	var o := camera.project_ray_origin(p)
 	var d := camera.project_ray_normal(p)
@@ -365,7 +365,7 @@ func _tap(p: Vector2) -> void:
 	cell_tapped.emit(hit.cell if not hit.is_empty() else _cell_from_screen(p))
 
 
-## O dedo está em cima do Mike? (o retângulo dele na tela, com uma folguinha)
+## Is the finger on Mike? (his rectangle on screen, with a little margin)
 func _on_mike(p: Vector2) -> bool:
 	if not mike.visible:
 		return false
@@ -376,7 +376,7 @@ func _on_mike(p: Vector2) -> bool:
 	return box.has_point(p)
 
 
-## A construção que o raio do dedo acerta primeiro: {"t": distância, "cell": casa dela mais perto do toque}.
+## The building the finger's ray hits first: {"t": distance, "cell": its cell closest to the tap}.
 func _item_under(o: Vector3, d: Vector3) -> Dictionary:
 	var best := {}
 	for k in _nodes:
@@ -402,7 +402,7 @@ func _item_under(o: Vector3, d: Vector3) -> Dictionary:
 	return best
 
 
-## Arrastar: o chão "gruda" no dedo.
+## Dragging: the ground "sticks" to the finger.
 func _pan(from: Vector2, to: Vector2) -> void:
 	var p0 := _ground_point(from)
 	var p1 := _ground_point(to)
@@ -418,14 +418,14 @@ func _zoom(factor: float) -> void:
 	_size_goal = clampf(_size_goal * factor, ZOOM_MIN, _zoom_max())
 
 
-## O mais longe que a câmera vai: a tela mostra só o topo de Marte (uns 40 m de altura de tela),
-## nunca o planeta inteiro. Em pé (celular) isso dá menos largura que deitado (computador).
+## The farthest the camera goes: the screen shows only the top of Mars (about 40 m of screen height),
+## never the whole planet. Upright (phone) this gives less width than sideways (computer).
 func _zoom_max() -> float:
 	var vp := get_viewport().get_visible_rect().size
 	return clampf(40.0 / maxf(vp.y / maxf(vp.x, 1.0), 0.3), CAM_MAX, ZOOM_MAX)
 
 
-## O mundo gira para o mesmo lado que os dedos.
+## The world turns the same way as the fingers.
 func _turn(angle: float) -> void:
 	_take_camera()
 	_yaw_goal += angle
@@ -444,16 +444,16 @@ func _ground_point(p: Vector2) -> Vector3:
 	return o + d * (-o.y / d.y)
 
 
-## O Mike anda até a frente da casa tocada (o lado virado para a câmera), dando a volta nas construções.
+## Mike walks to the front of the tapped cell (the side facing the camera), going around buildings.
 func walk_to(c: Vector2i, then := Callable()) -> void:
 	if _walking_out or State.exploring():
-		return   # o Mike está na expedição: ele não volta por causa de um toque na base
+		return   # Mike is on the expedition: he does not come back because of a tap on the base
 	var front := _rig.global_transform.basis.z
 	front = Vector3(front.x, 0.0, front.z).normalized()
 	_go(cell_center(c) + front * CELL * 0.62, WALK_SPEED, then, cell_center(c))
 
 
-## Anda até "target" pelo caminho livre, com curvas redondas. Ao chegar, olha para "look" e chama "then".
+## Walks to "target" along the free path, with rounded corners. On arrival, looks at "look" and calls "then".
 func _go(target: Vector3, speed := WALK_SPEED, then := Callable(), look := Vector3.INF, beyond := false) -> void:
 	_path = _round_corners(_find_path(_flat(mike.position), _flat(target), beyond))
 	_path_i = 1
@@ -509,7 +509,7 @@ func _flat(p: Vector3) -> Vector3:
 	return Vector3(p.x, 0.0, p.z)
 
 
-## Caminho livre de "from" até "to": A* na grade fina, depois corta caminho onde a linha reta passa sem bater.
+## Free path from "from" to "to": A* on the fine grid, then cuts corners where the straight line passes without hitting.
 func _find_path(from: Vector3, to: Vector3, beyond := false) -> Array[Vector3]:
 	var a := _free_near(_nav_id(from))
 	var b := _free_near(_nav_id(to))
@@ -530,7 +530,7 @@ func _find_path(from: Vector3, to: Vector3, beyond := false) -> Array[Vector3]:
 	return out
 
 
-## Troca cada quina do caminho por uma curva (Bézier) de raio CORNER.
+## Replaces each corner of the path with a Bézier curve of radius CORNER.
 func _round_corners(pts: Array[Vector3]) -> PackedVector3Array:
 	var out := PackedVector3Array()
 	if pts.is_empty():
@@ -577,7 +577,7 @@ func _nav_solid(p: Vector3) -> bool:
 	return _nav.is_in_boundsv(id) and _nav.is_point_solid(id)
 
 
-## O quadradinho livre mais perto (se o Mike ou o destino caiu dentro de uma construção).
+## The nearest free square (if Mike or the destination ended up inside a building).
 func _free_near(id: Vector2i) -> Vector2i:
 	if not _nav.is_point_solid(id):
 		return id
@@ -604,7 +604,7 @@ func _build_nav() -> void:
 	_nav.update()
 
 
-## As construções viram parede. Perto delas o caminho "custa" mais: o Mike prefere passar com folga.
+## Buildings become walls. Near them the path "costs" more: Mike prefers to pass with room to spare.
 func _sync_nav() -> void:
 	_nav.fill_solid_region(_nav.region, false)
 	_nav.fill_weight_scale_region(_nav.region, 1.0)
@@ -617,19 +617,19 @@ func _sync_nav() -> void:
 		_nav.fill_weight_scale_region(b.grow(1).intersection(_nav.region), 3.0)
 	for b in blocks:
 		_nav.fill_solid_region(b, true)
-	# O Mike anda no plano e no comecinho da curva do planeta, nunca pela beirada.
+	# Mike walks on the flat part and the start of the planet's curve, never along the edge.
 	var edge := _flat_r + PLANET * 0.45
 	for x in _nav.region.size.x:
 		for y in _nav.region.size.y:
 			var q := _nav_point(Vector2i(x, y))
 			if Vector2(q.x, q.z).length() > edge:
 				_nav.set_point_solid(Vector2i(x, y), true)
-	# Construíram em cima do Mike? Ele sai para o lado.
+	# Built on top of Mike? He steps aside.
 	if _path_i >= _path.size() and mike and not _walking_out and not State.exploring() and _nav_solid(mike.position):
 		_go(_nav_point(_free_near(_nav_id(mike.position))))
 
 
-## Altura do chão do planetinha (0 na base; desce depois do plano).
+## Ground height of the little planet (0 at the base; drops after the flat part).
 func _ground_y(p: Vector3) -> float:
 	return -planet_drop(Vector2(p.x, p.z).length())
 
@@ -639,15 +639,15 @@ func planet_drop(d: float) -> float:
 	return PLANET - sqrt(PLANET * PLANET - u * u)
 
 
-## Ponto lá do outro lado do planeta (atrás da curva, longe da câmera): por onde o Mike some na expedição.
+## A point on the far side of the planet (behind the curve, away from the camera): where Mike disappears on the expedition.
 func _far_point() -> Vector3:
 	var back := -_rig.global_transform.basis.z
 	return Vector3(back.x, 0.0, back.z).normalized() * (_flat_r + PLANET * (JOIN - 0.05))
 
 
-## Obra: o Mike vai até lá e martela; bloquinhos coloridos caem e quicam; no fim somem e a construção brota.
-## Coisas pequenas (bandeira, vaso): o Mike se abaixa e coloca, e ela salta do chão.
-func _obra(node: Node3D, type: String, c: Vector2i, width: int, rot: int) -> void:
+## Construction site: Mike walks there and hammers; colored blocks fall and bounce; at the end they vanish and the building sprouts.
+## Small things (flag, pot): Mike crouches and places them, and they pop out of the ground.
+func _build_site(node: Node3D, type: String, c: Vector2i, width: int, rot: int) -> void:
 	var small := type in PLACE_ONLY
 	node.visible = false
 	walk_to(c, func() -> void: _play_mike("colocar" if small else "construir"))
@@ -655,7 +655,7 @@ func _obra(node: Node3D, type: String, c: Vector2i, width: int, rot: int) -> voi
 	for i in range(1, _path.size()):
 		walk_time += _path[i - 1].distance_to(_path[i])
 	walk_time /= _speed
-	var total := walk_time + (0.45 if small else OBRA_WORK)
+	var total := walk_time + (0.45 if small else BUILD_WORK_TIME)
 	var site := Node3D.new()
 	add_child(site)
 	site.position = node.position
@@ -668,7 +668,7 @@ func _obra(node: Node3D, type: String, c: Vector2i, width: int, rot: int) -> voi
 		for i in 12:
 			var b := MeshInstance3D.new()
 			b.mesh = block
-			b.material_override = _mat(OBRA_COLORS[i % OBRA_COLORS.size()])
+			b.material_override = _mat(SITE_COLORS[i % SITE_COLORS.size()])
 			var col := i % 4
 			var row := i / 4
 			var rest := Vector3((col % 2 - 0.5) * spread.x * 0.5, 0.175 + row * 0.35, (col / 2 - 0.5) * spread.y * 0.5)
@@ -699,7 +699,7 @@ func _obra(node: Node3D, type: String, c: Vector2i, width: int, rot: int) -> voi
 	get_tree().create_timer(1.0).timeout.connect(site.queue_free)
 
 
-## Poeirinha cor de creme subindo do chão (do construcao.gd do Design).
+## Cream-colored dust rising from the ground (from Design's construcao.gd).
 func _dust_puff(parent: Node3D, amount: int) -> void:
 	var p := CPUParticles3D.new()
 	p.one_shot = true
@@ -722,7 +722,7 @@ func _dust_puff(parent: Node3D, amount: int) -> void:
 	p.emitting = true
 
 
-## O ponto da tela logo acima da construção (para o menu flutuante apontar para ela).
+## The screen point just above the building (so the floating menu can point to it).
 func item_screen_top(c: Vector2i) -> Vector2:
 	var k := State.key(State.anchor_of(c))
 	if not _nodes.has(k):
@@ -732,7 +732,7 @@ func item_screen_top(c: Vector2i) -> Vector2:
 	return camera.unproject_position(Vector3(box.get_center().x, box.end.y, box.get_center().z))
 
 
-## O Mike pula de alegria (quando colhe, por exemplo).
+## Mike jumps for joy (when he harvests, for example).
 func jump() -> void:
 	if _mike_anim and _mike_anim.has_animation("jump"):
 		_play_mike("jump")
@@ -751,7 +751,7 @@ func _cell_from_screen(p: Vector2) -> Vector2i:
 	return c if State.in_grid(c) else OUTSIDE
 
 
-# ───────────── Clima: tempestade, frio e poeira mudam a luz ─────────────
+# ───────────── Weather: storm, cold and dust change the light ─────────────
 func _sync_mood() -> void:
 	var storm: bool = State.storm_active() or State.pending_event == "storm"
 	var cold: bool = State.cold_left > 0 or State.pending_event == "cold"
@@ -767,7 +767,7 @@ func _sync_mood() -> void:
 	elif dust:
 		light = Color(0.9, 0.75, 0.6)
 		ambient = Color(0.75, 0.55, 0.4)
-	# Apagão (sem energia): a base fica na penumbra até a energia voltar.
+	# Blackout (no energy): the base stays dim until the energy comes back.
 	var blackout: bool = State.energy <= 0.0
 	_sun.light_energy = 0.45 if blackout else 1.1
 	if blackout:
@@ -780,8 +780,8 @@ func _sync_mood() -> void:
 	mike.visible = _walking_out or not (State.mike_inside() or State.exploring())
 
 
-# ───────────── Expedição ─────────────
-## O Mike sai andando para longe (lá para o fundo, rumo ao Monte Sharp) e some.
+# ───────────── Expedition ─────────────
+## Mike walks far away (to the back, toward Mount Sharp) and disappears.
 func _walk_out() -> void:
 	_walking_out = true
 	_set_suit(true)
@@ -790,7 +790,7 @@ func _walk_out() -> void:
 		_sync_mood(), Vector3.INF, true)
 
 
-## Volta da expedição: aparece lá no fundo e anda até a frente da casa, com o tubo.
+## Return from the expedition: appears far in the back and walks to the front of the house, with the tube.
 func _walk_back(_card_id: int) -> void:
 	_walking_out = false
 	var far := _far_point()
@@ -803,7 +803,7 @@ func _walk_back(_card_id: int) -> void:
 			return
 
 
-# ───────────── Montagem do mundo ─────────────
+# ───────────── Building the world ─────────────
 func _build_world() -> void:
 	_env = Environment.new()
 	_env.background_mode = Environment.BG_COLOR
@@ -821,7 +821,7 @@ func _build_world() -> void:
 	_sun.shadow_enabled = true
 	add_child(_sun)
 
-	# Câmera num "tripé": o tripé fica no ponto que a câmera olha; girar o tripé gira o mundo.
+	# Camera on a "tripod": the tripod sits at the point the camera looks at; turning the tripod turns the world.
 	_rig = Node3D.new()
 	_rig.rotation_degrees.y = 45.0
 	add_child(_rig)
@@ -834,8 +834,8 @@ func _build_world() -> void:
 	camera.position = camera.transform.basis.z * 40.0
 	camera.current = true
 
-	# Céu 360° do design/03 (com Sol, Fobos e Deimos) num painel lá no fundo, atrás do planetinha.
-	# Ao girar o mundo, o céu desliza junto (o Sol e as luas aparecem de um lado).
+	# 360° sky from design/03 (with the Sun, Phobos and Deimos) on a panel far in the back, behind the little planet.
+	# When the world turns, the sky slides along (the Sun and moons appear on one side).
 	var sky_file := State.model_file("ceu")
 	if sky_file.ends_with(".png") and ResourceLoader.exists(ITEMS_DIR + sky_file):
 		_sky_mat = ShaderMaterial.new()
@@ -849,7 +849,7 @@ func _build_world() -> void:
 		camera.add_child(_sky)
 		_sky.position = Vector3(0.0, 0.0, -300.0)
 
-	# Terreno com relevo e crateras do design/03 (centro plano para a base). Sem ele, um chão liso.
+	# Terrain with relief and craters from design/03 (flat center for the base). Without it, a plain ground.
 	var terrain := _load_model(State.model_file("chao"), 1000.0, 1000.0)
 	if terrain:
 		terrain.scale = Vector3.ONE
@@ -865,7 +865,7 @@ func _build_world() -> void:
 		ground.position.y = -0.02
 		add_child(ground)
 
-	# Poeirinha dourada flutuando (efeito do design/03).
+	# Floating golden dust (effect from design/03).
 	var dust_file := State.model_file("efeito-poeira")
 	if dust_file.ends_with(".gd") and ResourceLoader.exists(ITEMS_DIR + dust_file):
 		var dust: Node3D = (load(ITEMS_DIR + dust_file) as GDScript).new()
@@ -873,7 +873,7 @@ func _build_world() -> void:
 		add_child(dust)
 
 
-## O painel do céu cobre a tela inteira, sem esticar a imagem.
+## The sky panel covers the whole screen, without stretching the image.
 func _fit_sky() -> void:
 	if _sky == null:
 		return
@@ -884,8 +884,8 @@ func _fit_sky() -> void:
 	_sky_mat.set_shader_parameter("offset", 0.365 - _rig.rotation.y / TAU)
 
 
-## Dobra o terreno numa bola pequena: plano onde fica a base, descendo depois (o céu aparece atrás).
-## Fora do raio do planetinha, o chão é recortado num círculo.
+## Bends the terrain into a small ball: flat where the base is, dropping after that (the sky shows behind).
+## Outside the little planet's radius, the ground is cut into a circle.
 func _bend_terrain(terrain: Node3D) -> void:
 	_terrain_floor = terrain.position.y + _center_height(terrain)
 	_flat_r = FLAT_BY_LEVEL[clampi(State.house_level(), 1, State.MAX_LEVEL)]
@@ -901,11 +901,11 @@ func _bend_terrain(terrain: Node3D) -> void:
 
 
 var _terrain_floor := 0.0
-var _planet_bottom: MeshInstance3D   # a metade de baixo do planetinha (para ele ser uma bola, sem corte)
+var _planet_bottom: MeshInstance3D   # the bottom half of the little planet (so it is a ball, with no cut)
 
 
 func _rebend() -> void:
-	# O terreno vai só até onde a curva tem 45° (ainda suave); dali para baixo é a esfera lisa do corpo.
+	# The terrain only goes as far as where the curve is 45° (still smooth); from there down it is the body's smooth sphere.
 	var rim := _flat_r + PLANET * JOIN
 	var floor_y := _terrain_floor
 	for src in _terrain_src:
@@ -921,13 +921,13 @@ func _rebend() -> void:
 				var w := xf * verts[i]
 				var flat := Vector2(w.x, w.z)
 				var d := flat.length()
-				# A última faixa de pontos vai exatamente para o círculo da borda: a silhueta fica lisa, sem escadinha.
+				# The last band of points goes exactly onto the edge circle: the silhouette stays smooth, no stair-steps.
 				if d > rim - 1.3:
 					flat = flat / maxf(d, 0.001) * rim
 					w = Vector3(flat.x, floor_y, flat.y)
 					d = rim
 				else:
-					# Perto da beirada os morros vão sumindo: a borda do planeta fica lisa, sem "dentes".
+					# Near the edge the hills fade out: the planet's edge stays smooth, with no "teeth".
 					w.y = floor_y + (w.y - floor_y) * (1.0 - smoothstep(rim - 7.0, rim - 0.5, d))
 				w.y -= planet_drop(d)
 				verts[i] = inv * w
@@ -948,8 +948,8 @@ func _rebend() -> void:
 		(_dome.mesh as SphereMesh).height = (_flat_r + 1.5) * 0.63
 
 
-## O corpo do planeta: uma esfera lisa (feita aqui, em anéis) que continua a curva do terreno a partir
-## dos 45° até o polo de baixo, com a mesma textura. Vista de qualquer lado, a borda é redonda, sem escadinha.
+## The planet's body: a smooth sphere (built here, in rings) that continues the terrain's curve from
+## 45° down to the bottom pole, with the same texture. Seen from any side, the edge is round, with no stair-steps.
 func _build_planet_bottom(join_r: float, join_y: float) -> void:
 	if _planet_bottom == null:
 		_planet_bottom = MeshInstance3D.new()
@@ -971,7 +971,7 @@ func _build_planet_bottom(join_r: float, join_y: float) -> void:
 		_planet_bottom.material_override = mat
 		_planet_bottom.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		add_child(_planet_bottom)
-	# Esfera que passa pela borda do terreno com a mesma inclinação (45°): raio = borda / sen 45°.
+	# Sphere that passes through the terrain's edge with the same slope (45°): radius = edge / sin 45°.
 	var rb := join_r / sin(PI / 4.0)
 	var center := Vector3(0.0, join_y - join_r, 0.0)
 	var st := SurfaceTool.new()
@@ -992,7 +992,7 @@ func _build_planet_bottom(join_r: float, join_y: float) -> void:
 	_planet_bottom.mesh = st.commit()
 
 
-## Altura do terreno no meio do mapa (onde fica a base), para a grade ficar rente ao chão.
+## Terrain height at the middle of the map (where the base is), so the grid sits flush with the ground.
 func _center_height(terrain: Node3D) -> float:
 	var total := 0.0
 	var n := 0
@@ -1029,7 +1029,7 @@ func _build_dome() -> void:
 	_dome = MeshInstance3D.new()
 	var sph := SphereMesh.new()
 	sph.is_hemisphere = true
-	sph.radius = _flat_r + 1.5   # o escudo cobre a base inteira (cresce com a casa)
+	sph.radius = _flat_r + 1.5   # the shield covers the whole base (grows with the house)
 	sph.height = sph.radius * 0.63
 	_dome.mesh = sph
 	var m := StandardMaterial3D.new()
@@ -1043,7 +1043,7 @@ func _build_dome() -> void:
 
 
 # ───────────── Mike ─────────────
-## O Mike do design/01 (mike.glb, com as animações idle, run e jump dentro).
+## Mike from design/01 (mike.glb, with the idle, run and jump animations inside).
 func _build_mike() -> void:
 	mike = Node3D.new()
 	add_child(mike)
@@ -1082,9 +1082,9 @@ func _build_mike() -> void:
 	mike.add_child(body)
 
 
-## As animações parado/correndo/pular do mike.glb vieram com os braços abertos (pose de T).
-## Aqui cada braço desce (aponta para o chão, um pouco para fora), mantendo o balanço da animação.
-## As animações novas do Design (construir, colocar) já vêm certas e ficam como estão.
+## The idle/run/jump animations of mike.glb came with arms spread out (T-pose).
+## Here each arm is lowered (points at the ground, slightly outward), keeping the animation's swing.
+## Design's new animations (construir, colocar) already come right and are left as they are.
 func _arms_down(player: AnimationPlayer, s: Skeleton3D) -> void:
 	for anim_name in ["idle", "run", "jump"]:
 		var a := player.get_animation(anim_name)
@@ -1110,7 +1110,7 @@ func _arms_down(player: AnimationPlayer, s: Skeleton3D) -> void:
 					a.track_set_key_value(t, k, (a.track_get_key_value(t, k) as Quaternion) * delta)
 
 
-## Traje de astronauta na expedição; roupa normal na base.
+## Astronaut suit on the expedition; normal clothes at the base.
 func _set_suit(on: bool) -> void:
 	var want := "suit" if on and _mike_skins.has("suit") else "casual"
 	if not _mike_skins.has(want):
@@ -1126,7 +1126,7 @@ func _set_suit(on: bool) -> void:
 
 
 func _play_mike(anim_name: String) -> void:
-	# O martelo só aparece enquanto o Mike constrói.
+	# The hammer only shows while Mike is building.
 	for k in _mike_skins:
 		var hammer: Node3D = _mike_skins[k][2]
 		if hammer:
@@ -1137,7 +1137,7 @@ func _play_mike(anim_name: String) -> void:
 		_mike_anim.play(anim_name, 0.15)
 
 
-# ───────────── Itens da base ─────────────
+# ───────────── Base items ─────────────
 func _sync_items() -> void:
 	for k in _nodes.keys():
 		var gone: bool = not State.items.has(k)
@@ -1149,21 +1149,21 @@ func _sync_items() -> void:
 	for k in State.items:
 		var it: Dictionary = State.items[k]
 		var level := int(it.level)
-		var obra := false
+		var run_build_fx := false
 		if not _nodes.has(k):
 			var n := _make_item(it.type, level)
 			add_child(n)
 			_nodes[k] = n
 			if _built_once and build_fx:
 				build_fx = false
-				obra = true
+				run_build_fx = true
 			elif _built_once:
 				n.scale = Vector3.ONE * 0.3
 				create_tween().tween_property(n, "scale", Vector3.ONE, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		var node: Node3D = _nodes[k]
 		var w := State.width_of(it.type, level)
 		var rot := int(it.get("rot", 0))
-		# O meio da fileira de casas; girado de lado, a fileira vai para a frente (+Z).
+		# The middle of the row of cells; turned sideways, the row goes forward (+Z).
 		var along := Vector3((w - 1) * CELL / 2.0, 0.0, 0.0) if rot % 2 == 0 else Vector3(0.0, 0.0, (w - 1) * CELL / 2.0)
 		node.position = cell_center(State.parse_key(k)) + along
 		var model: Node3D = node.get_node_or_null("Model")
@@ -1175,8 +1175,8 @@ func _sync_items() -> void:
 		_update_broken(node, it, label.position.y)
 		if it.type == "shelf":
 			Shelf.dress(self, node, it)
-		if obra:
-			_obra(node, it.type, State.parse_key(k), w, rot)
+		if run_build_fx:
+			_build_site(node, it.type, State.parse_key(k), w, rot)
 	var flat: float = FLAT_BY_LEVEL[clampi(State.house_level(), 1, State.MAX_LEVEL)]
 	if flat != _flat_r:
 		_flat_r = flat
@@ -1199,17 +1199,17 @@ func _make_item(type: String, level: int) -> Node3D:
 	var target_h := State.model_height(type) * MIKE_HEIGHT / DESIGN_MIKE
 	if model:
 		if type == "rtg" and level >= State.MAX_LEVEL and file.begins_with("kilopower"):
-			# O Kilopower é um modelo à parte: um reator maior que o RTG, cabendo na casa.
+			# Kilopower is a separate model: a reactor bigger than the RTG, fitting in the cell.
 			_fit(model, CELL * 0.95, maxf(target_h, 0.8) * 1.8)
 		elif State.FOOTPRINT.has(type) or file.contains("-n%d." % level):
-			# Mesma escala em todos os níveis (o modelo de cada nível já vem maior).
-			# Quem ocupa várias casas: o nível 1 cabe numa casa. Os outros: o nível 1 tem a altura do tamanhos.csv.
+			# Same scale at every level (each level's model already comes bigger).
+			# Those that take several cells: level 1 fits in one cell. The others: level 1 has the height from tamanhos.csv.
 			if not _type_scale.has(type):
 				var first := _load_model(State.model_file(model_name, 1), 1.0, 1.0)
 				first.scale = Vector3.ONE
 				var size1 := _merged_aabb(first).size
 				if State.FOOTPRINT.has(type):
-					# Mede pela largura (o lado em que os níveis crescem); a escadinha da porta pode passar um pouco.
+					# Measured by width (the side the levels grow along); the door step may stick out a bit.
 					_type_scale[type] = CELL * 0.95 / maxf(size1.x, 0.001)
 				elif target_h <= 0.0:
 					_type_scale[type] = CELL * 0.95 / maxf(maxf(size1.x, size1.z), 0.001)
@@ -1261,7 +1261,7 @@ func _make_item(type: String, level: int) -> Node3D:
 	return root
 
 
-## Formas provisórias para o que ainda não tem modelo (casa, estufa, pista do Ingenuity).
+## Placeholder shapes for what has no model yet (house, greenhouse, Ingenuity pad).
 func _placeholder(type: String, h: float) -> Node3D:
 	var holder := Node3D.new()
 	match type:
@@ -1365,7 +1365,7 @@ func _update_plant(node: Node3D, it: Dictionary) -> void:
 	ready_mark.visible = it.plant != "" and p >= 1.0
 
 
-## Quebrado: um aviso amarelo flutua em cima da construção (tocar nela abre o "Consertar").
+## Broken: a yellow warning floats above the building (tapping it opens "Fix").
 func _update_broken(node: Node3D, it: Dictionary, label_y: float) -> void:
 	var warn: Sprite3D = node.get_node_or_null("Broken")
 	var broken: bool = it.get("broken", false)
@@ -1384,8 +1384,8 @@ func _update_broken(node: Node3D, it: Dictionary, label_y: float) -> void:
 		warn.visible = broken
 
 
-## Batateira (feita em código, a Kenney não tem): um montinho de terra, folhas verdes em cima
-## e três batatas aparecendo. Tem cerca de 1 de altura, em pé no chão.
+## Potato plant (made in code, Kenney does not have one): a little mound of soil, green leaves on top
+## and three potatoes showing. About 1 tall, standing on the ground.
 func potato_model() -> Node3D:
 	var root := Node3D.new()
 	var soil := MeshInstance3D.new()
@@ -1421,7 +1421,7 @@ func potato_model() -> Node3D:
 	return root
 
 
-## Carrega um .glb de jogo/models/items/ e ajusta ao tamanho da casa da grade (fica em pé no chão).
+## Loads a .glb from jogo/models/items/ and fits it to the grid cell size (stands on the ground).
 func _load_model(file: String, max_width: float, max_height: float) -> Node3D:
 	var path := ITEMS_DIR + file
 	if file == "" or not ResourceLoader.exists(path):
@@ -1435,7 +1435,7 @@ func _load_model(file: String, max_width: float, max_height: float) -> Node3D:
 	return holder
 
 
-## Aplica uma escala fixa e deixa o modelo em pé no chão, centralizado.
+## Applies a fixed scale and leaves the model standing on the ground, centered.
 func _scale_model(holder: Node3D, s: float) -> void:
 	holder.scale = Vector3.ONE
 	holder.position = Vector3.ZERO
@@ -1471,8 +1471,8 @@ func _merged_aabb(root: Node3D) -> AABB:
 	return out
 
 
-# ───────────── Ingenuity (o pet) ─────────────
-## Aparece quando a criança constrói a pista do Ingenuity.
+# ───────────── Ingenuity (the pet) ─────────────
+## Appears when the child builds the Ingenuity pad.
 func _sync_pet() -> void:
 	var want := State.count_items("pad") > 0
 	if want and _pet == null and ResourceLoader.exists(INGENUITY):
@@ -1486,7 +1486,7 @@ func _sync_pet() -> void:
 
 func _spawn_pet() -> void:
 	var inst: Node3D = load(INGENUITY).instantiate()
-	# Recolore no estilo das máquinas da Kenney (cores chapadas do design/04).
+	# Recolor in the style of Kenney's machines (flat colors from design/04).
 	for mi in inst.find_children("*", "MeshInstance3D", true, false):
 		var mesh := (mi as MeshInstance3D).mesh
 		for i in mesh.get_surface_count():
@@ -1500,7 +1500,7 @@ func _spawn_pet() -> void:
 		if r:
 			_rotors.append(r)
 			_rotor_axes.append(_thin_axis(r))
-	# Deixa o eixo das hélices apontando para cima (o modelo pode vir deitado).
+	# Leaves the rotor axis pointing up (the model may come lying down).
 	if not _rotors.is_empty():
 		var up := (_rotors[0].global_transform.basis if _rotors[0].is_inside_tree() else _local_basis_to(inst, _rotors[0])) * _rotor_axes[0]
 		if up.length() > 0.001 and absf(up.normalized().dot(Vector3.UP)) < 0.999:
@@ -1515,7 +1515,7 @@ func _spawn_pet() -> void:
 	_pet.position = mike.position + Vector3(1.1, 2.6, 0.7)
 
 
-## O eixo mais fino do desenho das hélices é o eixo em que elas giram.
+## The thinnest axis of the rotor shape is the axis they spin on.
 func _thin_axis(rotor: Node3D) -> Vector3:
 	var box := _merged_aabb(rotor)
 	var s := box.size
@@ -1536,7 +1536,7 @@ func _local_basis_to(root: Node3D, node: Node3D) -> Basis:
 	return b
 
 
-# ───────────── Utilidades ─────────────
+# ───────────── Utilities ─────────────
 func _find_child_of_type(node: Node, type: String) -> Node:
 	if node.is_class(type):
 		return node

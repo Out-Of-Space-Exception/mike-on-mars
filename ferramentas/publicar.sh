@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# Exporta o jogo para a web e publica no GitHub Pages (branch gh-pages).
-# Uso (Git Bash, na raiz do repositório): bash ferramentas/publicar.sh
+# Exports the game to the web and publishes it on GitHub Pages (gh-pages branch).
+# Usage (Git Bash, from the repository root): bash ferramentas/publicar.sh
 set -e
-RAIZ="$(cd "$(dirname "$0")/.." && pwd)"
-REMOTO="$(git -C "$RAIZ" remote get-url origin)"
-bash "$RAIZ/ferramentas/exportar.sh"
-cd "$RAIZ/build"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+REMOTE="$(git -C "$ROOT" remote get-url origin)"
+bash "$ROOT/ferramentas/exportar.sh"
+cd "$ROOT/build"
 git init -q -b gh-pages
 git add -A
-git commit -qm "Publica versão web $(date '+%d/%m %H:%M')"
-git push -qf "$REMOTO" gh-pages
-echo "Publicado: https://out-of-space-exception.github.io/mike-on-mars/ (leva ~1 min para atualizar)"
+git commit -qm "Publish web version $(date '+%d/%m %H:%M')"
+git push -qf "$REMOTE" gh-pages
+echo "Published: https://out-of-space-exception.github.io/mike-on-mars/ (takes ~1 min to update)"

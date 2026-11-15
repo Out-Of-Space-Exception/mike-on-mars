@@ -1,6 +1,6 @@
 extends Node
-## O estado do jogo: barras, base, estufas, cartas, eventos e sol. Salva em user://save.json
-## (no navegador vira IndexedDB). Toda regra numérica mora no bloco BALANCEAMENTO.
+## Game state: bars, base, greenhouses, cards, events and sol. Saved to user://save.json
+## (in the browser it becomes IndexedDB). Every numeric rule lives in the BALANCE block.
 
 signal changed
 signal storm_started(event: Dictionary)
@@ -8,47 +8,47 @@ signal storm_ended(shielded: bool)
 signal card_won(id: int, is_new: bool)
 signal explore_started
 signal explore_returned(card_id: int)
-signal event_started(type: String)      # poeira, redemoinho, frio, sem sinal (o HUD mostra a janela)
-signal event_message(key: String, extra: String)   # avisos curtos (pacote chegou, decoração nova...)
+signal event_started(type: String)      # dust, dust devil, cold, no signal (the HUD shows the window)
+signal event_message(key: String, extra: String)   # short notices (package arrived, new decoration...)
 
-# ───────────── BALANCEAMENTO (todos os números do jogo moram aqui) ─────────────
-const SOL_SECONDS := 2.5            # 1 sol (dia de Marte) = 2,5 s de jogo
+# ───────────── BALANCE (all the game numbers live here) ─────────────
+const SOL_SECONDS := 2.5            # 1 sol (a Mars day) = 2.5 s of game time
 const SAVE_EVERY := 10.0
 const GRID_W := 10
 const GRID_H := 10
 const BAR_MAX := 100.0
-const LOW_PART := 0.2               # barra abaixo de 1/5 do teto: desacelera (no nível 3, abaixo de 20)
-const START := {"energy": 20.0, "oxygen": 40.0, "shield": 40.0}   # começo devagar: a casa faz as barras subirem
-## Teto das barras: a Casa do Mike faz as barras crescerem. Nível 1: energia até 20, oxigênio e escudo até 40;
-## nível 2: tudo até 60; nível 3: tudo até 100. Melhorar a casa também enche as barras até o teto novo.
+const LOW_PART := 0.2               # bar below 1/5 of its cap: things slow down (at level 3, below 20)
+const START := {"energy": 20.0, "oxygen": 40.0, "shield": 40.0}   # slow start: the house makes the bars grow
+## Bar caps: Mike's House makes the bars grow. Level 1: energy up to 20, oxygen and shield up to 40;
+## level 2: everything up to 60; level 3: everything up to 100. Upgrading the house also fills the bars up to the new cap.
 const BAR_CAPS := {
 	1: {"energy": 20.0, "oxygen": 40.0, "shield": 40.0},
 	2: {"energy": 60.0, "oxygen": 60.0, "shield": 60.0},
 	3: {"energy": 100.0, "oxygen": 100.0, "shield": 100.0},
 }
-const HOUSE_UPGRADE_COST := {1: 18, 2: 55}   # melhorar a casa sempre cabe na barra de energia do nível dela
+const HOUSE_UPGRADE_COST := {1: 18, 2: 55}   # upgrading the house always fits in the energy bar of its level
 const START_ITEMS := {"4,4": "habitat"}
-const START_INVENTORY := {"lettuce": 1}   # um lanche que veio da Terra, para a 1ª expedição
+const START_INVENTORY := {"lettuce": 1}   # a snack that came from Earth, for the 1st expedition
 const MAX_LEVEL := 3
-## A área da base cresce com o nível da Casa do Mike: 4x4 no nível 1, 7x7 no 2 e a grade inteira (10x10) no 3.
+## The base area grows with Mike's House level: 4x4 at level 1, 7x7 at 2 and the whole grid (10x10) at 3.
 const ZONES := {1: Rect2i(3, 3, 4, 4), 2: Rect2i(2, 2, 7, 7), 3: Rect2i(0, 0, GRID_W, GRID_H)}
-const OLD_GRID_SHIFT := Vector2i(2, 1)   # saves da grade antiga (6x8) vão para o meio da nova
-const LEVEL_BONUS := 0.5            # +50% de produção por nível acima do 1
-const UPGRADE_MULT := {1: 3.0, 2: 8.0}   # melhorar custa o preço de construir x3 (nível 2) e x8 (nível 3)
-const UPGRADE_MAX := 95                  # teto: a barra de energia vai até 100
-const UPGRADE_BASE_FREE := 10.0          # para quem não custa nada para construir (a Casa do Mike)
-# Equipamento quebrado: de tempos em tempos (e às vezes depois de tempestade sem escudo) algo para de funcionar.
-const BREAK_EVERY := Vector2i(110, 170)  # sóis entre uma quebra e outra
-const BREAK_AFTER_STORM := 0.5           # sem escudo: chance de quebrar algo
-const REPAIR_FACTOR := 0.4               # consertar custa 40% do preço de construir (no mínimo 6)
+const OLD_GRID_SHIFT := Vector2i(2, 1)   # saves from the old grid (6x8) move to the middle of the new one
+const LEVEL_BONUS := 0.5            # +50% production per level above 1
+const UPGRADE_MULT := {1: 3.0, 2: 8.0}   # upgrading costs the build price x3 (level 2) and x8 (level 3)
+const UPGRADE_MAX := 95                  # cap: the energy bar goes up to 100
+const UPGRADE_BASE_FREE := 10.0          # for things that cost nothing to build (Mike's House)
+# Broken equipment: from time to time (and sometimes after a storm without shield) something stops working.
+const BREAK_EVERY := Vector2i(110, 170)  # sols between one breakdown and the next
+const BREAK_AFTER_STORM := 0.5           # without shield: chance that something breaks
+const REPAIR_FACTOR := 0.4               # repairing costs 40% of the build price (at least 6)
 const BREAKABLE := ["greenhouse", "solar", "rtg", "moxie", "antenna"]
-const SHIELD_RECHARGE := 2.0        # por sol, se a energia não estiver baixa
-const OXYGEN_BREATH := 0.5          # o Mike respira: gasta oxigênio todo sol
-const PLANT_OXYGEN := 0.3           # cada planta crescendo na estufa faz um pouco de oxigênio
-const EMERGENCY_ENERGY := 0.5       # bateria de emergência da casa, quando a energia está baixa
-const SLOW_GROWTH := 0.5            # com energia baixa, a planta cresce pela metade
-# "model" = nome do item no design/03-itens-do-jogo/itens.csv · "card" = carta ganha ao construir o 1º
-# "decor" = quantas cartas no álbum destravam a decoração · "max" = quantos dá para ter
+const SHIELD_RECHARGE := 2.0        # per sol, if energy is not low
+const OXYGEN_BREATH := 0.5          # Mike breathes: uses oxygen every sol
+const PLANT_OXYGEN := 0.3           # each plant growing in the greenhouse makes a little oxygen
+const EMERGENCY_ENERGY := 0.5       # the house's emergency battery, when energy is low
+const SLOW_GROWTH := 0.5            # with low energy, the plant grows at half speed
+# "model" = item name in design/03-itens-do-jogo/itens.csv · "card" = card won when building the 1st one
+# "decor" = how many cards in the album unlock the decoration · "max" = how many you can have
 const ITEMS := {
 	"habitat": {"name": "B_HABITAT", "cost": 0, "height": 1.6, "removable": false, "model": "casa-do-mike", "shield": 1.0},
 	"greenhouse": {"name": "B_GREENHOUSE", "cost": 15, "height": 1.2, "energy_when_planted": -1.0, "model": "estufa"},
@@ -60,66 +60,66 @@ const ITEMS := {
 	"flag": {"name": "D_FLAG", "cost": 0, "height": 1.4, "model": "decoracao-bandeira", "decor": 5},
 	"lights": {"name": "D_LIGHTS", "cost": 0, "height": 1.2, "model": "decoracao-luzinhas", "decor": 10},
 	"pot": {"name": "D_POT", "cost": 0, "height": 0.6, "model": "decoracao-vaso", "decor": 15},
-	# Estante de exposição (Design): só 1, com a Casa do Mike no nível 2. Quem libera as vagas é a casa.
+	# Display shelf (Design): only 1, with Mike's House at level 2. The house is what unlocks the slots.
 	"shelf": {"name": "D_SHELF", "cost": 0, "height": 1.8, "model": "estante", "max": 1, "house": 2},
 }
 const BUILDABLE := ["greenhouse", "solar", "rtg", "moxie", "antenna", "pad", "flag", "lights", "pot", "shelf"]
-const CARD_KILOPOWER := 14          # RTG no nível 3 vira uma mini usina (carta Kilopower)
-const KILOPOWER_ENERGY := 4.0       # o Kilopower (RTG nível 3) dá 4 de energia por sol, dia e noite
-# Quantas casas da grade cada nível ocupa (os modelos do design/03 crescem para o lado: nível 3 = 3 casas)
+const CARD_KILOPOWER := 14          # RTG at level 3 becomes a mini power plant (Kilopower card)
+const KILOPOWER_ENERGY := 4.0       # the Kilopower (level 3 RTG) gives 4 energy per sol, day and night
+# How many grid cells each level takes up (the design/03 models grow sideways: level 3 = 3 cells)
 const FOOTPRINT := {"habitat": [1, 2, 3], "greenhouse": [1, 2, 3], "solar": [1, 2, 3]}
-const GREENHOUSE_LEVEL_SPEED := 0.5 # estufa maior: +50% de velocidade por nível acima do 1
-# Plantas: tempo real proporcional (1 sol ≈ 1 dia). "unlock" = colheitas para destravar a semente.
+const GREENHOUSE_LEVEL_SPEED := 0.5 # bigger greenhouse: +50% speed per level above 1
+# Plants: proportional real time (1 sol ≈ 1 day). "unlock" = harvests needed to unlock the seed.
 const PLANTS := {
 	"lettuce": {"name": "P_LETTUCE", "sols": 33, "card": 1, "model": "alface", "unlock": 0},
 	"radish": {"name": "P_RADISH", "sols": 27, "card": 2, "model": "rabanete", "unlock": 0},
 	"kale": {"name": "P_KALE", "sols": 28, "card": 3, "model": "couve", "unlock": 1},
-	# Batata: cresce em uns 3 meses na Terra (aqui, 90 sóis). Plantada em simuladores de Marte (CONFERIR fonte no cartas.csv).
+	# Potato: grows in about 3 months on Earth (here, 90 sols). Grown in Mars simulators (CHECK source in cartas.csv).
 	"potato": {"name": "P_POTATO", "sols": 90, "card": 4, "model": "batata", "unlock": 2},
 	"zinnia": {"name": "P_ZINNIA", "sols": 60, "card": 5, "model": "zinia", "unlock": 3},
 	"chile": {"name": "P_CHILE", "sols": 120, "card": 6, "model": "pimenta", "unlock": 5},
 }
-# Cartas que chegam com o tempo
-const SOL_CARDS := {3: 19, 12: 20, 30: 37}   # 1º dia (Sol), 1ª noite (Frio da Gale), noites seguidas (Fobos e Deimos); espaçadas para não atrapalhar
-const BLUE_SUNSET_CHANCE := 0.01    # por sol: carta "Pôr do sol azul"
-const EARTH_SEEN_CHANCE := 0.02     # por sol, com antena: carta "Terra vista de Marte"
+# Cards that arrive over time
+const SOL_CARDS := {3: 19, 12: 20, 30: 37}   # 1st day (Sun), 1st night (Gale cold), following nights (Phobos and Deimos); spaced out so they don't get in the way
+const BLUE_SUNSET_CHANCE := 0.01    # per sol: "Blue sunset" card
+const EARTH_SEEN_CHANCE := 0.02     # per sol, with antenna: "Earth seen from Mars" card
 const CARD_BLUE_SUNSET := 38
 const CARD_EARTH_SEEN := 39
-# Tempestade solar (dados reais do DONKI em res://data/donki.json)
-const FIRST_STORM_SOL := 45         # a 1ª chega depois do tutorial, para a criança (e o jurado) ver logo
+# Solar storm (real DONKI data in res://data/donki.json)
+const FIRST_STORM_SOL := 45         # the 1st one arrives after the tutorial, so the child (and the judge) sees it soon
 const STORM_EVERY := Vector2i(70, 100)
-const STORM_SOLS := 5               # quanto tempo dura
-const STORM_SHIELD_COST := 30.0     # levantar o escudo gasta energia
-const STORM_RADIATION := 30.0       # sem escudo, a radiação come a barra de escudo
-const STORM_PLANT_LOSS := 0.5        # sem escudo, as plantas crescendo perdem metade do que cresceram
-const STORM_WARN_SOLS := 5           # com a antena, a NASA avisa a tempestade 5 sóis antes
-const STORM_SHIELD_COST_WARNED := 20.0  # avisado, o escudo sai mais barato (deu para se preparar)
-const AURORA_CHANCE := 0.10         # aguentou com escudo: chance da lendária "Aurora em Marte"
-const CARD_STORM := 23              # carta "Tempestade solar de 2024" (1ª tempestade)
+const STORM_SOLS := 5               # how long it lasts
+const STORM_SHIELD_COST := 30.0     # raising the shield uses energy
+const STORM_RADIATION := 30.0       # without shield, radiation eats the shield bar
+const STORM_PLANT_LOSS := 0.5        # without shield, growing plants lose half of what they grew
+const STORM_WARN_SOLS := 5           # with the antenna, NASA warns about the storm 5 sols ahead
+const STORM_SHIELD_COST_WARNED := 20.0  # when warned, the shield is cheaper (there was time to prepare)
+const AURORA_CHANCE := 0.10         # survived with shield: chance of the legendary "Aurora on Mars"
+const CARD_STORM := 23              # "Solar storm of 2024" card (1st storm)
 const CARD_AURORA := 25
-# Outros eventos (sorteados; todo evento tem lado ruim e lado bom)
+# Other events (drawn at random; every event has a bad side and a good side)
 const EVENT_FIRST_SOL := 90
 const EVENT_EVERY := Vector2i(60, 90)
-const DUST_SOLS := 15               # painéis sujos
-const DUST_FACTOR := 0.3            # painel sujo produz 30%
+const DUST_SOLS := 15               # dirty panels
+const DUST_FACTOR := 0.3            # a dirty panel produces 30%
 const COLD_SOLS := 5
-const COLD_HEAT_COST := 20.0        # aquecer a estufa gasta energia
-const COLD_GROWTH := 0.2            # sem aquecer, a planta quase para
-const FROST_CHANCE := 0.35          # de manhã: carta "Geada em Marte"
-const NOSIGNAL_SOLS := 10           # sem sinal: o piloto automático segue o plano
+const COLD_HEAT_COST := 20.0        # heating the greenhouse uses energy
+const COLD_GROWTH := 0.2            # without heating, the plant almost stops
+const FROST_CHANCE := 0.35          # in the morning: "Frost on Mars" card
+const NOSIGNAL_SOLS := 10           # no signal: the autopilot follows the plan
 const CARD_DUST := 21
 const CARD_DEVIL := 22
 const CARD_FROST := 24
-const PACKAGE_CARDS := [4, 40]      # o pacote da Terra traz batata e depois tomate
-# Expedição: o Mike sai da base e volta com um tubo de amostra
-const EXPLORE_SOLS := 4             # fica fora 4 sóis (~10 s)
-const EXPLORE_OXYGEN := 30.0        # o traje gasta oxigênio (bastante: nada de sair toda hora)
-const EXPLORE_EMPTY_CHANCE := 0.1   # às vezes o Mike volta sem nada (nunca duas vezes seguidas, nunca no tutorial)
-const EXPLORE_MIN_SHIELD := 25.0     # com o escudo baixo, lá fora tem radiação demais
-const EXPLORE_RADIATION := 5.0      # lá fora a radiação come um pouco do escudo
-const TUBE_ODDS := {"common": 60, "rare": 27, "epic": 10, "legendary": 3}   # em %
-## Toda expedição leva um lanche da estufa. Quanto mais raro o lanche (a raridade da carta da planta),
-## mais chance de carta rara no tubo.
+const PACKAGE_CARDS := [4, 40]      # the package from Earth brings potato and then tomato
+# Expedition: Mike leaves the base and comes back with a sample tube
+const EXPLORE_SOLS := 4             # stays out 4 sols (~10 s)
+const EXPLORE_OXYGEN := 30.0        # the suit uses oxygen (a lot: no going out all the time)
+const EXPLORE_EMPTY_CHANCE := 0.1   # sometimes Mike comes back with nothing (never twice in a row, never in the tutorial)
+const EXPLORE_MIN_SHIELD := 25.0     # with low shield, there is too much radiation outside
+const EXPLORE_RADIATION := 5.0      # outside, radiation eats a bit of the shield
+const TUBE_ODDS := {"common": 60, "rare": 27, "epic": 10, "legendary": 3}   # in %
+## Every expedition takes a snack from the greenhouse. The rarer the snack (the rarity of the plant's card),
+## the higher the chance of a rare card in the tube.
 const SNACK_ODDS := {
 	"common": {"common": 55, "rare": 30, "epic": 11, "legendary": 4},
 	"rare": {"common": 38, "rare": 37, "epic": 19, "legendary": 6},
@@ -127,16 +127,16 @@ const SNACK_ODDS := {
 	"legendary": {"common": 10, "rare": 35, "epic": 35, "legendary": 20},
 }
 const RARITY_ORDER := ["common", "rare", "epic", "legendary"]
-# Crescer com o jogo fechado
+# Growing while the game is closed
 const OFFLINE_MIN_SECONDS := 30
-const OFFLINE_MAX_SOLS := 2000      # ~1h20 de jogo; depois disso para de contar
+const OFFLINE_MAX_SOLS := 2000      # ~1h20 of game time; after that it stops counting
 # ─────────────────────────────────────────────────────────────────────────────
 
 const SAVE_PATH := "user://save.json"
 const SAVE_VERSION := 1
 
-var free_bars := false   # só nos testes de regra: barras sem teto (o teto tem o teste dele)
-var started := false             # o tempo só corre depois do "Jogar"
+var free_bars := false   # only in rule tests: bars without a cap (the cap has its own test)
+var started := false             # time only runs after "Play"
 var energy := 0.0
 var oxygen := 0.0
 var shield := 0.0
@@ -144,10 +144,10 @@ var sol := 1
 var items := {}     # "x,y" -> {"type", "level", "plant", "growth", "spent"}
 var cards := {}     # "id" -> quantas vezes ganhou
 var harvests := 0
-var inventory := {}  # planta -> quantas a criança já colheu
+var inventory := {}  # plant -> how many the child has harvested
 var locale := ""
-var paused := false              # o jogo pausa quando a criança precisa escolher
-var pending_event := ""          # evento esperando a escolha ou o "OK" da criança
+var paused := false              # the game pauses when the child needs to choose
+var pending_event := ""          # event waiting for the child's choice or "OK"
 var next_storm_sol := FIRST_STORM_SOL
 var storms_seen := 0
 var storm_left := 0
@@ -159,27 +159,27 @@ var cold_left := 0
 var cold_heated := false
 var nosignal_left := 0
 var nosignal_plan := ""
-var explore_left := 0            # sóis que faltam para o Mike voltar
-var storm_warned := false
-var last_empty := false
-var seen_cards := {}
-var next_break_sol := 140       # quando algo vai quebrar de novo            # cartas que a criança já viu no álbum (as outras ganham o selo "NOVA")
+var explore_left := 0            # sols left until Mike returns
+var storm_warned := false   # the antenna already warned about the next storm
+var last_empty := false   # the last expedition came back with nothing
+var seen_cards := {}   # cards the child has already seen in the album (the others get the "NEW" badge)
+var next_break_sol := 140       # when something will break again
 
-## Páginas do álbum, pela coluna "categoria" do cartas.csv (Robôs entra junto com Tecnologia).
+## Album pages, by the "categoria" column of cartas.csv (Robots go together with Technology).
 const ALBUM_PAGES := [
 	["plants", "ALBUM_PLANTS", ["plants"]],
 	["tech", "ALBUM_TECH", ["tech", "robots"]],
 	["minerals", "ALBUM_MINERALS", ["minerals"]],
 	["discoveries", "ALBUM_DISCOVERIES", ["discoveries"]],
 	["sky", "ALBUM_SKY", ["sky"]],
-]         # a última expedição voltou sem nada       # a antena já avisou a próxima tempestade
-var snack := ""                 # o lanche (uma colheita) que o Mike levou na expedição de agora
+]
+var snack := ""                 # the snack (one harvest) Mike took on the current expedition
 var music_on := true
 var sounds_on := true
-var tutorial := 0               # passo do tutorial do primeiro minuto (TUTORIAL_DONE = terminou)
+var tutorial := 0               # step of the first-minute tutorial (TUTORIAL_DONE = finished)
 const TUTORIAL_DONE := 99
-var tube_card := 0               # carta dentro do tubo que ainda não foi aberto (0 = nenhum)
-var away := {}                   # o que aconteceu com o jogo fechado: {"sols", "plants"}
+var tube_card := 0               # card inside the tube that has not been opened yet (0 = none)
+var away := {}                   # what happened while the game was closed: {"sols", "plants"}
 
 var _sol_timer := 0.0
 var _save_timer := 0.0
@@ -197,17 +197,17 @@ func _ready() -> void:
 	var saved_at := 0
 	if load_game():
 		saved_at = int(_read_json(SAVE_PATH).get("saved_at", 0))
-		clamp_bars()   # saves antigos: as barras passavam do teto da casa
+		clamp_bars()   # old saves: the bars went above the house cap
 	else:
 		new_game()
 	if locale == "":
 		locale = _device_locale()
 	TranslationServer.set_locale(locale)
 	_catch_up(saved_at)
-	# Atalho para testar e gravar o vídeo: abrir o link com ?tempestade traz a tempestade em 2 sóis.
+	# Shortcut for testing and recording the video: opening the link with ?tempestade brings the storm in 2 sols.
 	if OS.has_feature("web") and str(JavaScriptBridge.eval("location.search", true)).contains("tempestade"):
 		next_storm_sol = sol + 2
-	# Atalho para testar e gravar o vídeo: ?tubo traz um tubo de amostra esperando para abrir.
+	# Shortcut for testing and recording the video: ?tubo brings a sample tube waiting to be opened.
 	if OS.has_feature("web") and str(JavaScriptBridge.eval("location.search", true)).contains("tubo") and tube_card == 0:
 		tube_card = _draw_tube()
 	# Test shortcut: ?shelf sets Mike's House to level 2, with the shelf and a few cards.
@@ -241,7 +241,7 @@ func cards_total() -> int:
 	return _cards_info.size()
 
 
-## As cartas de uma página do álbum (em ordem).
+## The cards of an album page (in order).
 func page_cards(page: int) -> Array:
 	var cats: Array = ALBUM_PAGES[page][2]
 	var out := []
@@ -259,7 +259,7 @@ func page_owned(page: int) -> int:
 	return n
 
 
-## Quantas cartas a criança ganhou e ainda não viu no álbum.
+## How many cards the child has won and not yet seen in the album.
 func unseen_count() -> int:
 	var n := 0
 	for k in cards:
@@ -268,7 +268,7 @@ func unseen_count() -> int:
 	return n
 
 
-## A próxima decoração que o álbum destrava: {"name": chave do nome, "left": quantas cartas faltam}.
+## The next decoration the album unlocks: {"name": name key, "left": how many cards are missing}.
 func next_album_reward() -> Dictionary:
 	var best := {}
 	for t in ITEMS:
@@ -278,7 +278,7 @@ func next_album_reward() -> Dictionary:
 	return best
 
 
-## Os números das cartas do álbum, em ordem.
+## The album card numbers, in order.
 func card_ids() -> Array:
 	var ids := _cards_info.keys()
 	ids.sort()
@@ -289,11 +289,11 @@ func donki_count() -> int:
 	return _donki.size()
 
 
-## Arquivo .glb do item no jogo (vem do itens.csv do Design), ou "" se ainda não tem.
-## Com nível, procura a versão do nível (ex.: casa-do-mike-n2.glb).
+## The item's .glb file in the game (comes from the Design itens.csv), or "" if there is none yet.
+## With a level, looks for that level's version (e.g. casa-do-mike-n2.glb).
 func model_file(model_name: String, level := 1) -> String:
 	if model_name == "rtg" and level >= MAX_LEVEL and _models.get("files", {}).has("kilopower"):
-		return _models.files.kilopower   # o RTG no nível 3 vira o Kilopower (modelo do design/03)
+		return _models.files.kilopower   # the level 3 RTG becomes the Kilopower (design/03 model)
 	var file: String = _models.get("files", {}).get(model_name, "")
 	if level > 1 and file.contains("-n1."):
 		var leveled := file.replace("-n1.", "-n%d." % level)
@@ -302,12 +302,12 @@ func model_file(model_name: String, level := 1) -> String:
 	return file
 
 
-## Altura do item no jogo, pelo tamanhos.csv do Design (que mede com o Mike = 2,2). 0 = não tem.
+## Item height in the game, from the Design tamanhos.csv (measured with Mike = 2.2). 0 = none.
 func model_height(game_key: String) -> float:
 	return float(_models.get("heights", {}).get(game_key, 0.0))
 
 
-## Como ganhar a carta (texto para a criança, no álbum).
+## How to win the card (text for the child, in the album).
 func card_hint(id: int) -> String:
 	for p in PLANTS:
 		if int(PLANTS[p].card) == id:
@@ -342,15 +342,15 @@ func card_hint(id: int) -> String:
 	return tr("HOW_TUBE")
 
 
-## No tutorial, o tempo fica parado enquanto o Mike espera a criança (sem pressa, sem barra caindo).
-## Ele só anda quando o Mike sai para explorar, para ele poder voltar com o tubo.
-## Recomeçar o tutorial (configurações): fecha o aviso que estiver esperando e adia tempestade e eventos.
+## In the tutorial, time stands still while Mike waits for the child (no rush, no bars dropping).
+## It only moves when Mike goes out to explore, so he can come back with the tube.
+## Restart the tutorial (settings): closes any notice that is waiting and postpones storm and events.
 func restart_tutorial() -> void:
 	tutorial = 0
 	if paused and pending_event != "":
 		paused = false
 		pending_event = ""
-	# O que estava acontecendo (sem sinal, noite fria) acaba: o tutorial precisa da base livre.
+	# Whatever was happening (no signal, cold night) ends: the tutorial needs a free base.
 	nosignal_left = 0
 	cold_left = 0
 	next_storm_sol = maxi(next_storm_sol, sol + 30)
@@ -358,7 +358,7 @@ func restart_tutorial() -> void:
 	_after_action()
 
 
-## Fim do tutorial: a primeira tempestade vem com calma, um tempinho depois.
+## End of the tutorial: the first storm comes calmly, a little while later.
 func finish_tutorial() -> void:
 	tutorial = TUTORIAL_DONE
 	next_storm_sol = maxi(next_storm_sol, sol + 30)
@@ -370,7 +370,7 @@ func tutorial_holds_time() -> bool:
 	return tutorial < TUTORIAL_DONE and not exploring() and not tutorial_needs_energy()
 
 
-## No tutorial, o Mike pediu para construir algo que ainda não dá para pagar: o tempo anda até a energia chegar.
+## In the tutorial, Mike asked to build something that cannot be paid for yet: time runs until the energy arrives.
 func tutorial_needs_energy() -> bool:
 	if tutorial == 0:
 		return energy < float(ITEMS.solar.cost) and count_items("solar") == 0
@@ -429,7 +429,7 @@ func new_game() -> void:
 	changed.emit()
 
 
-# ───────────── Grade ─────────────
+# ───────────── Grid ─────────────
 static func key(c: Vector2i) -> String:
 	return "%d,%d" % [c.x, c.y]
 
@@ -443,7 +443,7 @@ static func in_grid(c: Vector2i) -> bool:
 	return c.x >= 0 and c.y >= 0 and c.x < GRID_W and c.y < GRID_H
 
 
-## Nível da Casa do Mike: ele abre área nova na base e é o nível máximo das outras construções.
+## Mike's House level: it opens new area in the base and is the maximum level of the other buildings.
 func house_level() -> int:
 	var lv := 1
 	for k in items:
@@ -452,26 +452,26 @@ func house_level() -> int:
 	return lv
 
 
-## O teto de cada barra agora: cresce com a Casa do Mike (20/40/40, depois 60 e 100).
+## The cap of each bar right now: grows with Mike's House (20/40/40, then 60 and 100).
 func bar_cap(bar: String) -> float:
 	if free_bars:
 		return BAR_MAX
 	return float(BAR_CAPS[clampi(house_level(), 1, MAX_LEVEL)][bar])
 
 
-## "Pouco" é abaixo de 1/5 do teto (com a energia até 20, pouco é abaixo de 4).
+## "Low" is below 1/5 of the cap (with energy up to 20, low is below 4).
 func low_line(bar: String) -> float:
 	return bar_cap(bar) * LOW_PART
 
 
-## Nenhuma barra passa do teto.
+## No bar goes above its cap.
 func clamp_bars() -> void:
 	energy = clampf(energy, 0.0, bar_cap("energy"))
 	oxygen = clampf(oxygen, 0.0, bar_cap("oxygen"))
 	shield = clampf(shield, 0.0, bar_cap("shield"))
 
 
-## A área aberta para construir com a casa no nível "level" (0 = o nível de agora).
+## The area open for building with the house at level "level" (0 = the current level).
 func zone(level := 0) -> Rect2i:
 	return ZONES[clampi(level if level > 0 else house_level(), 1, MAX_LEVEL)]
 
@@ -480,13 +480,13 @@ func cell_open(c: Vector2i, level := 0) -> bool:
 	return zone(level).has_point(c)
 
 
-## Quantas casas o item ocupa (para a direita da casa âncora), conforme o nível.
+## How many cells the item takes up (to the right of the anchor cell), by level.
 static func width_of(type: String, level: int) -> int:
 	var sizes: Array = FOOTPRINT.get(type, [1])
 	return int(sizes[clampi(level - 1, 0, sizes.size() - 1)])
 
 
-## As casas que o item ocupa. Girado de lado (rot 1 ou 3), a fileira vai para a frente em vez de para o lado.
+## The cells the item takes up. Turned sideways (rot 1 or 3), the row goes forward instead of sideways.
 static func cells_of(anchor: Vector2i, type: String, level: int, rot := 0) -> Array[Vector2i]:
 	var out: Array[Vector2i] = []
 	var step := Vector2i(1, 0) if rot % 2 == 0 else Vector2i(0, 1)
@@ -499,7 +499,7 @@ static func item_cells(anchor_key: String, it: Dictionary) -> Array[Vector2i]:
 	return cells_of(parse_key(anchor_key), it.type, int(it.level), int(it.get("rot", 0)))
 
 
-## Mapa "casa ocupada" -> "casa âncora do item que está nela".
+## Map of "occupied cell" -> "anchor cell of the item on it".
 func _occupancy() -> Dictionary:
 	var occ := {}
 	for k in items:
@@ -508,7 +508,7 @@ func _occupancy() -> Dictionary:
 	return occ
 
 
-## A casa âncora do item que ocupa a casa c (ou (-1, -1) se está livre).
+## The anchor cell of the item that occupies cell c (or (-1, -1) if it is free).
 func anchor_of(c: Vector2i) -> Vector2i:
 	var occ := _occupancy()
 	return parse_key(occ[key(c)]) if occ.has(key(c)) else Vector2i(-1, -1)
@@ -519,10 +519,10 @@ func item_at(c: Vector2i) -> Dictionary:
 	return items.get(occ.get(key(c), ""), {})
 
 
-## Dá para pôr este item (neste nível) com a âncora em c? (ignore = o próprio item, ao mover ou melhorar)
+## Can this item (at this level) be placed with its anchor at c? (ignore = the item itself, when moving or upgrading)
 func can_place(type: String, level: int, c: Vector2i, ignore := "", rot := 0) -> bool:
 	var occ := _occupancy()
-	# A própria casa usa a área do nível dela (ao crescer, ela já abre a área nova).
+	# The house itself uses the area of its own level (when it grows, it already opens the new area).
 	var area := zone(level if type == "habitat" else 0)
 	for cell in cells_of(c, type, level, rot):
 		if not area.has_point(cell) or (occ.has(key(cell)) and occ[key(cell)] != ignore):
@@ -538,7 +538,7 @@ func count_items(type: String) -> int:
 	return n
 
 
-## Nome do item na tela (o RTG no nível 3 vira Kilopower).
+## Item name on screen (the level 3 RTG becomes Kilopower).
 func item_name(it: Dictionary) -> String:
 	if it.get("type") == "rtg" and int(it.get("level", 1)) >= MAX_LEVEL:
 		return "B_KILOPOWER"
@@ -556,7 +556,7 @@ func free_cells() -> Array[Vector2i]:
 	return out
 
 
-## Onde o item da âncora "from" cabe se for movido.
+## Where the item at anchor "from" fits if it is moved.
 func move_targets(from: Vector2i) -> Array[Vector2i]:
 	var it: Dictionary = items.get(key(from), {})
 	var out: Array[Vector2i] = []
@@ -569,7 +569,7 @@ func move_targets(from: Vector2i) -> Array[Vector2i]:
 	return out
 
 
-## Girar 90°. Quem ocupa mais de uma casa só gira se a fileira nova couber.
+## Turn 90°. Anything taking more than one cell only turns if the new row fits.
 func rotate_block_reason(c: Vector2i) -> String:
 	var it: Dictionary = items.get(key(c), {})
 	if it.is_empty():
@@ -589,17 +589,17 @@ func rotate(c: Vector2i) -> bool:
 	return true
 
 
-# ───────────── Ações (cada uma salva e avisa a tela) ─────────────
+# ───────────── Actions (each one saves and notifies the screen) ─────────────
 func can_afford(cost: float) -> bool:
 	return energy >= cost
 
 
-## Por que não dá para mexer na base agora ("" = dá). Devolve a chave do texto.
+## Why the base cannot be changed right now ("" = it can). Returns the text key.
 func base_locked_reason() -> String:
 	if nosignal_left > 0:
 		return "LOCK_NOSIGNAL"
 	if exploring():
-		return "LOCK_EXPLORING"   # construir, mover e melhorar só com o Mike em casa
+		return "LOCK_EXPLORING"   # building, moving and upgrading only with Mike at home
 	return ""
 
 
@@ -652,7 +652,7 @@ func move(from: Vector2i, to: Vector2i) -> bool:
 func upgrade_cost(c: Vector2i) -> int:
 	var it := item_at(c)
 	if it.is_empty() or it.type == "shelf":
-		return -1   # a estante não tem nível: quem libera as vagas é a Casa do Mike
+		return -1   # the shelf has no level: Mike's House is what unlocks the slots
 	var lv := int(it.level)
 	if lv >= MAX_LEVEL:
 		return -1
@@ -664,7 +664,7 @@ func upgrade_cost(c: Vector2i) -> int:
 	return mini(roundi(base * float(UPGRADE_MULT.get(lv, 8.0))), UPGRADE_MAX)
 
 
-## Por que não dá para melhorar ("" = dá): falta energia ou falta espaço ao lado para o nível maior.
+## Why it cannot be upgraded ("" = it can): not enough energy or no room beside it for the bigger level.
 func upgrade_block_reason(c: Vector2i) -> String:
 	var it: Dictionary = items.get(key(c), {})
 	var cost := upgrade_cost(c)
@@ -672,7 +672,7 @@ func upgrade_block_reason(c: Vector2i) -> String:
 		return "MAX_LEVEL"
 	if base_locked_reason() != "":
 		return base_locked_reason()
-	# Nenhuma construção passa do nível da Casa do Mike.
+	# No building goes above Mike's House level.
 	if it.type != "habitat" and int(it.level) >= house_level():
 		return "NEED_HOUSE"
 	if not can_place(it.type, int(it.level) + 1, c, key(c), int(it.get("rot", 0))):
@@ -702,7 +702,7 @@ func upgrade(c: Vector2i) -> bool:
 	return true
 
 
-## Remover devolve tudo o que foi gasto: sem multa.
+## Removing refunds everything that was spent: no penalty.
 func remove(c: Vector2i) -> bool:
 	var it := item_at(c)
 	if base_locked_reason() != "" or it.is_empty() or not ITEMS[it.type].get("removable", true):
@@ -749,8 +749,8 @@ func harvest(c: Vector2i) -> String:
 	if not cards.has(str(PLANTS[p].card)):
 		add_card(PLANTS[p].card)
 	if unlocked_plants().size() > before:
-		var nova: String = unlocked_plants()[-1]
-		event_message.emit("SEED_NEW", tr(PLANTS[nova].name))
+		var new_plant: String = unlocked_plants()[-1]
+		event_message.emit("SEED_NEW", tr(PLANTS[new_plant].name))
 	_after_action()
 	return p
 
@@ -782,12 +782,12 @@ func set_locale(l: String) -> void:
 	_after_action()
 
 
-# ───────────── Expedição e tubo de amostra ─────────────
+# ───────────── Expedition and sample tube ─────────────
 func exploring() -> bool:
 	return explore_left > 0
 
 
-## Por que o Mike não pode sair agora ("" = pode). Devolve a chave do texto para a tela.
+## Why Mike cannot go out right now ("" = he can). Returns the text key for the screen.
 func explore_block_reason() -> String:
 	if base_locked_reason() != "":
 		return base_locked_reason()
@@ -802,12 +802,12 @@ func explore_block_reason() -> String:
 	return ""
 
 
-## Raridade de uma planta como lanche: a raridade da carta dela no cartas.csv.
+## Rarity of a plant as a snack: the rarity of its card in cartas.csv.
 func plant_rarity(p: String) -> String:
 	return str(card_info(int(PLANTS[p].card)).get("rarity", "common"))
 
 
-## O lanche que o Mike leva: o mais raro que tiver colhido.
+## The snack Mike takes: the rarest one he has harvested.
 func best_snack() -> String:
 	var best := ""
 	for p in inventory:
@@ -824,7 +824,7 @@ func start_explore() -> bool:
 	oxygen -= EXPLORE_OXYGEN
 	shield = maxf(0.0, shield - EXPLORE_RADIATION)
 	explore_left = EXPLORE_SOLS
-	# O lanche vai na mochila (o mais raro): quanto mais raro, mais chance de carta rara.
+	# The snack goes in the backpack (the rarest): the rarer it is, the higher the chance of a rare card.
 	snack = best_snack()
 	if snack != "":
 		inventory[snack] = int(inventory[snack]) - 1
@@ -834,7 +834,7 @@ func start_explore() -> bool:
 	return true
 
 
-## Abre o tubo que o Mike trouxe: a carta vai para o álbum (e aparece na tela).
+## Opens the tube Mike brought: the card goes to the album (and shows on screen).
 func open_tube() -> int:
 	var id := tube_card
 	if id == 0:
@@ -849,7 +849,7 @@ func tube_rarity() -> String:
 	return card_info(tube_card).get("rarity", "common")
 
 
-## Sorteia a raridade pelo TUBE_ODDS e depois uma carta dessa raridade que dá para achar na Gale.
+## Draws the rarity using TUBE_ODDS, then a card of that rarity that can be found at Gale.
 func _draw_tube() -> int:
 	var pool := {}
 	for id in _cards_info:
@@ -875,27 +875,27 @@ func _draw_tube() -> int:
 	return pool[rarity].pick_random()
 
 
-# ───────────── Tempestade solar ─────────────
+# ───────────── Solar storm ─────────────
 func storm_active() -> bool:
 	return storm_left > 0
 
 
-## Sem escudo, o Mike fica em casa até a tempestade passar (não sai para explorar).
+## Without shield, Mike stays home until the storm passes (he does not go out to explore).
 func mike_inside() -> bool:
 	return (storm_left > 0 and not storm_shielded) or oxygen <= 0.0
 
 
-## Quanto custa levantar o escudo: com a antena (aviso da NASA), sai mais barato.
+## How much it costs to raise the shield: with the antenna (NASA warning), it is cheaper.
 func storm_shield_cost() -> float:
 	return event_cost(STORM_SHIELD_COST_WARNED if count_items("antenna") > 0 else STORM_SHIELD_COST)
 
 
-## Aquecer a estufa no frio.
+## Heating the greenhouse in the cold.
 func cold_cost() -> float:
 	return event_cost(COLD_HEAT_COST)
 
 
-## Os eventos cabem na barra pequena do começo: com a energia até 20, custam a metade.
+## Events fit the small bar at the start: with energy up to 20, they cost half.
 func event_cost(base: float) -> float:
 	return roundf(base * clampf(bar_cap("energy") / 40.0, 0.5, 1.0))
 
@@ -907,7 +907,7 @@ func choose_storm(raise_shield: bool) -> bool:
 	if raise_shield:
 		energy -= storm_shield_cost()
 	else:
-		# Sem escudo: a radiação come o escudo e atrapalha as plantas que estão crescendo.
+		# Without shield: radiation eats the shield and hurts the plants that are growing.
 		shield = maxf(0.0, shield - STORM_RADIATION)
 		var hurt := false
 		for k in items:
@@ -928,7 +928,7 @@ func _start_storm() -> void:
 	if _donki.is_empty():
 		next_storm_sol = sol + STORM_EVERY.x
 		return
-	# A 1ª tempestade é sempre a de 20/05/2024, que o Curiosity mediu aqui na Gale.
+	# The 1st storm is always the one from 2024-05-20, which Curiosity measured here at Gale.
 	var event: Dictionary = {}
 	if storms_seen == 0:
 		for e in _donki:
@@ -955,8 +955,8 @@ func _end_storm() -> void:
 	save_game()
 
 
-# ───────────── Outros eventos ─────────────
-## Eventos que seguram outro evento (a poeira não segura: o redemoinho pode vir limpar).
+# ───────────── Other events ─────────────
+## Events that hold back another event (dust does not: the dust devil can come and clean).
 func event_active() -> bool:
 	return cold_left > 0 or nosignal_left > 0
 
@@ -964,16 +964,16 @@ func event_active() -> bool:
 func _start_event() -> void:
 	next_event_sol = sol + randi_range(EVENT_EVERY.x, EVENT_EVERY.y)
 	var options := ["dust", "cold", "nosignal"]
-	# A noite congelante só vem quando tem planta crescendo na estufa (senão a pergunta não faz sentido).
+	# The freezing night only comes when a plant is growing in the greenhouse (otherwise the question makes no sense).
 	if not _has_growing_plant():
 		options.erase("cold")
 	if dust_left > 0:
-		options = ["devil"]      # painel sujo? o próximo evento é o redemoinho que limpa
+		options = ["devil"]      # dirty panel? the next event is the dust devil that cleans it
 	var type: String = options.pick_random()
 	if type == "dust":
 		dust_left = DUST_SOLS
 		_reward_once(CARD_DUST)
-		# O redemoinho que limpa os painéis vem enquanto eles ainda estão sujos (antes, nunca dava tempo).
+		# The dust devil that cleans the panels comes while they are still dirty (before, there was never time).
 		next_event_sol = sol + randi_range(5, DUST_SOLS - 4)
 	elif type == "devil":
 		dust_left = 0
@@ -989,7 +989,7 @@ func _has_growing_plant() -> bool:
 	return false
 
 
-## A criança tocou "OK" num aviso (poeira, redemoinho).
+## The child tapped "OK" on a notice (dust, dust devil).
 func ack_event() -> void:
 	if pending_event in ["dust", "devil"]:
 		_resume()
@@ -1052,9 +1052,9 @@ func _resume() -> void:
 	_after_action()
 
 
-# ───────────── O tempo passa: 1 sol ─────────────
+# ───────────── Time passes: 1 sol ─────────────
 func _tick() -> void:
-	# Durante o tutorial, nada de tempestade nem evento: a criança aprende em paz.
+	# During the tutorial, no storm or event: the child learns in peace.
 	if tutorial < TUTORIAL_DONE:
 		next_storm_sol = maxi(next_storm_sol, sol + 12)
 		next_event_sol = maxi(next_event_sol, sol + 12)
@@ -1066,7 +1066,7 @@ func _tick() -> void:
 		var it: Dictionary = items[k]
 		var def: Dictionary = ITEMS[it.type]
 		if it.get("broken", false):
-			continue   # quebrado: não faz energia, nem oxigênio, e a planta para de crescer
+			continue   # broken: makes no energy or oxygen, and the plant stops growing
 		var bonus := 1.0 + LEVEL_BONUS * (int(it.level) - 1)
 		var e: float = def.get("energy", 0.0)
 		if it.type == "solar" and dust_left > 0:
@@ -1079,7 +1079,7 @@ func _tick() -> void:
 		if it.type == "greenhouse":
 			e = def.energy_when_planted if it.plant != "" and not greenhouse_off else 0.0
 		d_energy += e * bonus if e > 0.0 else e
-		# O MOXIE precisa de energia para fazer oxigênio, como o de verdade.
+		# MOXIE needs energy to make oxygen, like the real one.
 		if def.has("oxygen") and energy > 0.0:
 			d_oxygen += def.oxygen * bonus
 		if it.type == "greenhouse" and it.plant != "" and not greenhouse_off and energy > 0.0:
@@ -1087,10 +1087,10 @@ func _tick() -> void:
 			if cold_left > 0 and not cold_heated:
 				speed = COLD_GROWTH
 			it.growth += speed * (1.0 + GREENHOUSE_LEVEL_SPEED * (int(it.level) - 1))
-			# Planta crescendo faz oxigênio (fotossíntese), como na Estação Espacial.
+			# A growing plant makes oxygen (photosynthesis), like on the Space Station.
 			d_oxygen += PLANT_OXYGEN
-	# O Mike respira. E a casa tem uma bateria de emergência: com pouca energia, ela ajuda devagar
-	# (assim a criança nunca fica presa sem conseguir construir nada).
+	# Mike breathes. And the house has an emergency battery: with little energy, it helps slowly
+	# (so the child never gets stuck unable to build anything).
 	d_oxygen -= OXYGEN_BREATH
 	if energy < low_e:
 		d_energy += EMERGENCY_ENERGY
@@ -1110,7 +1110,7 @@ func _tick() -> void:
 		explore_left -= 1
 		if explore_left == 0:
 			if tutorial >= TUTORIAL_DONE and not last_empty and randf() < EXPLORE_EMPTY_CHANCE:
-				# Voltou sem nada: o lanche volta para a mochila (a criança não perde duas vezes).
+				# Came back with nothing: the snack goes back in the backpack (the child does not lose twice).
 				last_empty = true
 				tube_card = 0
 				if snack != "":
@@ -1143,9 +1143,9 @@ func _tick() -> void:
 			if storm_left == 0:
 				_end_storm()
 		elif tutorial < TUTORIAL_DONE:
-			pass   # durante o tutorial, nada de tempestade nem evento
+			pass   # during the tutorial, no storm or event
 		elif count_items("antenna") > 0 and not storm_warned and next_storm_sol - sol <= STORM_WARN_SOLS and next_storm_sol > sol:
-			storm_warned = true   # a antena recebeu o aviso da NASA
+			storm_warned = true   # the antenna received the NASA warning
 			event_message.emit("STORM_WARNING", str(next_storm_sol - sol))
 		elif sol >= next_storm_sol and not event_active():
 			_start_storm()
@@ -1163,7 +1163,7 @@ func _time_cards() -> void:
 		_reward_once(CARD_EARTH_SEEN)
 
 
-## O textinho de cada construção: o da Thais (INFO_*, do painel de informação), senão a frase curta.
+## The short text of each building: Thais's (INFO_*, from the info panel), otherwise the short sentence.
 func item_text(name_key: String) -> String:
 	var info := "INFO_" + name_key.trim_prefix("B_").trim_prefix("D_")
 	if tr(info) != info:
@@ -1172,7 +1172,7 @@ func item_text(name_key: String) -> String:
 	return tr(desc) if tr(desc) != desc else ""
 
 
-## Quebra uma construção que funciona (nunca a casa nem enfeite). Devolve a casa âncora ou "".
+## Breaks a working building (never the house or a decoration). Returns the anchor cell or "".
 func break_something() -> String:
 	var options := []
 	for k in items:
@@ -1204,7 +1204,7 @@ func repair(c: Vector2i) -> bool:
 	return true
 
 
-## Quanto cada construção faz por sol agora (a mesma conta do _tick, sem mexer em nada).
+## How much each building makes per sol right now (the same math as _tick, without changing anything).
 func item_rates(it: Dictionary) -> Dictionary:
 	var def: Dictionary = ITEMS[it.type]
 	if it.get("broken", false):
@@ -1225,7 +1225,7 @@ func item_rates(it: Dictionary) -> Dictionary:
 	return {"energy": e * bonus if e > 0.0 else e, "oxygen": o, "shield": def.get("shield", 0.0) * (lv - 1)}
 
 
-## Quanto cada barra ganha (ou perde) por sol, somando a base inteira e o Mike respirando.
+## How much each bar gains (or loses) per sol, adding up the whole base and Mike breathing.
 func current_rates() -> Dictionary:
 	var r := {"energy": 0.0, "oxygen": -OXYGEN_BREATH, "shield": 0.0}
 	for k in items:
@@ -1239,7 +1239,7 @@ func current_rates() -> Dictionary:
 	return r
 
 
-## Crescer com o jogo fechado: avança os sóis que passaram (sem eventos) e guarda o resumo.
+## Growing while the game is closed: advances the sols that passed (without events) and keeps the summary.
 func _catch_up(saved_at: int) -> void:
 	away = {}
 	if saved_at <= 0 or paused:
@@ -1265,7 +1265,7 @@ func _ready_plants() -> int:
 	return n
 
 
-# ───────────── Salvar e carregar ─────────────
+# ───────────── Save and load ─────────────
 const _SAVED := ["energy", "oxygen", "shield", "sol", "items", "cards", "harvests", "inventory", "locale", "paused",
 	"pending_event", "next_storm_sol", "storms_seen", "storm_left", "storm_shielded", "storm_event",
 	"next_event_sol", "dust_left", "cold_left", "cold_heated", "nosignal_left", "nosignal_plan",
@@ -1301,20 +1301,20 @@ func load_game() -> bool:
 				set(k, data[k])
 	for k in items:
 		items[k].level = int(items[k].level)
-	# Save da grade antiga (6x8): tudo vai para o meio da grade nova (10x10).
+	# Save from the old grid (6x8): everything moves to the middle of the new grid (10x10).
 	if int(data.get("grid", 6)) != GRID_W:
 		var moved := {}
 		for k in items:
 			moved[key(parse_key(k) + OLD_GRID_SHIFT)] = items[k]
 		items = moved
-	# Save de antes do álbum novo: as cartas que já tinha contam como vistas.
+	# Save from before the new album: the cards already owned count as seen.
 	if not data.has("seen_cards"):
 		for k in cards:
 			seen_cards[k] = true
-	# Save de antes do tutorial: quem já construiu algo não precisa dele.
+	# Save from before the tutorial: anyone who already built something does not need it.
 	if not data.has("tutorial"):
 		tutorial = TUTORIAL_DONE if items.size() > 1 else 0
-	# Save antigo (de antes dos eventos novos) com tempestade esperando a escolha.
+	# Old save (from before the new events) with a storm waiting for the choice.
 	if paused and pending_event == "":
 		pending_event = "storm" if not storm_event.is_empty() else ""
 		paused = pending_event != ""
