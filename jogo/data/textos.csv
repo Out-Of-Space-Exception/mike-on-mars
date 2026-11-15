@@ -86,7 +86,7 @@ TUTO_WAIT,Estou explorando a cratera! Volto em {n} sóis.,I'm exploring the crat
 TUTO_TUBE,Voltei! Toque no tubo para abrir sua carta.,I'm back! Tap the tube to open your card.,¡Volví! Toca el tubo para abrir tu carta.,Je suis rentré ! Touche le tube pour ouvrir ta carte.
 TUTO_DONE,Muito bem! Cuide das 3 barras e complete o álbum.,Great job! Keep the 3 bars up and fill the album.,¡Muy bien! Cuida las 3 barras y completa el álbum.,Bravo ! Garde les 3 barres pleines et remplis l'album.
 TUTO_SKIP,Pular,Skip,Saltar,Passer
-HINT_PC,No computador: arraste com o botão direito do mouse para girar (ou use Q e E). A rodinha dá zoom.,On a computer: drag with the right mouse button to turn (or use Q and E). The wheel zooms.,En la computadora: arrastra con el botón derecho para girar (o usa Q y E). La rueda hace zoom.,Sur ordinateur : fais glisser avec le bouton droit pour tourner (ou Q et E). La molette zoome.
+HINT_PC,"No PC: botão direito gira, rodinha dá zoom.","On PC: right button turns, wheel zooms.","En PC: botón derecho gira, la rueda hace zoom.","Sur PC : clic droit pour tourner, molette pour zoomer."
 PLANT_GROWING,{plant} · {n}/{max} sóis,{plant} · {n}/{max} sols,{plant} · {n}/{max} soles,{plant} · {n}/{max} sols
 PLANT_READY,Pronto para colher: {plant}!,Ready to harvest: {plant}!,¡Listo para cosechar: {plant}!,Prêt à récolter : {plant} !
 EV_SOLAR_CURIOSITY,O robô Curiosity mediu esta aqui na Gale!,The Curiosity rover measured this one here in Gale!,¡El rover Curiosity midió esta aquí en Gale!,"Le rover Curiosity a mesuré celle-ci ici, à Gale !"
@@ -104,7 +104,7 @@ D_POT,Vaso,Flower pot,Maceta,Pot de fleurs
 D_POT_DESC,"Uma plantinha de enfeite, para a base ficar com cara de casa.",A little plant to make the base feel like home.,"Una plantita de adorno, para que la base parezca un hogar.",Une petite plante pour que la base ressemble à une maison.
 LOCKED_DECOR,Junte mais cartas para destravar.,Collect more cards to unlock it.,Junta más cartas para desbloquearla.,Collectionne plus de cartes pour la débloquer.
 NEED_MAX,Você já tem uma.,You already have one.,Ya tienes uno.,Tu en as déjà un.
-LOCK_NOSIGNAL,Sem sinal: o piloto automático está no comando.,No signal: the autopilot is in charge.,Sin señal: el piloto automático manda.,Pas de signal : le pilote automatique est aux commandes.
+LOCK_NOSIGNAL,Sem sinal: o piloto automático manda.,No signal: autopilot is in charge.,Sin señal: manda el piloto automático.,Pas de signal : le pilote automatique décide.
 NOSIGNAL_LEFT,Sem sinal · {n} sóis,No signal · {n} sols,Sin señal · {n} soles,Pas de signal · {n} sols
 EV_NOSIGNAL_TEXT,O Sol ficou entre a Terra e Marte. Sem mensagens por um tempo.,The Sun is between Earth and Mars. No messages for a while.,El Sol está entre la Tierra y Marte. Sin mensajes por un tiempo.,Le Soleil est entre la Terre et Mars. Pas de messages pendant un moment.
 PLAN_SAVE,Economizar energia,Save energy,Ahorrar energía,Économiser l'énergie
@@ -126,10 +126,10 @@ PHOTO_SAVED,Foto salva!,Photo saved!,¡Foto guardada!,Photo enregistrée !
 AWAY_SOLS,Passaram {n} sóis.,{n} sols went by.,Pasaron {n} soles.,{n} sols sont passés.
 B_KILOPOWER,Kilopower,Kilopower,Kilopower,Kilopower
 B_KILOPOWER_DESC,"Uma mini usina nuclear: energia forte, de dia e de noite.","A mini nuclear power plant: strong energy, day and night.","Una mini planta nuclear: energía fuerte, de día y de noche.","Une mini centrale nucléaire : beaucoup d'énergie, jour et nuit."
-NEED_SPACE,Precisa de espaço livre ao lado para crescer.,It needs free space next to it to grow.,Necesita espacio libre al lado para crecer.,Il faut de la place libre à côté pour grandir.
+NEED_SPACE,Falta espaço livre ao lado.,It needs free space next to it.,Falta espacio libre al lado.,Il faut de la place à côté.
 NEED_HOUSE,"Primeiro, melhore a Casa do Mike.","First, upgrade Mike's habitat.","Primero, mejora la Casa de Mike.","D'abord, améliore la Maison de Mike."
-MAP_GROW,A base cresceu! Tem mais lugar para construir.,The base grew! There is more room to build.,¡La base creció! Hay más lugar para construir.,La base a grandi ! Il y a plus de place pour construire.
-MAP_LOCKED,Melhore a Casa do Mike para abrir esta área.,Upgrade Mike's habitat to open this area.,Mejora la Casa de Mike para abrir esta zona.,Améliore la Maison de Mike pour ouvrir cette zone.
+MAP_GROW,A base cresceu!,The base grew!,¡La base creció!,La base a grandi !
+MAP_LOCKED,Melhore a Casa do Mike para abrir aqui.,Upgrade Mike's habitat to open this.,Mejora la Casa de Mike para abrir aquí.,Améliore la Maison de Mike pour ouvrir ici.
 HOW_TITLE,Como ganhar esta carta,How to get this card,Cómo ganar esta carta,Comment gagner cette carte
 HOW_HARVEST,Colha {name} na estufa.,Harvest {name} in the greenhouse.,Cosecha {name} en el invernadero.,Récolte {name} dans la serre.
 HOW_SEED,A semente aparece depois de {n} colheitas.,The seed shows up after {n} harvests.,La semilla aparece después de {n} cosechas.,La graine apparaît après {n} récoltes.
@@ -161,13 +161,13 @@ SET_SOUNDS,Sons,Sounds,Sonidos,Sons
 SET_ON,ligada,on,encendida,activée
 SET_OFF,desligada,off,apagada,désactivée
 SET_TUTORIAL,Ver o tutorial de novo,See the tutorial again,Ver el tutorial otra vez,Revoir le tutoriel
-SNACK_PACKED,"O Mike levou {name} de lanche. Lanche mais raro, carta mais rara!","Mike packed {name} as a snack. Rarer snack, rarer card!","Mike llevó {name} de merienda. ¡Merienda más rara, carta más rara!","Mike a pris {name} en goûter. Goûter plus rare, carte plus rare !"
-SNACK_HINT,Toda expedição precisa de um lanche da estufa. Lanche mais raro dá carta mais rara!,Every expedition needs a snack from the greenhouse. A rarer snack gives a rarer card!,Cada expedición necesita una merienda del invernadero. ¡Una merienda más rara da una carta más rara!,Chaque expédition a besoin d'un goûter de la serre. Un goûter plus rare donne une carte plus rare !
-NEED_FOOD,O Mike precisa de um lanche da estufa para explorar. Plante e colha!,Mike needs a snack from the greenhouse to explore. Plant and harvest!,Mike necesita una merienda del invernadero para explorar. ¡Planta y cosecha!,Mike a besoin d'un goûter de la serre pour explorer. Plante et récolte !
-LOCK_SHIELD,Escudo baixo: muita radiação lá fora. Espere o escudo subir.,Low shield: too much radiation outside. Wait for the shield to go up.,Escudo bajo: mucha radiación afuera. Espera a que suba el escudo.,Bouclier faible : trop de radiations dehors. Attends que le bouclier remonte.
-LOCK_EXPLORING,Espere o Mike voltar da expedição para construir.,Wait for Mike to come back from the expedition to build.,Espera a que Mike vuelva de la expedición para construir.,Attends que Mike revienne de l'expédition pour construire.
-STORM_PLANTS,"Sem escudo, a radiação atrapalhou as plantas da estufa.","Without the shield, radiation hurt the greenhouse plants.","Sin escudo, la radiación dañó las plantas del invernadero.","Sans bouclier, les radiations ont abîmé les plantes de la serre."
-STORM_WARNING,A antena recebeu um aviso da NASA: tempestade solar em {name} sóis! Guarde energia para o escudo.,The antenna got a NASA warning: solar storm in {name} sols! Save energy for the shield.,La antena recibió un aviso de la NASA: ¡tormenta solar en {name} soles! Guarda energía para el escudo.,L'antenne a reçu une alerte de la NASA : tempête solaire dans {name} sols ! Garde de l'énergie pour le bouclier.
+SNACK_PACKED,Lanche na mochila: {name}!,Snack packed: {name}!,¡Merienda en la mochila: {name}!,Goûter dans le sac : {name} !
+SNACK_HINT,Cada expedição usa um lanche.,Each expedition uses a snack.,Cada expedición usa una merienda.,Chaque expédition utilise un goûter.
+NEED_FOOD,Falta lanche. Colha na estufa!,No snack. Harvest the greenhouse!,Falta merienda. ¡Cosecha en el invernadero!,Pas de goûter. Récolte dans la serre !
+LOCK_SHIELD,Escudo baixo. Espere ele subir.,Low shield. Wait for it to go up.,Escudo bajo. Espera a que suba.,Bouclier faible. Attends qu'il remonte.
+LOCK_EXPLORING,Espere o Mike voltar.,Wait for Mike to come back.,Espera a que Mike vuelva.,Attends que Mike revienne.
+STORM_PLANTS,A radiação atrapalhou as plantas.,Radiation hurt the plants.,La radiación dañó las plantas.,Les radiations ont abîmé les plantes.
+STORM_WARNING,Aviso da NASA: tempestade em {name} sóis!,NASA warning: storm in {name} sols!,Aviso de la NASA: ¡tormenta en {name} soles!,Alerte de la NASA : tempête dans {name} sols !
 TUTO_NUDGE,"Primeiro, toque em: {name}","First, tap: {name}","Primero, toca: {name}","D'abord, touche : {name}"
 TUTO_SQUARE,um quadrado claro,a light square,un cuadrado claro,une case claire
 REMOVE_TITLE,Remover: {name}?,Remove: {name}?,¿Quitar: {name}?,Retirer : {name} ?
@@ -179,6 +179,7 @@ TUBE_MYSTERY,O que será que tem aqui dentro?,What could be inside?,¿Qué habr�
 CARD_NEW_BADGE,NOVA!,NEW!,¡NUEVA!,NOUVELLE !
 BTN_SETTINGS,Ajustes,Settings,Ajustes,Réglages
 STORM_SOON,Tempestade solar em {n} sóis,Solar storm in {n} sols,Tormenta solar en {n} soles,Tempête solaire dans {n} sols
+EXPLORE_EMPTY,Desta vez o Mike não achou nada. O lanche voltou!,Mike found nothing this time. The snack is back!,Esta vez Mike no encontró nada. ¡La merienda volvió!,"Cette fois, Mike n'a rien trouvé. Le goûter est revenu !"
 INFO_GREENHOUSE,"As plantas crescem aqui. A luz gasta energia. Sem energia, elas crescem pela metade.","Plants grow here. The lights use energy. With no energy, they grow at half speed.","Aquí crecen las plantas. La luz gasta energía. Sin energía, crecen a la mitad.","Les plantes poussent ici. La lumière utilise de l'énergie. Sans énergie, elles poussent deux fois moins vite."
 INFO_SOLAR,"Na tempestade de poeira, a poeira cobre o painel e tapa a luz do Sol: ele faz só 30% por 15 sóis.","In a dust storm, dust covers the panel and blocks the sunlight: it makes only 30% for 15 sols.","En una tormenta de polvo, el polvo cubre el panel y tapa la luz del Sol: solo da 30% durante 15 soles.","Pendant une tempête de poussière, la poussière couvre le panneau et cache le Soleil : il ne fait que 30 % pendant 15 sols."
 INFO_RTG,"Pouca energia, mas não para nunca: nem de noite, nem na poeira. No nível 3 vira Kilopower: +4.","A little energy, but it never stops: not at night, not in dust. At level 3 it becomes Kilopower: +4.","Poca energía, pero nunca para: ni de noche, ni con polvo. En el nivel 3 se vuelve Kilopower: +4.","Peu d'énergie, mais elle ne s'arrête jamais : ni la nuit, ni dans la poussière. Au niveau 3, elle devient Kilopower : +4."

@@ -44,10 +44,10 @@ func _ready() -> void:
 	box.set_border_width_all(6)
 	box.shadow_offset = Vector2(0, 12)
 	box.shadow_size = 6
-	box.content_margin_left = 26
-	box.content_margin_right = 26
-	box.content_margin_top = 26
-	box.content_margin_bottom = 26
+	box.content_margin_left = 32
+	box.content_margin_right = 32
+	box.content_margin_top = 32
+	box.content_margin_bottom = 32
 	_card.add_theme_stylebox_override("panel", box)
 	_card.custom_minimum_size = Vector2(640, 0)
 	centro.add_child(_card)
@@ -62,7 +62,7 @@ func _ready() -> void:
 	pbox.border_color = Palette.GOLD
 	pbox.set_border_width_all(4)
 	palco.add_theme_stylebox_override("panel", pbox)
-	palco.custom_minimum_size = Vector2(0, 320)
+	palco.custom_minimum_size = Vector2(0, 288)
 	col.add_child(palco)
 	_spin = Node3D.new()
 	_stage_tex = Icons3D.render(self, _spin, 384, 1.9, true, Vector3(1.0, 0.75, 2.2))
@@ -91,7 +91,7 @@ func _ready() -> void:
 
 	# O botão principal: grande, dourado, sozinho.
 	_btn_construir = Button.new()
-	_btn_construir.custom_minimum_size = Vector2(0, 108)
+	_btn_construir.custom_minimum_size = Vector2(0, 112)
 	_btn_construir.add_theme_font_size_override("font_size", 38)
 	_btn_construir.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_btn_construir.expand_icon = true

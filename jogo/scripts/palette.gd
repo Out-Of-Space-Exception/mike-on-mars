@@ -90,7 +90,9 @@ static func key(color: Color, pressed := false) -> StyleBoxFlat:
 	b.border_width_right = 4
 	b.border_width_top = 4
 	b.border_width_bottom = 4 if pressed else 12
-	b.content_margin_top = 18 if pressed else 10
+	b.content_margin_left = 24
+	b.content_margin_right = 24
+	b.content_margin_top = 16 if pressed else 8
 	b.content_margin_bottom = 8
 	return b
 
@@ -100,10 +102,10 @@ static func plate(stripe := false) -> StyleBoxFlat:
 	var b := _box(PLATE, 8)
 	b.set_border_width_all(3)
 	b.border_color = PLATE_EDGE
-	b.content_margin_left = 34
-	b.content_margin_right = 34
-	b.content_margin_top = 26 + (STRIPE_H if stripe else 0.0)
-	b.content_margin_bottom = 26
+	b.content_margin_left = 32
+	b.content_margin_right = 32
+	b.content_margin_top = 32 + (STRIPE_H if stripe else 0.0)
+	b.content_margin_bottom = 32
 	return b
 
 
@@ -115,10 +117,10 @@ static func paper(edge: Color = INK) -> StyleBoxFlat:
 	b.shadow_color = Color(INK, 0.45)
 	b.shadow_size = 0
 	b.shadow_offset = Vector2(6, 8)
-	b.content_margin_left = 30
-	b.content_margin_right = 30
-	b.content_margin_top = 24
-	b.content_margin_bottom = 24
+	b.content_margin_left = 32
+	b.content_margin_right = 32
+	b.content_margin_top = 32
+	b.content_margin_bottom = 32
 	return b
 
 

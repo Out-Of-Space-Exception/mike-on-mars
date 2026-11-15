@@ -95,6 +95,7 @@ const PACKAGE_CARDS := [4, 40]      # o pacote da Terra traz batata e depois tom
 # Expedição: o Mike sai da base e volta com um tubo de amostra
 const EXPLORE_SOLS := 4             # fica fora 4 sóis (~10 s)
 const EXPLORE_OXYGEN := 30.0        # o traje gasta oxigênio (bastante: nada de sair toda hora)
+const EXPLORE_EMPTY_CHANCE := 0.1   # às vezes o Mike volta sem nada (nunca duas vezes seguidas, nunca no tutorial)
 const EXPLORE_MIN_SHIELD := 25.0     # com o escudo baixo, lá fora tem radiação demais
 const EXPLORE_RADIATION := 5.0      # lá fora a radiação come um pouco do escudo
 const TUBE_ODDS := {"comum": 60, "raro": 27, "épico": 10, "lendário": 3}   # em %
@@ -139,7 +140,8 @@ var cold_heated := false
 var nosignal_left := 0
 var nosignal_plan := ""
 var explore_left := 0            # sóis que faltam para o Mike voltar
-var storm_warned := false       # a antena já avisou a próxima tempestade
+var storm_warned := false
+var last_empty := false         # a última expedição voltou sem nada       # a antena já avisou a próxima tempestade
 var snack := ""                 # o lanche (uma colheita) que o Mike levou na expedição de agora
 var music_on := true
 var sounds_on := true
@@ -173,6 +175,9 @@ func _ready() -> void:
 	# Atalho para testar e gravar o vídeo: abrir o link com ?tempestade traz a tempestade em 2 sóis.
 	if OS.has_feature("web") and str(JavaScriptBridge.eval("location.search", true)).contains("tempestade"):
 		next_storm_sol = sol + 2
+	# Atalho para testar e gravar o vídeo: ?tubo traz um tubo de amostra esperando para abrir.
+	if OS.has_feature("web") and str(JavaScriptBridge.eval("location.search", true)).contains("tubo") and tube_card == 0:
+		tube_card = _draw_tube()
 
 
 func card_info(id: int) -> Dictionary:
@@ -952,7 +957,18 @@ func _tick() -> void:
 	if explore_left > 0:
 		explore_left -= 1
 		if explore_left == 0:
-			tube_card = _draw_tube()
+			if tutorial >= TUTORIAL_DONE and not last_empty and randf() < EXPLORE_EMPTY_CHANCE:
+				# Voltou sem nada: o lanche volta para a mochila (a criança não perde duas vezes).
+				last_empty = true
+				tube_card = 0
+				if snack != "":
+					inventory[snack] = int(inventory.get(snack, 0)) + 1
+				snack = ""
+				if not _offline:
+					event_message.emit("EXPLORE_EMPTY", "")
+			else:
+				last_empty = false
+				tube_card = _draw_tube()
 			if not _offline:
 				explore_returned.emit(tube_card)
 	if dust_left > 0:
@@ -1064,7 +1080,7 @@ func _ready_plants() -> int:
 const _SAVED := ["energy", "oxygen", "shield", "sol", "items", "cards", "harvests", "inventory", "locale", "paused",
 	"pending_event", "next_storm_sol", "storms_seen", "storm_left", "storm_shielded", "storm_event",
 	"next_event_sol", "dust_left", "cold_left", "cold_heated", "nosignal_left", "nosignal_plan",
-	"explore_left", "tube_card", "tutorial", "music_on", "sounds_on", "snack"]
+	"explore_left", "tube_card", "tutorial", "music_on", "sounds_on", "snack", "last_empty"]
 
 
 func save_game() -> void:
