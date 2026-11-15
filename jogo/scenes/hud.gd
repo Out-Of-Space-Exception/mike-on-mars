@@ -1706,6 +1706,8 @@ func _style_key(b: Button, enabled: bool) -> void:
 ## O nome de cada botão de baixo cabe numa linha (diminui a letra se precisar, como em "Construire").
 func _fit_button_texts() -> void:
 	for k in _btn_labels:
+		if not _buttons.has(k):
+			continue
 		var lb: Label = _btn_labels[k]
 		var room: float = _buttons[k].size.x - 18.0
 		if room < 40.0:
