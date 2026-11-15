@@ -14,7 +14,7 @@ Mike on Mars is a free browser game for kids aged 7 to 12. Players help astronau
 - **Build:** tap an item, then tap the ground. Items can be moved, removed and upgraded.
 - **Plant:** grow real space crops in the greenhouse, like lettuce, radish and Hatch chile. The greenhouse lights use energy.
 - **Explore:** Mike uses oxygen to explore and comes back with a sample tube. The tube shakes, glows in the color of its rarity and opens a card.
-- **40 cards** in 4 rarities (common, rare, epic, legendary). Each card has a real name, a NASA photo and a 1-line fact.
+- **36 cards** in 4 rarities (common, rare, epic, legendary). Each card has a real name, a NASA photo and a 1-line fact.
 - **Events** always have a bad side and a good side. Example: in a solar storm, raising the shield uses energy, but a shielded player may win the legendary "Aurora on Mars" card. Other events: dust storm, dust devil, freezing night and no signal from Earth.
 - **Real trade-off:** solar panels give lots of energy but suffer from dust; the nuclear battery (RTG) gives a little energy but never stops.
 - **No game over.** A low bar only slows or pauses an action until it recovers. The game pauses when the player has to choose. There is no timer.
@@ -45,7 +45,7 @@ Mike on Mars is a free browser game for kids aged 7 to 12. Players help astronau
 - How the game uses it: each solar storm in the game is a real 2024 event and shows its real date. The player chooses: raise the shield (uses energy) or keep Mike inside. The first storm is always the one of May 20, 2024, which the Curiosity rover measured in Gale Crater.
 - This is archived data, not live. The game says so on its "NASA data" screen.
 
-**2. Facts and photos on the 40 cards**
+**2. Facts and photos on the 36 cards**
 - Every card fact comes from a NASA page (nasa.gov, science.nasa.gov or jpl.nasa.gov). The game links each card to its source.
 - Sources, card by card:
   - Lettuce: https://www.nasa.gov/mission_pages/station/research/news/veggie

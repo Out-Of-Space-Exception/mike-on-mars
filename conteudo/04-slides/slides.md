@@ -38,7 +38,7 @@ Imagem: print com as 3 barras e o aviso de tempestade solar.
 ## 5. NASA data
 **Real NASA science inside**
 - 140 real solar storms from 2024, from NASA's DONKI database. Archived data, not live.
-- 40 cards, each with a real NASA photo and a 1-line fact.
+- 36 cards, each with a real NASA photo and a 1-line fact.
 - Example: MOXIE made 122 g of oxygen from Mars air.
 
 Sources: DONKI (https://kauai.ccmc.gsfc.nasa.gov/DONKI/) · nasa.gov · science.nasa.gov · jpl.nasa.gov
