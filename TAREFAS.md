@@ -28,7 +28,7 @@
 - [ ] 18h30 · [Texto da página do projeto](conteudo/06-pagina-do-projeto/PASSO.md)
 - [x] 19h · [Roteiro do vídeo](conteudo/07-roteiro-do-video/PASSO.md)
 - [x] 19h30 · [Cenas e créditos](conteudo/08-cenas-e-creditos/PASSO.md)
-- [ ] 20h · [Teste no celular](conteudo/09-teste-no-celular/PASSO.md)
+- [x] 20h · [Teste no celular](conteudo/09-teste-no-celular/PASSO.md) — rodada encerrada; resultados e limites no [relatorio](conteudo/09-teste-no-celular/bugs.md).
 
 ## 💻 Dev · Filipe e João · até 7h de domingo
 
@@ -62,3 +62,5 @@
 - [ ] **Dev → todos:** o código agora é todo em inglês (nomes e comentários), inclusive os scripts do Design e as ferramentas. Os nomes de arquivos de modelos, sons e pastas continuam iguais.
 - [x] **Design → Conteúdo:** criar a carta **41 · Rocknest 3** (comum, tubo de amostra, Gale) no `cartas.csv`, com um fato de fonte oficial. A foto e a carta pronta estão em [design/05-telas/cartas-descobertas/](design/05-telas/cartas-descobertas/leiame.md). As cartas 26, 32, 34 e 35 ganharam fotos novas lá também, se quiserem trocar. **Design:** criada, com o fato da legenda da NASA. Status CONFERIR para o Conteúdo revisar o texto.
 - [ ] **Design → Dev:** sementes e pacote da Terra (em `state.gd`, constantes `START_SEEDS`, `PACKAGE_EVERY`, `PACKAGE_SEEDS`, `PACKAGE_CARDS_BY` e `HARVEST_SEEDS`). A criança começa com 5 sementes de alface; os pacotes só chegam com a **antena construída**: cada um traz 3 sementes sorteadas e chega quando o "Sem sinal" acaba ou depois de 150 sóis sem pacote (no "Sem sinal" a contagem pausa; tocar na antena mostra quantos sóis e quanto tempo faltam); cada colheita devolve 1 a 3 sementes. A regra de liberar plantas por colheitas continua. Batata e tomate vêm sorteados até o 5º pacote. Conferir e marcar `[x]`.
+
+- [ ] **Conteudo → Dev:** investigar os quatro problemas relatados no Redmi Note 11S/Firefox: camera presa embaixo do planeta apos casa nivel 2 (persiste ao reabrir), album sem rolagem, lentidao ao explorar e ao abrir tubos. Reproducao e limites do teste em [bugs.md](conteudo/09-teste-no-celular/bugs.md).
