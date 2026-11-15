@@ -4,6 +4,15 @@ a=sys.argv[sys.argv.index('--')+1:]; IN,OUT=a[0],a[1]; PREV=a[2] if len(a)>2 els
 bpy.ops.wm.read_factory_settings(use_empty=True); bpy.ops.import_scene.gltf(filepath=IN)
 arm=[o for o in bpy.data.objects if o.type=='ARMATURE'][0]
 if 'Icosphere' in bpy.data.objects: bpy.data.objects.remove(bpy.data.objects['Icosphere'])
+# ---- martelo low-poly na mão direita (a Dev mostra o nó "Martelo" só durante "construir") ----
+def _mat(n,c):
+    m=bpy.data.materials.new(n); m.use_nodes=True; m.node_tree.nodes['Principled BSDF'].inputs['Base Color'].default_value=(*c,1); m.node_tree.nodes['Principled BSDF'].inputs['Roughness'].default_value=0.7; return m
+hb=arm.data.bones['RightHand']; hp=arm.matrix_world@hb.head_local; hd=(arm.matrix_world.to_3x3()@(hb.tail_local-hb.head_local)).normalized()
+c0=hp+hd*0.12
+bpy.ops.mesh.primitive_cylinder_add(vertices=8,radius=0.045,depth=0.85,location=c0+M.Vector((0,-0.3,0)),rotation=(math.radians(90),0,0)); cabo=bpy.context.object; cabo.data.materials.append(_mat('martelo-cabo',(0.36,0.17,0.07)))
+bpy.ops.mesh.primitive_cube_add(size=1,location=c0+M.Vector((0,-0.72,0))); cab=bpy.context.object; cab.scale=(0.13,0.13,0.36); cab.data.materials.append(_mat('martelo-cabeca',(0.55,0.56,0.6)))
+bpy.ops.object.select_all(action='DESELECT'); cabo.select_set(True); cab.select_set(True); bpy.context.view_layer.objects.active=cabo; bpy.ops.object.join(); cabo.name='Martelo'
+bpy.context.view_layer.update(); _mw=cabo.matrix_world.copy(); cabo.parent=arm; cabo.parent_type='BONE'; cabo.parent_bone='RightHand'; cabo.matrix_world=_mw
 bpy.context.view_layer.objects.active=arm; bpy.ops.object.mode_set(mode='POSE')
 arm.animation_data_create()
 for t in arm.animation_data.nla_tracks: t.mute=True
