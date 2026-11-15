@@ -1,0 +1,21 @@
+keys,pt_BR,en,es,fr
+D_SHELF,Estante,Display shelf,Estante,Étagère
+D_SHELF_DESC,Mostre as plantas e pedras de Marte que você achou.,Show off the plants and Mars rocks you found.,Muestra las plantas y rocas de Marte que encontraste.,Montre les plantes et les roches de Mars que tu as trouvées.
+BTN_SHELF,Ver estante,View shelf,Ver estante,Voir l'étagère
+NEED_HOUSE_2,Melhore a Casa do Mike para o nível 2.,Upgrade Mike's house to level 2.,Mejora la casa de Mike al nivel 2.,Améliore la maison de Mike au niveau 2.
+SHELF_TITLE,Sua estante,Your shelf,Tu estante,Ton étagère
+SHELF_PICK,O que vai no espaço {n}?,What goes in spot {n}?,¿Qué va en el espacio {n}?,Que mettre à la place {n} ?
+SHELF_EMPTY,Vazio,Empty,Vacío,Vide
+SHELF_MORE,Casa do Mike no último nível: mais 3 espaços!,Mike's house at the top level: 3 more spots!,Casa de Mike en el último nivel: ¡3 espacios más!,Maison de Mike au dernier niveau : 3 places de plus !
+SHELF_SLOT_LOCKED,Casa nível 3,House level 3,Casa nivel 3,Maison niveau 3
+SHELF_HINT,??? = ainda não achou. Explore para achar pedras e colha plantas na estufa.,??? = not found yet. Explore to find rocks and harvest plants in the greenhouse.,??? = aún no lo encontraste. Explora para hallar rocas y cosecha plantas en el invernadero.,??? = pas encore trouvé. Explore pour trouver des roches et récolte des plantes dans la serre.
+SHELF_HEMATITA,Hematita,Hematite,Hematita,Hématite
+SHELF_ENXOFRE,Enxofre,Sulfur,Azufre,Soufre
+SHELF_LEOPARDO,Manchas de leopardo,Leopard spots,Manchas de leopardo,Taches de léopard
+SHELF_VEIOS_BRANCOS,Veios brancos,White veins,Vetas blancas,Veines blanches
+SHELF_ROCKNEST_3,Rocknest 3,Rocknest 3,Rocknest 3,Rocknest 3
+SHELF_OXIDO_DE_MANGANES,Óxido de manganês,Manganese oxide,Óxido de manganeso,Oxyde de manganèse
+SHELF_JOHN_KLEIN_A,John Klein: pedra A,John Klein: rock A,John Klein: roca A,John Klein : roche A
+SHELF_JOHN_KLEIN_B,John Klein: pedra B,John Klein: rock B,John Klein: roca B,John Klein : roche B
+SHELF_JOHN_KLEIN_C,John Klein: pedra C,John Klein: rock C,John Klein: roca C,John Klein : roche C
+SHELF_METEORITO_LEBANON,Meteorito Lebanon,Lebanon meteorite,Meteorito Lebanon,Météorite Lebanon
