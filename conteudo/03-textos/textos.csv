@@ -154,3 +154,10 @@ MIKE_1,Oi! Bora explorar a cratera?,Hi! Want to explore the crater?,¡Hola! ¿Ex
 MIKE_2,Planta faz oxigênio pra mim respirar!,Plants make oxygen so I can breathe!,¡Las plantas hacen oxígeno para que yo respire!,Les plantes font de l'oxygène pour que je respire !
 MIKE_3,"Se vier tempestade solar, eu me escondo!","If a solar storm comes, I hide!","¡Si viene una tormenta solar, me escondo!","Si une tempête solaire arrive, je me cache !"
 MIKE_4,"Lá longe é o Monte Sharp, com 5 km de altura!","Far away is Mount Sharp, 5 km tall!","¡Allá lejos está el Monte Sharp, de 5 km de altura!","Là-bas, c'est le mont Sharp, haut de 5 km !"
+SET_TITLE,Configurações,Settings,Ajustes,Réglages
+SET_LANG,Idioma,Language,Idioma,Langue
+SET_MUSIC,Música,Music,Música,Musique
+SET_SOUNDS,Sons,Sounds,Sonidos,Sons
+SET_ON,ligada,on,encendida,activée
+SET_OFF,desligada,off,apagada,désactivée
+SET_TUTORIAL,Ver o tutorial de novo,See the tutorial again,Ver el tutorial otra vez,Revoir le tutoriel

@@ -124,6 +124,8 @@ var cold_heated := false
 var nosignal_left := 0
 var nosignal_plan := ""
 var explore_left := 0            # sóis que faltam para o Mike voltar
+var music_on := true
+var sounds_on := true
 var tutorial := 0               # passo do tutorial do primeiro minuto (TUTORIAL_DONE = terminou)
 const TUTORIAL_DONE := 99
 var tube_card := 0               # carta dentro do tubo que ainda não foi aberto (0 = nenhum)
@@ -228,12 +230,18 @@ func card_hint(id: int) -> String:
 	return tr("HOW_TUBE")
 
 
+## No tutorial, o tempo fica parado enquanto o Mike espera a criança (sem pressa, sem barra caindo).
+## Ele só anda quando o Mike sai para explorar, para ele poder voltar com o tubo.
+func tutorial_holds_time() -> bool:
+	return tutorial < TUTORIAL_DONE and not exploring()
+
+
 func start() -> void:
 	started = true
 
 
 func _process(delta: float) -> void:
-	if paused or not started:
+	if paused or not started or tutorial_holds_time():
 		return
 	_sol_timer += delta
 	while _sol_timer >= SOL_SECONDS:
@@ -724,6 +732,8 @@ func _start_event() -> void:
 	if type == "dust":
 		dust_left = DUST_SOLS
 		_reward_once(CARD_DUST)
+		# O redemoinho que limpa os painéis vem enquanto eles ainda estão sujos (antes, nunca dava tempo).
+		next_event_sol = sol + randi_range(5, DUST_SOLS - 4)
 	elif type == "devil":
 		dust_left = 0
 		_reward_once(CARD_DEVIL)
@@ -953,7 +963,7 @@ func _ready_plants() -> int:
 const _SAVED := ["energy", "oxygen", "shield", "sol", "items", "cards", "harvests", "inventory", "locale", "paused",
 	"pending_event", "next_storm_sol", "storms_seen", "storm_left", "storm_shielded", "storm_event",
 	"next_event_sol", "dust_left", "cold_left", "cold_heated", "nosignal_left", "nosignal_plan",
-	"explore_left", "tube_card", "tutorial"]
+	"explore_left", "tube_card", "tutorial", "music_on", "sounds_on"]
 
 
 func save_game() -> void:

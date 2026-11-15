@@ -68,6 +68,16 @@ var _card_fact: Label
 var _card_photo: TextureRect
 var _card_frame: TextureRect
 var _info_construcao: Control
+var _icon_cache := {}         # ícones 3D já desenhados
+var _settings: PanelContainer
+var _set_title: Label
+var _set_lang: Label
+var _set_flags: HBoxContainer
+var _set_music: Button
+var _set_sounds: Button
+var _set_tutorial: Button
+var _set_nasa: Button
+var _gear: Button
 # Tutorial do primeiro minuto: recado fixo do Mike no topo + seta dourada em cima do que tocar.
 var _tut_card: PanelContainer
 var _tut_label: Label
@@ -118,8 +128,11 @@ func _ready() -> void:
 	_build_popups()
 	# Painel de informação da construção (Design 05): abre ao tocar num item do menu Construir.
 	_info_construcao = preload("res://scenes/info_construcao.gd").new()
+	_info_construcao.icons = {"energy": _icon("energy"), "oxygen": _icon("oxygen"), "shield": _icon("shield"), "card": _icon("card")}
+	_info_construcao.model_for = func(type: String) -> Node3D: return _item_model(type, 1.25)
 	_root.add_child(_info_construcao)
 	_info_construcao.construir.connect(_on_build_item)
+	_build_settings()
 	_build_postcard()
 	_build_tutorial()
 	_build_start()
@@ -216,7 +229,7 @@ func _lang_menu() -> PopupMenu:
 	_lang_popup.clear()
 	# Português primeiro (o time é do Brasil), depois os outros.
 	for l in ["pt_BR", "en", "es", "fr"]:
-		_lang_popup.add_icon_item(load(LANG_FLAGS[l]), LANG_LABELS[l], LANGS.find(l))
+		_lang_popup.add_icon_item(_icon("flag_" + l), LANG_LABELS[l], LANGS.find(l))
 	_lang_popup.set_focused_item(_lang_popup.get_item_index(LANGS.find(State.locale)))
 	return _lang_popup
 
@@ -389,8 +402,7 @@ func _refresh_panel() -> void:
 		row.add_theme_constant_override("separation", 6)
 		chip.add_child(row)
 		var ic := TextureRect.new()
-		ic.texture = load(BAR_ICONS[bar])
-		ic.modulate = Palette.BAR[bar]
+		ic.texture = _icon(bar)
 		ic.custom_minimum_size = Vector2(30, 30)
 		ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -435,7 +447,7 @@ func _refresh_panel() -> void:
 	var cost := State.upgrade_cost(selected)
 	if cost >= 0:
 		var up := _add_panel_button("%s  -%d" % [tr("BTN_UPGRADE"), cost], _on_upgrade, true)
-		up.icon = load(BAR_ICONS.energy)
+		up.icon = _icon("energy")
 		up.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		up.modulate = Color.WHITE if State.upgrade_block_reason(selected) == "" else Color(1, 1, 1, 0.55)
 	_add_panel_button(tr("BTN_MOVE"), _on_move)
@@ -744,7 +756,7 @@ func _refresh() -> void:
 		_bar_fill[bar].bg_color = Palette.ALERT if value < State.LOW else Palette.BAR[bar]
 	_sol_label.text = "%s  •  %s" % [tr("HUD_SOL").format({"n": State.sol}), tr("HUD_PLACE")]
 	_start_lang.text = LANG_NAMES.get(State.locale, "EN")
-	_start_lang.icon = load(LANG_FLAGS.get(State.locale, LANG_FLAGS.en))
+	_start_lang.icon = _icon("flag_" + State.locale)
 	_start_play.text = tr("BTN_PLAY")
 	_start_nasa.text = tr("BTN_NASA")
 	_buttons.build.text = tr("BTN_BUILD")
@@ -887,11 +899,16 @@ func _refresh_build_menu() -> void:
 		if not State.is_unlocked(type):
 			continue
 		var b := Button.new()
-		b.custom_minimum_size = Vector2(0, 100)
+		b.custom_minimum_size = Vector2(0, 178)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		b.add_theme_font_size_override("font_size", 22)
+		b.add_theme_font_size_override("font_size", 21)
 		b.text = tr(def.name) + ("\n-%d" % def.cost if def.cost > 0 else "")
+		b.icon = _thumb(type)
+		b.expand_icon = true
+		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+		b.add_theme_constant_override("icon_max_width", 104)
 		b.modulate = Color.WHITE if State.build_block_reason(type) == "" else Color(1, 1, 1, 0.5)
 		if type in _info_construcao.COM_INFO:
 			b.pressed.connect(_open_build_info.bind(type))
@@ -907,7 +924,7 @@ func _open_build_info(type: String) -> void:
 
 
 func _update_dim() -> void:
-	_dim.visible = _choice.visible or _info.visible or _card.visible or _tube.visible or _nasa.visible
+	_dim.visible = _choice.visible or _info.visible or _card.visible or _tube.visible or _nasa.visible or (_settings != null and _settings.visible)
 
 
 ## Recado do Mike no topo da tela, como notificação de celular: desce, fica um pouco e sobe.
@@ -915,6 +932,7 @@ func _update_dim() -> void:
 func _show_toast(text: String, shake := false) -> void:
 	_toast_label.text = text
 	move_child(_toast, get_child_count() - 1)   # sempre por cima de tudo
+	_toast_label.custom_minimum_size.x = get_viewport().get_visible_rect().size.x - 32.0 - 42.0 - 76.0 - 16.0
 	_toast_style.border_color = Palette.ALERT if shake else Palette.GOLD
 	var w := get_viewport().get_visible_rect().size.x
 	_toast.custom_minimum_size.x = w - 32.0
@@ -1041,7 +1059,10 @@ func _tut_update() -> void:
 	_tut_label.text = text
 	_tut_skip.text = tr("TUTO_SKIP")
 	_tut_skip.visible = s < 5
-	_tut_card.custom_minimum_size.x = get_viewport().get_visible_rect().size.x - 32.0
+	var w := get_viewport().get_visible_rect().size.x - 32.0
+	_tut_card.custom_minimum_size.x = w
+	_tut_label.custom_minimum_size.x = w - 36.0 - 84.0 - 28.0 - (_tut_skip.get_minimum_size().x + 14.0 if s < 5 else 0.0)
+	_tut_card.size = Vector2(w, 0.0)
 	_tut_card.reset_size()
 	if not _tut_card.visible:
 		_tut_card.visible = true
@@ -1104,6 +1125,179 @@ func _process(delta: float) -> void:
 		_tut_arrow.position = p - Vector2(_tut_arrow.size.x / 2.0, _tut_arrow.size.y + 6.0 + bob)
 
 
+# ───────────── Ícones em 3D ─────────────
+## Todos os ícones do jogo são pecinhas 3D (scripts/icons3d.gd), desenhadas uma vez e guardadas.
+func _icon(key: String) -> Texture2D:
+	if _icon_cache.has(key):
+		return _icon_cache[key]
+	var model: Node3D
+	match key:
+		"energy":
+			model = Icons3D.energy()
+		"oxygen":
+			model = Icons3D.oxygen()
+		"shield":
+			model = Icons3D.shield()
+		"build":
+			model = Icons3D.hammer()
+		"explore":
+			model = Icons3D.tube()
+		"album":
+			model = Icons3D.cards(_frames(["comum", "raro", "lendario"]))
+		"card":
+			model = Icons3D.cards(_frames(["lendario"]))
+		"photo":
+			model = Icons3D.camera()
+		"settings":
+			model = Icons3D.gear()
+		"nasa":
+			model = _item_model("antenna", 1.0)
+		_:
+			if key.begins_with("flag_"):
+				model = Icons3D.flag(load(LANG_FLAGS.get(key.trim_prefix("flag_"), LANG_FLAGS.en)))
+			else:
+				model = Node3D.new()
+	_icon_cache[key] = Icons3D.render(self, model, 160, 1.3)
+	return _icon_cache[key]
+
+
+func _frames(names: Array) -> Array:
+	var out := []
+	for n in names:
+		var path := "res://ui/frames/moldura-carta-%s.png" % n
+		out.append(load(path) if ResourceLoader.exists(path) else null)
+	return out
+
+
+## O modelo 3D de uma construção (nível 1), no meio, para miniatura e para o painel que gira.
+func _item_model(type: String, fit := 1.0) -> Node3D:
+	var holder := Node3D.new()
+	var file := State.model_file(State.ITEMS[type].get("model", ""), 1)
+	var m: Node3D = base._load_model(file, fit, fit)
+	if m:
+		var box: AABB = base._merged_aabb(m)
+		m.position.y -= (box.position.y + box.size.y / 2.0) * m.scale.y
+		holder.add_child(m)
+	return holder
+
+
+## Miniatura 3D de cada item do menu Construir (a criança vê o que é antes de tocar).
+func _thumb(type: String) -> Texture2D:
+	var k := "thumb_" + type
+	if not _icon_cache.has(k):
+		_icon_cache[k] = Icons3D.render(self, _item_model(type), 160, 1.25, false, Vector3(1.0, 0.85, 1.7))
+	return _icon_cache[k]
+
+
+# ───────────── Configurações (engrenagem no canto) ─────────────
+func _build_settings() -> void:
+	_settings = _popup(620, "paper")
+	var sbox: VBoxContainer = _settings.get_child(0)
+	sbox.add_theme_constant_override("separation", 18)
+	var head := HBoxContainer.new()
+	sbox.add_child(head)
+	_set_title = _title_label(42)
+	_set_title.add_theme_color_override("font_color", Palette.BG)
+	_set_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_set_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(_set_title)
+	head.add_child(_red_x(func() -> void:
+		_settings.visible = false
+		_update_dim()))
+	_set_lang = _wrap_label("", 28)
+	_set_lang.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_set_lang.add_theme_color_override("font_color", Palette.INK)
+	sbox.add_child(_set_lang)
+	_set_flags = HBoxContainer.new()
+	_set_flags.add_theme_constant_override("separation", 10)
+	sbox.add_child(_set_flags)
+	for l in ["pt_BR", "en", "es", "fr"]:
+		var f := Button.new()
+		f.custom_minimum_size = Vector2(0, 110)
+		f.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		f.icon = _icon("flag_" + l)
+		f.expand_icon = true
+		f.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		f.set_meta("lang", l)
+		f.pressed.connect(func() -> void:
+			Sfx.play("toque-botao")
+			State.set_locale(l)
+			_refresh_settings())
+		_set_flags.add_child(f)
+	_set_music = _key_button(func() -> void:
+		State.music_on = not State.music_on
+		Sfx.apply_settings()
+		State.save_game()
+		_refresh_settings())
+	sbox.add_child(_set_music)
+	_set_sounds = _key_button(func() -> void:
+		State.sounds_on = not State.sounds_on
+		State.save_game()
+		Sfx.play("toque-botao")
+		_refresh_settings())
+	sbox.add_child(_set_sounds)
+	_set_tutorial = _key_button(func() -> void:
+		_settings.visible = false
+		_update_dim()
+		State.tutorial = 0
+		_tut_update(), true)
+	sbox.add_child(_set_tutorial)
+	_set_nasa = _key_button(func() -> void:
+		_settings.visible = false
+		_on_nasa(), true)
+	sbox.add_child(_set_nasa)
+
+
+func _open_settings() -> void:
+	Sfx.play("abrir-menu")
+	_build_menu.visible = false
+	_close_panel()
+	_refresh_settings()
+	_settings.visible = true
+	_update_dim()
+
+
+func _refresh_settings() -> void:
+	if _settings == null:
+		return
+	_set_title.text = tr("SET_TITLE")
+	_set_lang.text = tr("SET_LANG")
+	for f in _set_flags.get_children():
+		var on: bool = f.get_meta("lang") == State.locale
+		for s in ["normal", "hover", "pressed", "focus"]:
+			f.add_theme_stylebox_override(s, Palette.key(Palette.GOLD if on else Palette.BUTTON, s == "pressed"))
+	for pair in [[_set_music, "SET_MUSIC", State.music_on], [_set_sounds, "SET_SOUNDS", State.sounds_on]]:
+		var b: Button = pair[0]
+		b.text = "%s: %s" % [tr(pair[1]), tr("SET_ON" if pair[2] else "SET_OFF")]
+		for s in ["normal", "hover", "disabled"]:
+			b.add_theme_stylebox_override(s, Palette.key(Palette.GOLD if pair[2] else Palette.BUTTON))
+		b.add_theme_stylebox_override("pressed", Palette.key(Palette.GOLD if pair[2] else Palette.BUTTON, true))
+	_set_tutorial.text = tr("SET_TUTORIAL")
+	_set_nasa.text = tr("BTN_NASA")
+	_set_nasa.icon = _icon("nasa")
+	_set_nasa.expand_icon = true
+	_set_nasa.add_theme_constant_override("icon_max_width", 64)
+
+
+## Botão redondo vermelho com X: fecha a janela (fica no canto de cima, à direita, longe do botão principal).
+func _red_x(action: Callable) -> Button:
+	var x := Button.new()
+	x.text = "X"
+	x.custom_minimum_size = Vector2(76, 76)
+	x.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	x.add_theme_font_size_override("font_size", 38)
+	for c in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
+		x.add_theme_color_override(c, Color.WHITE)
+	var xb := Palette._box(Palette.ALERT, 38)
+	xb.border_color = Color.WHITE
+	xb.set_border_width_all(4)
+	for s in ["normal", "hover", "pressed", "focus"]:
+		x.add_theme_stylebox_override(s, xb)
+	x.pressed.connect(action)
+	_juice(x)
+	return x
+
+
 ## Todo botão responde na hora: afunda quando aperta e quica quando solta (pesquisa, item 16).
 func _juice(b: Button) -> void:
 	b.resized.connect(func() -> void: b.pivot_offset = b.size / 2.0)
@@ -1133,12 +1327,10 @@ func _build_top() -> void:
 		row.add_theme_constant_override("separation", 14)
 		rows.add_child(row)
 		var icon := TextureRect.new()
-		icon.custom_minimum_size = Vector2(44, 44)
+		icon.custom_minimum_size = Vector2(54, 54)
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		if ResourceLoader.exists(BAR_ICONS[bar]):
-			icon.texture = load(BAR_ICONS[bar])
-		icon.modulate = Palette.BAR[bar]
+		icon.texture = _icon(bar)
 		row.add_child(icon)
 		var label := Label.new()
 		label.custom_minimum_size = Vector2(150, 0)
@@ -1183,7 +1375,26 @@ func _build_top() -> void:
 	pill.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	pill.add_theme_stylebox_override("panel", Palette.paper(Palette.GOLD.darkened(0.25)))
 	pill.rotation_degrees = -2.0
-	top.add_child(pill)
+	pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var pill_row := HBoxContainer.new()
+	pill_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	top.add_child(pill_row)
+	pill_row.add_child(pill)
+	var gap := Control.new()
+	gap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pill_row.add_child(gap)
+	_gear = Button.new()
+	_gear.custom_minimum_size = Vector2(96, 96)
+	_gear.icon = _icon("settings")
+	_gear.expand_icon = true
+	_gear.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	for s in ["normal", "hover", "focus"]:
+		_gear.add_theme_stylebox_override(s, Palette.key(Palette.BUTTON))
+	_gear.add_theme_stylebox_override("pressed", Palette.key(Palette.BUTTON, true))
+	_gear.pressed.connect(_open_settings)
+	_juice(_gear)
+	pill_row.add_child(_gear)
 	_sol_label = Label.new()
 	_sol_label.add_theme_font_size_override("font_size", 28)
 	_sol_label.add_theme_color_override("font_color", Palette.INK)
@@ -1310,13 +1521,11 @@ func _build_bottom() -> void:
 		for s in ["normal", "hover", "disabled"]:
 			b.add_theme_stylebox_override(s, Palette.key(color))
 		b.add_theme_stylebox_override("pressed", Palette.key(color, true))
-		if ICONS.has(k) and ResourceLoader.exists(ICONS[k]):
-			b.icon = load(ICONS[k])
-			b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-			b.add_theme_constant_override("icon_max_width", 64 if main_action else 52)
-			for ic in ["icon_normal_color", "icon_hover_color", "icon_pressed_color", "icon_focus_color"]:
-				b.add_theme_color_override(ic, Palette.INK)
+		b.icon = _icon(k)
+		b.expand_icon = true
+		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+		b.add_theme_constant_override("icon_max_width", 84 if main_action else 70)
 		_juice(b)
 		row.add_child(b)
 		_buttons[k] = b

@@ -95,6 +95,7 @@ func _eventos() -> void:
 	ok(State.cards.has("4"), "quando o sinal volta, o pacote traz a carta Batata")
 	_forcar_evento("dust")
 	ok(State.dust_left > 0 and hud._info.visible, "tempestade de poeira suja os painéis e avisa")
+	ok(State.next_event_sol - State.sol < State.DUST_SOLS, "depois da poeira, o redemoinho vem enquanto o painel ainda está sujo")
 	hud._on_info_ok()
 	_forcar_evento("devil")
 	ok(State.dust_left == 0 and State.cards.has("22"), "o redemoinho limpa os painéis e dá a carta")
@@ -341,6 +342,12 @@ func _tutorial() -> void:
 	State.open_tube()
 	hud._tut_update()
 	ok(State.tutorial == 5, "abriu o tubo: parabéns")
+	State.tutorial = 0
+	State.started = true
+	var sol_parado: int = State.sol
+	State._process(30.0)
+	ok(State.sol == sol_parado, "no tutorial, o tempo fica parado esperando a criança")
+	State.tutorial = 5
 	hud._tut_skip.pressed.emit()
 	ok(State.tutorial == State.TUTORIAL_DONE and not hud._tut_card.visible, "o tutorial termina e o recado some")
 	hud._card.visible = false

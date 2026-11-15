@@ -78,7 +78,7 @@ var _dragging := false
 
 const DRAG_START := 14.0    # pixels: menos que isso é toque, mais é arrastar
 const ZOOM_MIN := 6.0
-const ZOOM_MAX := 28.0
+const ZOOM_MAX := 50.0           # de longe dá para ver o planetinha inteiro, como uma bola
 
 # Caminho do Mike: uma grade fina (4 x 4 por casa da base) onde as construções são parede.
 const NAV_STEP := 0.5           # metros por quadradinho
@@ -99,7 +99,7 @@ var _tile_lock_mat: StandardMaterial3D
 # Planetinha: o chão é plano onde fica a base e faz a curva para baixo depois, como uma bola.
 # Ele cresce junto com a Casa do Mike (a área aberta sempre cabe no plano).
 const FLAT_BY_LEVEL := {1: 6.0, 2: 9.0, 3: 10.5}   # metros do meio até onde o chão é plano
-const PLANET := 8.0             # raio da curva depois do plano
+const PLANET := 14.0            # raio da curva depois do plano (grande: o planeta fica redondo como uma bola)
 var _flat_r := 6.0
 var _terrain_src: Array = []    # [MeshInstance3D, transform, [arrays de cada superfície], [materiais]]
 const SKY_SHADER := """
@@ -205,9 +205,11 @@ func _frame_camera() -> void:
 	if _manual_cam and not whole_grid:
 		return
 	if orbit:
-		_cam_goal = Vector3(0.0, 0.0, CAM_START)
-		_pos_goal = Vector3.ZERO
-		_size_goal = CAM_START
+		# Tela inicial: o planetinha inteiro, uma bola com a base em cima, e o céu em volta.
+		var whole := (_flat_r + PLANET) * 2.25
+		_cam_goal = Vector3(0.0, 0.0, whole)
+		_pos_goal = Vector3(0.0, -(_flat_r + PLANET) * 0.35, 0.0)
+		_size_goal = whole
 		if _cam_snap:
 			_cam_snap = false
 			_rig.position = _pos_goal
@@ -947,6 +949,8 @@ func _build_planet_bottom(radius: float, top_y: float) -> void:
 	bowl.rings = 16
 	_planet_bottom.mesh = bowl
 	_planet_bottom.position = Vector3(0.0, top_y + 0.02, 0.0)
+	# Um pouco mais funda que larga: vista de cima, em ângulo, a silhueta fica redonda como uma bola.
+	_planet_bottom.scale = Vector3(1.0, 1.3, 1.0)
 
 
 ## Altura do terreno no meio do mapa (onde fica a base), para a grade ficar rente ao chão.

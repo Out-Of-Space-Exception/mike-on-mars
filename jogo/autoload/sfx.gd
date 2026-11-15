@@ -15,6 +15,8 @@ func _ready() -> void:
 
 
 func play(sound_name: String) -> void:
+	if not State.sounds_on:
+		return
 	var stream := _load(sound_name)
 	if stream == null:
 		return
@@ -37,6 +39,13 @@ func play_music(sound_name: String) -> void:
 		add_child(_music)
 	_music.stream = stream
 	_music.play()
+	apply_settings()
+
+
+## Liga ou desliga a música (configurações). O som dos botões é conferido a cada play().
+func apply_settings() -> void:
+	if _music:
+		_music.stream_paused = not State.music_on
 
 
 func _load(sound_name: String) -> AudioStream:
