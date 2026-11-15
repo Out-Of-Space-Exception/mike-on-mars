@@ -103,7 +103,9 @@ const FRAME := {"comum": "comum", "raro": "raro", "épico": "epico", "lendário"
 var _card_source := ""
 var _card_queue: Array[int] = []
 var _card_new: Array[bool] = []
-var _card_reveal := false       # a carta que acabou de sair do tubo entra com festa    # "Carta nova!" só quando a criança acabou de ganhar
+var _card_reveal := false
+var _card_badge: PanelContainer   # selo "NOVA!" inclinado no canto da carta
+var _badge_tween: Tween       # a carta que acabou de sair do tubo entra com festa    # "Carta nova!" só quando a criança acabou de ganhar
 var _tube: PanelContainer
 var _tube_node: Node3D
 var _tube_glass: StandardMaterial3D
@@ -840,7 +842,24 @@ func _show_next_card() -> void:
 	_card.visible = true
 	_update_dim()
 	# Festa de recompensa: raios na cor da raridade girando atrás, e a carta chega girando e quicando.
-	var festive := _card_reveal or (is_new_card and int(State.cards.get(str(id), 0)) <= 1)
+	var brand_new: bool = is_new_card and int(State.cards.get(str(id), 0)) <= 1
+	_card_badge.visible = brand_new
+	if _badge_tween:
+		_badge_tween.kill()
+	if brand_new:
+		(_card_badge.get_node("Text") as Label).text = tr("CARD_NEW_BADGE")
+		_card_badge.reset_size()
+		_card_badge.pivot_offset = _card_badge.size / 2.0
+		_card_badge.scale = Vector2.ZERO
+		_badge_tween = create_tween()
+		_badge_tween.tween_interval(0.45)
+		_badge_tween.tween_property(_card_badge, "scale", Vector2.ONE * 1.25, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		_badge_tween.tween_property(_card_badge, "scale", Vector2.ONE, 0.12)
+		_badge_tween.tween_callback(func() -> void:
+			_badge_tween = create_tween().set_loops()
+			_badge_tween.tween_property(_card_badge, "scale", Vector2.ONE * 1.1, 0.45).set_trans(Tween.TRANS_SINE)
+			_badge_tween.tween_property(_card_badge, "scale", Vector2.ONE, 0.45).set_trans(Tween.TRANS_SINE))
+	var festive := _card_reveal or brand_new
 	_card_reveal = false
 	_card_rays.visible = festive
 	_card_rays.set_meta("color", color)
@@ -1689,6 +1708,8 @@ func _fit_button_texts() -> void:
 	for k in _btn_labels:
 		var lb: Label = _btn_labels[k]
 		var room: float = _buttons[k].size.x - 18.0
+		if room < 40.0:
+			continue   # o botão ainda não tem largura (antes do primeiro desenho)
 		var size := 30 if k == "explore" else 24
 		var f: Font = Palette.font(700)
 		while size > 16 and room > 0.0 and f.get_string_size(lb.text, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x > room:
@@ -1948,6 +1969,7 @@ func _build_bottom() -> void:
 			b.set_meta("label", lb)
 			_btn_labels[k] = lb
 		_style_key(b, true)
+		b.resized.connect(_fit_button_texts)   # o texto se ajusta quando o botão ganha a largura de verdade
 		_juice(b)
 		row.add_child(b)
 		_buttons[k] = b
@@ -2123,6 +2145,27 @@ func _build_popups() -> void:
 	_card_frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_card_frame.stretch_mode = TextureRect.STRETCH_SCALE
 	face.add_child(_card_frame)
+	# Selo "NOVA!": inclinado no canto de cima, à esquerda, pulsando (só em carta que a criança ainda não tinha).
+	_card_badge = PanelContainer.new()
+	var badge_box := Palette._box(Palette.ALERT, 14)
+	badge_box.border_color = Palette.INK
+	badge_box.set_border_width_all(3)
+	badge_box.content_margin_left = 16
+	badge_box.content_margin_right = 16
+	badge_box.content_margin_top = 4
+	badge_box.content_margin_bottom = 6
+	badge_box.shadow_color = Color(Palette.INK, 0.45)
+	badge_box.shadow_offset = Vector2(3, 4)
+	_card_badge.add_theme_stylebox_override("panel", badge_box)
+	_card_badge.rotation_degrees = -16.0
+	_card_badge.position = Vector2(-22, -14)
+	_card_badge.visible = false
+	var badge_text := Label.new()
+	badge_text.name = "Text"
+	badge_text.add_theme_font_override("font", Palette.font(800))
+	badge_text.add_theme_font_size_override("font_size", 30)
+	badge_text.add_theme_color_override("font_color", Color.WHITE)
+	_card_badge.add_child(badge_text)
 	_card_name = Label.new()
 	_card_name.position = Vector2(107, 92) * k
 	_card_name.size = Vector2(855, 108) * k
@@ -2140,6 +2183,7 @@ func _build_popups() -> void:
 	_card_fact.add_theme_font_size_override("font_size", 24)
 	_card_fact.add_theme_color_override("font_color", Color("3a261c"))
 	face.add_child(_card_fact)
+	face.add_child(_card_badge)
 	_card_rarity_pill = PanelContainer.new()
 	_card_rarity_pill.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	kbox.add_child(_card_rarity_pill)

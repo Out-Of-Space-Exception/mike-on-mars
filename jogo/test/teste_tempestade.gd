@@ -51,6 +51,7 @@ func _tempestade() -> void:
 	_ticks(State.STORM_SOLS)
 	ok(State.cards.has(str(State.CARD_STORM)), "ganha a carta Tempestade solar de 2024")
 	ok(hud._card.visible, "a carta aparece na tela")
+	ok(hud._card_badge.visible, "carta nova ganha o selo NOVA!")
 	State.next_storm_sol = State.sol + 1
 	State._tick()
 	var escudo: float = State.shield
