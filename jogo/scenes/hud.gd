@@ -2312,13 +2312,13 @@ func _album_tile(id: int) -> Control:
 	var window := Rect2(Vector2(60, 236) * k, Vector2(944, 614) * k)
 	if owned:
 		var photo := TextureRect.new()
+		photo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE   # antes do tamanho: senão a imagem força o tamanho dela
+		photo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		var file := "res://ui/cards/%s" % info.get("photo_file", "")
 		if str(info.get("photo_file", "")) != "" and ResourceLoader.exists(file):
 			photo.texture = load(file)
 		photo.position = window.position
 		photo.size = window.size
-		photo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		photo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		photo.clip_contents = true
 		photo.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		b.add_child(photo)
@@ -2342,12 +2342,12 @@ func _album_tile(id: int) -> Control:
 		q.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		b.add_child(q)
 	var frame := TextureRect.new()
+	frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE   # antes do tamanho: senão a moldura fica do tamanho da imagem
+	frame.stretch_mode = TextureRect.STRETCH_SCALE
 	var frame_file := "res://ui/frames/moldura-carta-%s.png" % FRAME.get(rarity, "comum")
 	if ResourceLoader.exists(frame_file):
 		frame.texture = load(frame_file)
 	frame.size = b.custom_minimum_size
-	frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	frame.stretch_mode = TextureRect.STRETCH_SCALE
 	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if not owned:
 		frame.modulate = Color(0.8, 0.8, 0.8)
