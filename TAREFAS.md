@@ -22,10 +22,10 @@
 
 - [ ] 12h30 · [Os sons](conteudo/01-sons/PASSO.md)
 - [x] 15h · [As cartas](conteudo/02-cartas/PASSO.md) — 36 cartas do jogo revisadas; cinco reservas mantidas fora do jogo; fontes e recortes documentados.
-- [ ] 16h · [Textos das cartas e dos avisos](conteudo/03-textos/PASSO.md)
+- [x] 16h · [Textos das cartas e dos avisos](conteudo/03-textos/PASSO.md) — 187 chaves revisadas; cartas já conferidas; registro em [revisao-textos.md](conteudo/03-textos/revisao-textos.md).
 - [x] 17h · [Slides](conteudo/04-slides/PASSO.md) — versão de apoio em pt-BR aprovada pelo time; publicação no repositório autorizada. Demo oficial escolhida: vídeo em inglês.
-- [ ] 17h30 · [Traduções](conteudo/05-traducoes/PASSO.md)
-- [ ] 18h30 · [Texto da página do projeto](conteudo/06-pagina-do-projeto/PASSO.md)
+- [x] 17h30 · [Traduções](conteudo/05-traducoes/PASSO.md) — revisão editorial e estrutural nos quatro idiomas concluída; conferência visual no aparelho continua no teste.
+- [x] 18h30 · [Texto da página do projeto](conteudo/06-pagina-do-projeto/PASSO.md) — seis seções em inglês, referências e usos de IA completos; formulário e publicação com Dev.
 - [x] 19h · [Roteiro do vídeo](conteudo/07-roteiro-do-video/PASSO.md)
 - [x] 19h30 · [Cenas e créditos](conteudo/08-cenas-e-creditos/PASSO.md)
 - [x] 20h · [Teste no celular](conteudo/09-teste-no-celular/PASSO.md) — rodada encerrada; resultados e limites no [relatorio](conteudo/09-teste-no-celular/bugs.md).
@@ -57,7 +57,7 @@
 - [x] **Dev → Conteúdo:** o jogo agora tem **35 cartas** (as 5 "em breve" de Meridiani e Jezero saíram: ids 7, 8, 10, 17 e 18). Trocar "40 cards" por "35 cards" no [slides.md](conteudo/04-slides/slides.md) e no [pagina.md](conteudo/06-pagina-do-projeto/pagina.md). **Design:** com a carta 41, agora são 36; trocado para "36 cards" nos dois.
 - [x] **Dev → Conteúdo:** subir as fotos das cartas em `conteudo/02-cartas/fotos/` com os nomes do item 6 do [PASSO das cartas](conteudo/02-cartas/PASSO.md) (as de 7, 8, 10, 17 e 18 não precisam mais). As molduras do Design já estão prontas e entram no jogo junto com as fotos.
 - [x] **Design → Dev:** colocar no jogo a **estante de exposição**. Ela é construída como o painel solar, tem o botão "Ver estante" no painel do item (zoom de frente, com o céu do jogo atrás) e a criança escolhe o que expor. Só libera com a **Casa do Mike no nível 2, com 3 vagas**; no **último nível, 6 vagas**. Passo a passo testado numa cópia do jogo: [design/05-telas/estante/leiame.md](design/05-telas/estante/leiame.md).
-- [ ] **Dev → Conteúdo:** revisar os textos novos do jogo. Os textos do [textos.csv](conteudo/03-textos/textos.csv) foram reescritos mais simples (sem "de verdade" e sem "·" ou "•" no meio), e as 40 cartas do [cartas.csv](conteudo/02-cartas/cartas.csv) ganharam **nome e fato em espanhol e francês** (antes apareciam em inglês). Os números e as datas são os mesmos de antes, com as mesmas fontes.
+- [x] **Dev → Conteúdo:** revisar os textos novos do jogo. Entrega: 187 chaves da interface revisadas nos quatro idiomas; 41 linhas de cartas conferidas, com 36 ativas e cinco reservas. [Revisão dos textos](conteudo/03-textos/revisao-textos.md) e [das traduções](conteudo/05-traducoes/revisao-traducoes.md).
 - [x] **Dev → Design:** o texto do MOXIE no painel de informação ([textos.csv](design/05-telas/info-construcao/textos.csv), `INFO_MOXIE`) ainda diz "O MOXIE de verdade fez 122 g...". Se quiserem, troquem por "O MOXIE fez 122 g de oxigênio em Marte." (o resto do jogo não usa mais "de verdade"). **Design:** trocado.
 - [ ] **Dev → todos:** o código agora é todo em inglês (nomes e comentários), inclusive os scripts do Design e as ferramentas. Os nomes de arquivos de modelos, sons e pastas continuam iguais.
 - [x] **Design → Conteúdo:** criar a carta **41 · Rocknest 3** (comum, tubo de amostra, Gale) no `cartas.csv`, com um fato de fonte oficial. A foto e a carta pronta estão em [design/05-telas/cartas-descobertas/](design/05-telas/cartas-descobertas/leiame.md). As cartas 26, 32, 34 e 35 ganharam fotos novas lá também, se quiserem trocar. **Design:** criada, com o fato da legenda da NASA. Status CONFERIR para o Conteúdo revisar o texto.

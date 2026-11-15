@@ -1,0 +1,81 @@
+keys,idioma,antes,depois
+B_HABITAT_DESC,pt_BR,"A casa do Mike, onde ele dorme e fica protegido. Melhore a casa e a base cresce, junto com as barras!",A casa protege o Mike. Melhore para ampliar a base e as barras.
+B_HABITAT_DESC,en,"Mike's home, where he sleeps and stays safe. Upgrade it and the base grows, and so do the bars!",Mike stays safe here. Upgrade it to expand the base and the bars.
+B_HABITAT_DESC,es,"La casa de Mike, donde duerme y está a salvo. ¡Mejórala y crecen la base y las barras!",Aquí Mike está a salvo. Mejora la casa para ampliar la base y las barras.
+B_HABITAT_DESC,fr,"La maison de Mike, où il dort et reste à l'abri. Améliore-la et la base grandit, avec les barres !",Mike est à l'abri ici. Améliore la maison pour agrandir la base et les barres.
+EV_SOLAR_REAL,pt_BR,"Essa tempestade aconteceu em {date}, e a NASA registrou!",Data no arquivo da NASA: {date}.
+EV_SOLAR_REAL,en,"This storm happened on {date}, and NASA recorded it!",Date in the NASA archive: {date}.
+EV_SOLAR_REAL,es,¡Esta tormenta pasó el {date} y la NASA la registró!,Fecha en el archivo de la NASA: {date}.
+EV_SOLAR_REAL,fr,"Cette tempête a eu lieu le {date}, et la NASA l'a enregistrée !",Date dans les archives de la NASA : {date}.
+TUTO_DONE,en,Great job! Build the Antenna to get seeds from Earth. Keep the 3 bars full and complete the album.,Great job! Build the Antenna to get seeds from Earth. Manage the 3 bars and complete the album.
+TUTO_DONE,fr,Bravo ! Construis l'Antenne pour recevoir des graines de la Terre. Garde les 3 barres pleines et complète l'album.,Bravo ! Construis l'Antenne pour recevoir des graines de la Terre. Gère les 3 barres et complète l'album.
+NEED_MAX,pt_BR,Você já tem uma.,Você já tem esse item.
+NEED_MAX,en,You already have one.,You already have this item.
+NEED_MAX,es,Ya tienes uno.,Ya tienes este objeto.
+NEED_MAX,fr,Tu en as déjà un.,Tu as déjà cet objet.
+EV_NOSIGNAL_TEXT,pt_BR,O Sol ficou entre a Terra e Marte e bloqueia as mensagens por uns dias.,O Sol está entre a Terra e Marte. As mensagens podem falhar por alguns dias.
+EV_NOSIGNAL_TEXT,en,The Sun is between Earth and Mars and blocks messages for a few days.,The Sun is between Earth and Mars. Messages may be disrupted for a few days.
+EV_NOSIGNAL_TEXT,es,El Sol quedó entre la Tierra y Marte y bloquea los mensajes por unos días.,El Sol está entre la Tierra y Marte. Los mensajes pueden fallar unos días.
+EV_NOSIGNAL_TEXT,fr,Le Soleil est entre la Terre et Mars et bloque les messages pendant quelques jours.,Le Soleil est entre la Terre et Mars. Les messages peuvent être perturbés quelques jours.
+BTN_NASA,pt_BR,Dados da NASA,NASA
+BTN_NASA,en,NASA data,NASA
+BTN_NASA,es,Datos NASA,NASA
+BTN_NASA,fr,Données NASA,NASA
+NASA_DONKI,pt_BR,"Tempestades solares: {n} tempestades de 2024 guardadas no DONKI, o arquivo de clima espacial da NASA. Elas já passaram, então não é ao vivo.","Arquivo NASA: {n} registros de clima espacial de 2024. Algumas datas vêm de simulações de chegada a Marte no DONKI. São dados arquivados, não previsões ao vivo."
+NASA_DONKI,en,"Solar storms: {n} storms from 2024, saved in DONKI, NASA's space weather archive. They already happened, so it's not live.","NASA archive: {n} space weather records from 2024. Some dates come from DONKI simulations of arrivals at Mars. Archived data, not live forecasts."
+NASA_DONKI,es,"Tormentas solares: {n} tormentas de 2024 guardadas en DONKI, el archivo de clima espacial de la NASA. Ya pasaron, así que no es en vivo.","Archivo NASA: {n} registros de clima espacial de 2024. Algunas fechas vienen de simulaciones de llegada a Marte en DONKI. Son datos archivados, no pronósticos en vivo."
+NASA_DONKI,fr,"Tempêtes solaires : {n} tempêtes de 2024 gardées dans DONKI, l'archive de météo spatiale de la NASA. Elles sont déjà passées, donc ce n'est pas en direct.","Archives NASA : {n} entrées de météo spatiale de 2024. Certaines dates viennent de simulations d'arrivée sur Mars dans DONKI. Des archives, pas des prévisions en direct."
+HOW_STORM,pt_BR,Aguente uma tempestade solar.,Espere uma tempestade solar passar.
+HOW_STORM,en,Get through a solar storm.,Wait for a solar storm to pass.
+HOW_STORM,es,Aguanta una tormenta solar.,Espera a que pase una tormenta solar.
+HOW_STORM,fr,Survis à une tempête solaire.,Attends la fin d'une tempête solaire.
+HOW_AURORA,pt_BR,Aguente uma tempestade solar com o escudo ligado. É rara!,Passe por uma tempestade solar com o escudo ligado. A carta é difícil de encontrar!
+HOW_AURORA,en,Get through a solar storm with the shield on. It's rare!,Get through a solar storm with the shield on. This card is hard to find!
+HOW_AURORA,es,Aguanta una tormenta solar con el escudo activado. ¡Es rara!,Pasa una tormenta solar con el escudo activado. ¡Esta carta es difícil de conseguir!
+HOW_AURORA,fr,Survis à une tempête solaire avec le bouclier activé. C'est rare !,Attends la fin d'une tempête solaire avec le bouclier activé. Cette carte est difficile à trouver !
+HOW_DUST,pt_BR,Aguente uma tempestade de poeira.,Espere uma tempestade de poeira passar.
+HOW_DUST,en,Get through a dust storm.,Wait for a dust storm to pass.
+HOW_DUST,es,Aguanta una tormenta de polvo.,Espera a que pase una tormenta de polvo.
+HOW_DUST,fr,Survis à une tempête de poussière.,Attends la fin d'une tempête de poussière.
+OUT_ENERGY,pt_BR,Apagão! A energia acabou.,Energia baixa. Vamos recuperar!
+OUT_ENERGY,en,Blackout! The energy ran out.,Low energy. Let's recharge!
+OUT_ENERGY,es,¡Apagón! Se acabó la energía.,Energía baja. ¡Vamos a recuperarla!
+OUT_ENERGY,fr,Panne ! Il n'y a plus d'énergie.,Énergie faible. On recharge !
+OUT_OXYGEN,pt_BR,Acabou o oxigênio! O Mike ficou em casa.,Oxigênio baixo. O Mike espera em casa.
+OUT_OXYGEN,en,Out of oxygen! Mike stays inside.,Low oxygen. Mike waits inside.
+OUT_OXYGEN,es,¡Se acabó el oxígeno! Mike se queda adentro.,Oxígeno bajo. Mike espera en casa.
+OUT_OXYGEN,fr,Plus d'oxygène ! Mike reste à l'intérieur.,Oxygène faible. Mike attend à l'intérieur.
+OUT_ENERGY_HINT,pt_BR,Sem energia: construa um painel solar ou um RTG.,"Espere a barra amarela subir. Depois, construa um painel solar ou um RTG."
+OUT_ENERGY_HINT,en,No energy: build a solar panel or an RTG.,Wait for the yellow bar to rise. Then build a solar panel or an RTG.
+OUT_ENERGY_HINT,es,Sin energía: construye un panel solar o un RTG.,Espera a que suba la barra amarilla. Luego construye un panel solar o un RTG.
+OUT_ENERGY_HINT,fr,Pas d'énergie : construis un panneau solaire ou un RTG.,Attends que la barre jaune remonte. Puis construis un panneau solaire ou un RTG.
+OUT_OXYGEN_HINT,pt_BR,Sem oxigênio: construa o MOXIE ou plante na estufa.,Espere o oxigênio subir. Um MOXIE ou plantas na estufa ajudam.
+OUT_OXYGEN_HINT,en,No oxygen: build a MOXIE or plant in the greenhouse.,Wait for oxygen to rise. A MOXIE or greenhouse plants can help.
+OUT_OXYGEN_HINT,es,Sin oxígeno: construye un MOXIE o planta en el invernadero.,Espera a que suba el oxígeno. Un MOXIE o plantas en el invernadero ayudan.
+OUT_OXYGEN_HINT,fr,Pas d'oxygène : construis un MOXIE ou plante dans la serre.,Attends que l'oxygène remonte. Un MOXIE ou des plantes dans la serre peuvent aider.
+SET_ON,pt_BR,ligada,sim
+SET_ON,es,encendida,sí
+SET_ON,fr,activée,oui
+SET_OFF,pt_BR,desligada,não
+SET_OFF,es,apagada,no
+SET_OFF,fr,désactivée,non
+STORM_WARNING,pt_BR,Aviso da NASA: tempestade solar em {name} sóis!,Tempestade solar no jogo em {name} sóis!
+STORM_WARNING,en,NASA warning: solar storm in {name} sols!,Solar storm in the game in {name} sols!
+STORM_WARNING,es,Aviso de la NASA: ¡tormenta solar en {name} soles!,¡Tormenta solar en el juego en {name} soles!
+STORM_WARNING,fr,Alerte de la NASA : tempête solaire dans {name} sols !,Tempête solaire dans le jeu dans {name} sols !
+REMOVE_TITLE,pt_BR,Remover: {name}?,Remover {name}?
+REMOVE_TITLE,en,Remove: {name}?,Remove {name}?
+REMOVE_TITLE,es,¿Quitar: {name}?,¿Quitar {name}?
+REMOVE_TITLE,fr,Retirer : {name} ?,Retirer {name} ?
+EXPLORE_EMPTY,pt_BR,Desta vez o Mike não achou nada. O lanche voltou!,Nenhuma amostra desta vez. O lanche voltou!
+EXPLORE_EMPTY,en,Mike found nothing this time. The snack is back!,No sample this time. Your snack is back!
+EXPLORE_EMPTY,es,Esta vez Mike no encontró nada. ¡La merienda volvió!,Esta vez no hay muestra. ¡Recuperaste la merienda!
+EXPLORE_EMPTY,fr,"Cette fois, Mike n'a rien trouvé. Le goûter est revenu !",Pas d'échantillon cette fois. Ton goûter est de retour !
+ITEM_BROKEN,pt_BR,Quebrou: {name}! Toque nele para consertar.,{name} parou. Toque no item para consertar.
+ITEM_BROKEN,en,{name} broke! Tap it to fix.,{name} stopped working. Tap the item to fix it.
+ITEM_BROKEN,es,¡Se rompió: {name}! Tócalo para arreglarlo.,{name} dejó de funcionar. Toca el objeto para arreglarlo.
+ITEM_BROKEN,fr,{name} est cassé ! Touche-le pour le réparer.,{name} ne fonctionne plus. Touche cet objet pour le réparer.
+PACKAGE_PAUSED,pt_BR,Sem sinal! O pacote espera o sinal voltar.,Sem sinal! O pacote chega quando o sinal voltar.
+PACKAGE_PAUSED,en,No signal! The package waits for the signal to come back.,No signal! The package arrives when the signal returns.
+PACKAGE_PAUSED,es,¡Sin señal! El paquete espera a que vuelva la señal.,¡Sin señal! El paquete llega cuando vuelva la señal.
+PACKAGE_PAUSED,fr,Pas de signal ! Le colis attend que le signal revienne.,Pas de signal ! Le colis arrive au retour du signal.
