@@ -25,6 +25,8 @@ var _root: Control
 var _bars := {}
 var _bar_labels := {}
 var _bar_fill := {}
+var _bar_nums := {}           # o número de agora dentro da barra
+var _bar_rates := {}          # quanto ganha ou perde por sol
 var _sol_label: Label
 var _hint: Label
 var _toast: PanelContainer
@@ -40,7 +42,12 @@ var _build_grid: GridContainer
 var _panel: PanelContainer
 var _panel_title: Label
 var _panel_info: Label
-var _panel_buttons: HFlowContainer
+var _panel_buttons: VBoxContainer
+var _panel_level: Label
+var _panel_desc: Label
+var _panel_stats: HBoxContainer
+var _panel_tail: Polygon2D
+var _panel_pos := Vector2.INF
 var _dim: ColorRect
 var _choice: PanelContainer
 var _choice_title: Label
@@ -334,10 +341,15 @@ func _on_photo() -> void:
 
 # ───────────── Painel do item tocado ─────────────
 func _open_panel(c: Vector2i) -> void:
+	var was_open := _panel.visible and selected == c
 	selected = c
 	_panel.visible = true
 	_build_menu.visible = false
 	_refresh_panel()
+	if not was_open:
+		_panel_pos = Vector2.INF
+		_panel.scale = Vector2(0.8, 0.8)
+		create_tween().tween_property(_panel, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_tut_update()
 
 
@@ -352,18 +364,60 @@ func _refresh_panel() -> void:
 		_close_panel()
 		return
 	var def: Dictionary = State.ITEMS[it.type]
-	var title := tr(State.item_name(it))
-	if State.upgrade_cost(selected) >= 0 or int(it.level) > 1:
-		title += " · " + tr("LEVEL").format({"n": int(it.level)})
-	_panel_title.text = title
+	_panel_title.text = tr(State.item_name(it))
+	_panel_level.text = tr("LEVEL").format({"n": int(it.level)})
+	_panel_level.get_parent().visible = State.upgrade_cost(selected) >= 0 or int(it.level) > 1
+	var desc_key: String = State.item_name(it) + "_DESC"
+	_panel_desc.text = tr(desc_key) if tr(desc_key) != desc_key else ""
+	_panel_desc.visible = _panel_desc.text != ""
+	# Quanto ela faz por sol, com os ícones das barras de cima.
+	for c in _panel_stats.get_children():
+		c.queue_free()
+	var rates: Dictionary = State.item_rates(it)
+	for bar in ["energy", "oxygen", "shield"]:
+		var v: float = rates[bar]
+		if absf(v) < 0.05:
+			continue
+		var chip := PanelContainer.new()
+		var chip_box := Palette._box(Palette.BG, 16)
+		chip_box.content_margin_left = 10
+		chip_box.content_margin_right = 14
+		chip_box.content_margin_top = 4
+		chip_box.content_margin_bottom = 4
+		chip.add_theme_stylebox_override("panel", chip_box)
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 6)
+		chip.add_child(row)
+		var ic := TextureRect.new()
+		ic.texture = load(BAR_ICONS[bar])
+		ic.modulate = Palette.BAR[bar]
+		ic.custom_minimum_size = Vector2(30, 30)
+		ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		row.add_child(ic)
+		var n := Label.new()
+		n.text = ("%+d/sol" % roundi(v)) if absf(v) >= 1.0 else ("%+.1f/sol" % v)
+		n.add_theme_font_size_override("font_size", 22)
+		n.add_theme_color_override("font_color", Color("9be27a") if v > 0.0 else Color("ff9a8a"))
+		row.add_child(n)
+		_panel_stats.add_child(chip)
+	_panel_stats.visible = _panel_stats.get_child_count() > 0
 	_panel_info.visible = false
 	for b in _panel_buttons.get_children():
 		b.queue_free()
 	if it.type == "greenhouse":
 		if it.plant == "":
+			# Sementes em 2 colunas, para o menu não ficar comprido demais.
+			var seeds := GridContainer.new()
+			seeds.columns = 2
+			seeds.add_theme_constant_override("h_separation", 10)
+			seeds.add_theme_constant_override("v_separation", 10)
+			_panel_buttons.add_child(seeds)
 			for p in State.unlocked_plants():
 				var plant_def: Dictionary = State.PLANTS[p]
-				var pb := _add_panel_button("%s (%d)" % [tr(plant_def.name), plant_def.sols], _on_plant.bind(p))
+				var pb := _add_panel_button("%s (%d)" % [tr(plant_def.name), plant_def.sols], _on_plant.bind(p), true)
+				pb.reparent(seeds)
+				pb.add_theme_font_size_override("font_size", 24)
 				pb.icon = _plant_icon(p)   # Design: a planta antes do nome, mais visual
 				pb.expand_icon = true
 				pb.add_theme_constant_override("icon_max_width", 56)
@@ -377,24 +431,48 @@ func _refresh_panel() -> void:
 				"plant": tr(State.PLANTS[it.plant].name), "n": int(it.growth), "max": State.PLANTS[it.plant].sols})
 	if State.base_locked_reason() != "":
 		return
-	_add_panel_button(tr("BTN_MOVE"), _on_move)
-	_add_panel_button(tr("BTN_ROTATE"), _on_rotate)
+	# Melhorar é a ação principal (dourada, em cima); depois mover, girar e remover.
 	var cost := State.upgrade_cost(selected)
 	if cost >= 0:
-		var up := _add_panel_button("%s -%d" % [tr("BTN_UPGRADE"), cost], _on_upgrade)
+		var up := _add_panel_button("%s  -%d" % [tr("BTN_UPGRADE"), cost], _on_upgrade, true)
+		up.icon = load(BAR_ICONS.energy)
+		up.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		up.modulate = Color.WHITE if State.upgrade_block_reason(selected) == "" else Color(1, 1, 1, 0.55)
+	_add_panel_button(tr("BTN_MOVE"), _on_move)
+	_add_panel_button(tr("BTN_ROTATE"), _on_rotate)
 	if def.get("removable", true):
 		_add_panel_button(tr("BTN_REMOVE"), _on_remove)
 
 
-func _add_panel_button(text: String, action: Callable) -> Button:
-	var b := Button.new()
+func _add_panel_button(text: String, action: Callable, main := false) -> Button:
+	var b := _key_button(action, not main)
 	b.text = text
-	b.custom_minimum_size = Vector2(150, 90)
-	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	b.pressed.connect(action)
+	b.custom_minimum_size = Vector2(0, 78)
+	b.add_theme_font_size_override("font_size", 28)
+	b.autowrap_mode = TextServer.AUTOWRAP_OFF
+	b.add_theme_constant_override("icon_max_width", 34)
 	_panel_buttons.add_child(b)
 	return b
+
+
+## O menu flutuante segue a construção (se a câmera mexer) e fica dentro da tela,
+## entre as barras de cima e os botões de baixo. A pontinha sempre aponta para a construção.
+func _place_panel(delta: float) -> void:
+	if not _panel.visible:
+		return
+	var anchor: Vector2 = base.item_screen_top(selected)
+	if anchor == Vector2.INF:
+		return
+	var vp := get_viewport().get_visible_rect().size
+	var sz := _panel.size
+	var target := Vector2(anchor.x - sz.x / 2.0, anchor.y - sz.y - 34.0)
+	target.x = clampf(target.x, 12.0, vp.x - sz.x - 12.0)
+	target.y = clampf(target.y, 250.0, maxf(250.0, vp.y - sz.y - 330.0))
+	_panel_pos = target if _panel_pos == Vector2.INF else _panel_pos.lerp(target, 1.0 - exp(-delta * 14.0))
+	_panel.position = _panel_pos
+	_panel.pivot_offset = Vector2(clampf(anchor.x - _panel_pos.x, 30.0, sz.x - 30.0), sz.y)
+	_panel_tail.position = Vector2(_panel.pivot_offset.x, sz.y)
+	_panel_tail.visible = anchor.y > _panel_pos.y + sz.y
 
 
 func _on_move() -> void:
@@ -652,9 +730,16 @@ func _on_nasa() -> void:
 
 # ───────────── Atualizar a tela ─────────────
 func _refresh() -> void:
+	var rates: Dictionary = State.current_rates()
 	for bar in BAR_KEYS:
 		var value: float = State.get(bar)
 		_bars[bar].value = value
+		_bar_nums[bar].text = str(int(floor(value)))
+		var r: float = rates[bar]
+		var rl: Label = _bar_rates[bar]
+		rl.visible = absf(r) >= 0.05
+		rl.text = ("%+d/sol" % roundi(r)) if absf(r) >= 1.0 else ("%+.1f/sol" % r)
+		rl.add_theme_color_override("font_color", Color("9be27a") if r > 0.0 else Color("ff9a8a"))
 		_bar_labels[bar].text = tr(BAR_KEYS[bar])
 		_bar_fill[bar].bg_color = Palette.ALERT if value < State.LOW else Palette.BAR[bar]
 	_sol_label.text = "%s  •  %s" % [tr("HUD_SOL").format({"n": State.sol}), tr("HUD_PLACE")]
@@ -986,8 +1071,8 @@ func _tut_point() -> Vector2:
 			return top.call(_buttons.build)
 		2:
 			if _panel.visible:
-				for b in _panel_buttons.get_children():
-					if b is Button and not b.is_queued_for_deletion():
+				for b in _panel_buttons.find_children("*", "Button", true, false):
+					if not b.is_queued_for_deletion() and not b.get_parent().is_queued_for_deletion():
 						return top.call(b)
 				return Vector2.INF
 			for k in State.items:
@@ -1004,9 +1089,10 @@ func _tut_point() -> Vector2:
 	return Vector2.INF
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if _tut_card == null:
 		return
+	_place_panel(delta)
 	if State.tutorial == 5 and _tut_done_at > 0.0 and Time.get_ticks_msec() / 1000.0 - _tut_done_at > 5.0:
 		State.tutorial = State.TUTORIAL_DONE
 		_tut_update()
@@ -1061,7 +1147,7 @@ func _build_top() -> void:
 		var pb := ProgressBar.new()
 		pb.max_value = State.BAR_MAX
 		pb.show_percentage = false
-		pb.custom_minimum_size = Vector2(0, 24)
+		pb.custom_minimum_size = Vector2(0, 36)
 		pb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		pb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		var fill := Palette.bar_fill(Palette.BAR[bar])
@@ -1070,6 +1156,27 @@ func _build_top() -> void:
 		_bars[bar] = pb
 		_bar_labels[bar] = label
 		_bar_fill[bar] = fill
+		# Dentro da barra: quanto tem agora (à esquerda) e quanto muda por sol (à direita).
+		var num := Label.new()
+		num.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		num.offset_left = 12
+		num.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		num.add_theme_font_size_override("font_size", 24)
+		num.add_theme_color_override("font_color", Color.WHITE)
+		num.add_theme_color_override("font_outline_color", Palette.BG.darkened(0.3))
+		num.add_theme_constant_override("outline_size", 8)
+		pb.add_child(num)
+		var rate := Label.new()
+		rate.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		rate.offset_right = -10
+		rate.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		rate.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		rate.add_theme_font_size_override("font_size", 20)
+		rate.add_theme_color_override("font_outline_color", Palette.BG.darkened(0.3))
+		rate.add_theme_constant_override("outline_size", 8)
+		pb.add_child(rate)
+		_bar_nums[bar] = num
+		_bar_rates[bar] = rate
 
 	# O "Sol N · Cratera Gale" é uma placa no canto, um pouco torta (nada de tudo centralizado).
 	var pill := PanelContainer.new()
@@ -1116,20 +1223,73 @@ func _build_bottom() -> void:
 	_build_grid.add_theme_constant_override("v_separation", 10)
 	_build_menu.add_child(_build_grid)
 
-	_panel = Plate.new()
+	# Menu da construção: um cartão de papel flutuando EM CIMA da construção tocada, com uma
+	# pontinha apontando para ela. Nome e nível, uma frase do que ela faz, quanto faz por sol
+	# e as ações em lista (uma embaixo da outra). Tocar fora ou em outra construção fecha.
+	_panel = PanelContainer.new()
+	var card := Palette.paper(Palette.GOLD)
+	card.set_corner_radius_all(28)
+	card.set_border_width_all(5)
+	card.shadow_offset = Vector2(0, 10)
+	card.shadow_size = 4
+	card.content_margin_left = 22
+	card.content_margin_right = 22
+	card.content_margin_top = 18
+	card.content_margin_bottom = 20
+	_panel.add_theme_stylebox_override("panel", card)
+	_panel.custom_minimum_size = Vector2(440, 0)
 	_panel.visible = false
-	bottom.add_child(_panel)
+	_panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	_root.add_child(_panel)
+	_panel_tail = Polygon2D.new()
+	_panel_tail.polygon = PackedVector2Array([Vector2(-22, -6), Vector2(22, -6), Vector2(0, 24)])
+	_panel_tail.color = Palette.PAPER
+	_panel.add_child(_panel_tail)
+	var tail_edge := Line2D.new()
+	tail_edge.points = PackedVector2Array([Vector2(-22, -1), Vector2(0, 24), Vector2(22, -1)])
+	tail_edge.width = 5.0
+	tail_edge.default_color = Palette.GOLD
+	tail_edge.joint_mode = Line2D.LINE_JOINT_ROUND
+	_panel_tail.add_child(tail_edge)
 	var pbox := VBoxContainer.new()
-	pbox.add_theme_constant_override("separation", 10)
+	pbox.add_theme_constant_override("separation", 12)
 	_panel.add_child(pbox)
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 12)
+	pbox.add_child(head)
 	_panel_title = Label.new()
-	_panel_title.add_theme_color_override("font_color", Palette.GOLD)
-	pbox.add_child(_panel_title)
-	_panel_info = _wrap_label("", 26)
+	_panel_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_panel_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_panel_title.add_theme_font_size_override("font_size", 34)
+	_panel_title.add_theme_color_override("font_color", Palette.BG)
+	head.add_child(_panel_title)
+	var pill := PanelContainer.new()
+	var pill_box := Palette._box(Palette.GOLD, 18)
+	pill_box.content_margin_left = 14
+	pill_box.content_margin_right = 14
+	pill_box.content_margin_top = 4
+	pill_box.content_margin_bottom = 4
+	pill.add_theme_stylebox_override("panel", pill_box)
+	pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	head.add_child(pill)
+	_panel_level = Label.new()
+	_panel_level.add_theme_font_size_override("font_size", 22)
+	_panel_level.add_theme_color_override("font_color", Palette.INK)
+	pill.add_child(_panel_level)
+	_panel_desc = Label.new()
+	_panel_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_panel_desc.add_theme_font_size_override("font_size", 25)
+	_panel_desc.add_theme_color_override("font_color", Palette.INK)
+	pbox.add_child(_panel_desc)
+	_panel_stats = HBoxContainer.new()
+	_panel_stats.add_theme_constant_override("separation", 10)
+	pbox.add_child(_panel_stats)
+	_panel_info = _wrap_label("", 25)
+	_panel_info.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_panel_info.add_theme_color_override("font_color", Palette.BG)
 	pbox.add_child(_panel_info)
-	_panel_buttons = HFlowContainer.new()
-	_panel_buttons.add_theme_constant_override("h_separation", 10)
-	_panel_buttons.add_theme_constant_override("v_separation", 10)
+	_panel_buttons = VBoxContainer.new()
+	_panel_buttons.add_theme_constant_override("separation", 10)
 	pbox.add_child(_panel_buttons)
 
 	# Embaixo, no alcance do polegar. Explorar é a ação principal: maior, dourada e mais alta que as outras.
@@ -1466,15 +1626,19 @@ func _build_postcard() -> void:
 	strip.offset_bottom = -60
 	strip.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	strip.rotation_degrees = -4.0
+	strip.custom_minimum_size = Vector2(500, 0)
 	strip.add_theme_stylebox_override("panel", Palette.paper(Palette.BUTTON))
 	_postcard.add_child(strip)
 	var col := VBoxContainer.new()
 	strip.add_child(col)
 	var title := _title_label(50)
 	title.text = "Mike on Mars"
+	title.autowrap_mode = TextServer.AUTOWRAP_OFF
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	title.add_theme_color_override("font_color", Palette.BUTTON.darkened(0.2))
 	col.add_child(title)
 	_postcard_label = _wrap_label("", 32)
+	_postcard_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	_postcard_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_postcard_label.add_theme_color_override("font_color", Palette.INK)
 	col.add_child(_postcard_label)
@@ -1498,32 +1662,20 @@ func _build_start() -> void:
 	col.add_theme_constant_override("separation", 6)
 	col.theme = _root.theme
 	_start.add_child(col)
-	# Título como letreiro: duas linhas, torto, alinhado à esquerda, "Mars" em terracota.
-	var sign := VBoxContainer.new()
-	sign.rotation_degrees = -4.0
-	sign.add_theme_constant_override("separation", -18)
-	col.add_child(sign)
-	var t1 := _title_label(120)
-	t1.text = "Mike"
-	sign.add_child(t1)
-	var t2 := _title_label(84)
-	t2.text = "on Mars"
-	t2.add_theme_color_override("font_color", Palette.BUTTON)
-	sign.add_child(t2)
-	for t in [t1, t2]:
-		t.add_theme_color_override("font_shadow_color", Color(0.1, 0.02, 0.03, 0.9))
-		t.add_theme_constant_override("shadow_offset_x", 5)
-		t.add_theme_constant_override("shadow_offset_y", 7)
-	var mike := TextureRect.new()
-	if ResourceLoader.exists("res://ui/icons/mike.png"):
-		mike.texture = load("res://ui/icons/mike.png")
-	mike.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	mike.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	mike.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	col.add_child(mike)
+	# O logo do Design 06 (o nome, Marte e o foguete), balançando de leve.
+	var logo := TextureRect.new()
+	logo.texture = load("res://ui/logo.png") if ResourceLoader.exists("res://ui/logo.png") else load("res://ui/icons/mike.png")
+	logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	logo.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	col.add_child(logo)
+	logo.resized.connect(func() -> void: logo.pivot_offset = logo.size / 2.0)
+	var sway := create_tween().set_loops()
+	sway.tween_property(logo, "rotation_degrees", 2.5, 1.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	sway.tween_property(logo, "rotation_degrees", -2.5, 1.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	_start_play = _key_button(_on_play)
 	_start_play.custom_minimum_size = Vector2(360, 170)
-	_start_play.size_flags_horizontal = Control.SIZE_SHRINK_END
+	_start_play.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_start_play.add_theme_font_size_override("font_size", 52)
 	_start_play.autowrap_mode = TextServer.AUTOWRAP_OFF
 	col.add_child(_start_play)

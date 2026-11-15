@@ -700,6 +700,16 @@ func _dust_puff(parent: Node3D, amount: int) -> void:
 	p.emitting = true
 
 
+## O ponto da tela logo acima da construção (para o menu flutuante apontar para ela).
+func item_screen_top(c: Vector2i) -> Vector2:
+	var k := State.key(State.anchor_of(c))
+	if not _nodes.has(k):
+		return Vector2.INF
+	var node: Node3D = _nodes[k]
+	var box: AABB = node.global_transform * _merged_aabb(node)
+	return camera.unproject_position(Vector3(box.get_center().x, box.end.y, box.get_center().z))
+
+
 ## O Mike pula de alegria (quando colhe, por exemplo).
 func jump() -> void:
 	if _mike_anim and _mike_anim.has_animation("jump"):

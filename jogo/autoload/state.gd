@@ -890,6 +890,39 @@ func _time_cards() -> void:
 		_reward_once(CARD_EARTH_SEEN)
 
 
+## Quanto cada construção faz por sol agora (a mesma conta do _tick, sem mexer em nada).
+func item_rates(it: Dictionary) -> Dictionary:
+	var def: Dictionary = ITEMS[it.type]
+	var lv := int(it.level)
+	var bonus := 1.0 + LEVEL_BONUS * (lv - 1)
+	var e: float = def.get("energy", 0.0)
+	if it.type == "solar" and dust_left > 0:
+		e *= DUST_FACTOR
+	if it.type == "rtg" and lv >= MAX_LEVEL:
+		e = KILOPOWER_ENERGY
+		bonus = 1.0
+	if it.type == "greenhouse":
+		e = def.energy_when_planted if str(it.get("plant", "")) != "" else 0.0
+	var o: float = def.get("oxygen", 0.0) * bonus
+	if it.type == "greenhouse" and str(it.get("plant", "")) != "":
+		o += PLANT_OXYGEN
+	return {"energy": e * bonus if e > 0.0 else e, "oxygen": o, "shield": def.get("shield", 0.0) * (lv - 1)}
+
+
+## Quanto cada barra ganha (ou perde) por sol, somando a base inteira e o Mike respirando.
+func current_rates() -> Dictionary:
+	var r := {"energy": 0.0, "oxygen": -OXYGEN_BREATH, "shield": 0.0}
+	for k in items:
+		var ir := item_rates(items[k])
+		for b in r:
+			r[b] += ir[b]
+	if energy < LOW:
+		r.energy += EMERGENCY_ENERGY
+	else:
+		r.shield += SHIELD_RECHARGE
+	return r
+
+
 ## Crescer com o jogo fechado: avança os sóis que passaram (sem eventos) e guarda o resumo.
 func _catch_up(saved_at: int) -> void:
 	away = {}

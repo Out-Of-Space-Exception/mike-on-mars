@@ -37,7 +37,7 @@
 - [x] 14h30 · [Esqueleto](dev/03-esqueleto/PASSO.md)
 - [x] 16h30 · [Tubo de amostra e tempestades](dev/04-tubo-e-tempestades/PASSO.md)
 - [x] 19h · [Jogo completo](dev/05-jogo-completo/PASSO.md)
-- [ ] 20h · [Receber as entregas](dev/06-receber-entregas/PASSO.md)
+- [x] 20h · [Receber as entregas](dev/06-receber-entregas/PASSO.md)
 - [ ] 1h · [Acabamento e congelamento](dev/07-acabamento-e-congelamento/PASSO.md)
 - [ ] 4h · [Bugs](dev/08-bugs/PASSO.md)
 - [ ] 6h · [Vídeo e página](dev/09-video-e-pagina/PASSO.md)
@@ -51,7 +51,7 @@
 - [x] **Dev → Design:** subir em `design/03-itens-do-jogo/` os modelos da Kenney que não foram repintados: `cabbage.glb` (alface), `radish.glb` (rabanete), `flower_redA.glb` (zínia), `machine_barrel.glb` (RTG), `satelliteDish.glb` (antena) e `skybox-morning.png` (céu). Se o pacote tiver a pasta `Textures`, mande o `colormap.png` junto.
 - [x] **Dev → Design:** escolher e subir 2 modelos que faltam, em `design/03-itens-do-jogo/kenney/`: a **Casa do Mike** (um módulo de base) e a **Estufa**. Podem ser do Space Kit, Space Station Kit ou Modular Space Kit. Anotar no `itens.csv` (linhas `casa-do-mike` e `estufa`).
 - [x] **Dev → Design (se der tempo):** um modelo para o **Kilopower** (o RTG no nível 3 vira uma mini usina nuclear: na vida real ele tem um radiador em forma de guarda-chuva). Hoje o jogo põe um radiador dourado simples em cima do RTG. Entregar em `design/03-itens-do-jogo/` e anotar no `itens.csv` (linha `kilopower`).
-- [ ] **Design → Dev:** implementar o painel de informação da construção (Fechar / Construir -N ⚡), passo a passo em [design/05-telas/info-construcao/leiame.md](design/05-telas/info-construcao/LEIAME.md).
+- [x] **Design → Dev:** implementar o painel de informação da construção (Fechar / Construir -N ⚡), passo a passo em [design/05-telas/info-construcao/leiame.md](design/05-telas/info-construcao/LEIAME.md).
 - [ ] **Dev → Conteúdo:** faltam 2 sons do `sons.csv` em `conteudo/01-sons/sons/`: `passos` e `vento-poeira` (os outros já chegaram).
 - [ ] **Dev → Conteúdo:** o jogo agora tem **35 cartas** (as 5 "em breve" de Meridiani e Jezero saíram: ids 7, 8, 10, 17 e 18). Trocar "40 cards" por "35 cards" no [slides.md](conteudo/04-slides/slides.md) e no [pagina.md](conteudo/06-pagina-do-projeto/pagina.md).
-- [ ] **Dev → Conteúdo:** subir as fotos das cartas em `conteudo/02-cartas/fotos/` com os nomes do item 6 do [PASSO das cartas](conteudo/02-cartas/PASSO.md) (as de 7, 8, 10, 17 e 18 não precisam mais). As molduras do Design já estão prontas e entram no jogo junto com as fotos.
+- [x] **Dev → Conteúdo:** subir as fotos das cartas em `conteudo/02-cartas/fotos/` com os nomes do item 6 do [PASSO das cartas](conteudo/02-cartas/PASSO.md) (as de 7, 8, 10, 17 e 18 não precisam mais). As molduras do Design já estão prontas e entram no jogo junto com as fotos.

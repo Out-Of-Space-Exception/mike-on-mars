@@ -17,3 +17,4 @@ jogo/models/**/*-tex.png
 jogo/ui/cards/*.png
 jogo/ui/frames/*.png
 jogo/ui/info-construcao/*.png
+jogo/ui/logo.png

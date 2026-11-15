@@ -20,6 +20,7 @@ BAR_SHIELD,Escudo,Shield,Escudo,Bouclier
 HUD_SOL,Sol {n},Sol {n},Sol {n},Sol {n}
 HUD_PLACE,Cratera Gale,Gale Crater,Cráter Gale,Cratère Gale
 B_HABITAT,Casa do Mike,Mike's habitat,Casa de Mike,Maison de Mike
+B_HABITAT_DESC,A casa onde o Mike dorme e se protege. Melhore e a base cresce!,"Mike's home, where he sleeps and stays safe. Upgrade it and the base grows!",La casa donde Mike duerme y se protege. ¡Mejórala y la base crece!,La maison où Mike dort et se protège. Améliore-la et la base grandit !
 B_GREENHOUSE,Estufa,Greenhouse,Invernadero,Serre
 B_GREENHOUSE_DESC,Aqui as plantas crescem. A luz gasta energia.,Plants grow here. The lights use energy.,Aquí crecen las plantas. Las luces gastan energía.,"Ici, les plantes poussent. Les lumières consomment de l'énergie."
 B_SOLAR,Painel solar,Solar panel,Panel solar,Panneau solaire
@@ -31,6 +32,7 @@ B_MOXIE_DESC,Transforma o ar de Marte em oxigênio.,Turns Mars air into oxygen.,
 B_ANTENNA,Antena,Antenna,Antena,Antenne
 B_ANTENNA_DESC,Fala com a Terra.,Talks to Earth.,Habla con la Tierra.,Parle avec la Terre.
 B_PAD,Pista do Ingenuity,Ingenuity pad,Pista del Ingenuity,Piste d'Ingenuity
+B_PAD_DESC,Lugar de pouso do helicóptero Ingenuity. Ele voa com o Mike!,Landing spot for the Ingenuity helicopter. It flies with Mike!,Lugar de aterrizaje del helicóptero Ingenuity. ¡Vuela con Mike!,Aire d'atterrissage de l'hélicoptère Ingenuity. Il vole avec Mike !
 B_DECOR,Decoração,Decoration,Decoración,Décoration
 P_LETTUCE,Alface,Lettuce,Lechuga,Laitue
 P_RADISH,Rabanete,Radish,Rábano,Radis
@@ -95,8 +97,11 @@ EXPLORING,Explorando · {n} sóis,Exploring · {n} sols,Explorando · {n} soles,
 TUBE_READY,Abrir o tubo!,Open the tube!,¡Abre el tubo!,Ouvre le tube !
 LOCK_STORM,O Mike espera a tempestade passar.,Mike waits for the storm to pass.,Mike espera a que pase la tormenta.,Mike attend la fin de la tempête.
 D_FLAG,Bandeira,Flag,Bandera,Drapeau
+D_FLAG_DESC,Mostra que esta base em Marte é sua!,Shows that this Mars base is yours!,¡Muestra que esta base en Marte es tuya!,Montre que cette base sur Mars est à toi !
 D_LIGHTS,Luzinhas,String lights,Lucecitas,Guirlande
+D_LIGHTS_DESC,Luzinhas para enfeitar as noites geladas de Marte.,Little lights for the cold Mars nights.,Lucecitas para adornar las noches frías de Marte.,Des petites lumières pour les nuits froides de Mars.
 D_POT,Vaso,Flower pot,Maceta,Pot de fleurs
+D_POT_DESC,"Uma plantinha de enfeite, para a base ficar com cara de casa.",A little plant to make the base feel like home.,"Una plantita de adorno, para que la base parezca un hogar.",Une petite plante pour que la base ressemble à une maison.
 LOCKED_DECOR,Junte mais cartas para destravar.,Collect more cards to unlock it.,Junta más cartas para desbloquearla.,Collectionne plus de cartes pour la débloquer.
 NEED_MAX,Você já tem uma.,You already have one.,Ya tienes uno.,Tu en as déjà un.
 LOCK_NOSIGNAL,Sem sinal: o piloto automático está no comando.,No signal: the autopilot is in charge.,Sin señal: el piloto automático manda.,Pas de signal : le pilote automatique est aux commandes.
@@ -120,6 +125,7 @@ SEED_NEW,Semente nova: {name}!,New seed: {name}!,¡Semilla nueva: {name}!,Nouvel
 PHOTO_SAVED,Foto salva!,Photo saved!,¡Foto guardada!,Photo enregistrée !
 AWAY_SOLS,Passaram {n} sóis.,{n} sols went by.,Pasaron {n} soles.,{n} sols sont passés.
 B_KILOPOWER,Kilopower,Kilopower,Kilopower,Kilopower
+B_KILOPOWER_DESC,"Uma mini usina nuclear: energia forte, de dia e de noite.","A mini nuclear power plant: strong energy, day and night.","Una mini planta nuclear: energía fuerte, de día y de noche.","Une mini centrale nucléaire : beaucoup d'énergie, jour et nuit."
 NEED_SPACE,Precisa de espaço livre ao lado para crescer.,It needs free space next to it to grow.,Necesita espacio libre al lado para crecer.,Il faut de la place libre à côté pour grandir.
 NEED_HOUSE,"Primeiro, melhore a Casa do Mike.","First, upgrade Mike's habitat.","Primero, mejora la Casa de Mike.","D'abord, améliore la Maison de Mike."
 MAP_GROW,A base cresceu! Tem mais lugar para construir.,The base grew! There is more room to build.,¡La base creció! Hay más lugar para construir.,La base a grandi ! Il y a plus de place pour construire.

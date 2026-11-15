@@ -125,6 +125,9 @@ if (existsSync(info)) {
   for (const f of readdirSync(info)) if (/^(item-.*|placa-titulo|ornamento-luas|ic-carta)\.png$/.test(f)) copyFileSync(join(info, f), join(RAIZ, 'jogo/ui/info-construcao', f));
 }
 
+// 7c. Logo do design/06 (tela inicial)
+if (existsSync(join(RAIZ, 'design/06-logo-e-icone/logo.png'))) copyFileSync(join(RAIZ, 'design/06-logo-e-icone/logo.png'), join(RAIZ, 'jogo/ui/logo.png'));
+
 // 8. Ícones do design/05
 const icones = join(RAIZ, 'design/05-telas/telas-godot');
 mkdirSync(join(RAIZ, 'jogo/ui/icons'), {recursive: true});
