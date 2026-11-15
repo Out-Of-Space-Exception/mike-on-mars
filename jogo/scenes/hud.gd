@@ -2242,7 +2242,9 @@ func _build_album() -> void:
 	_album_count.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_album_count.add_theme_font_override("font", Palette.font(800))
 	_album_count.add_theme_font_size_override("font_size", 24)
-	_album_count.add_theme_color_override("font_color", Palette.INK)
+	_album_count.add_theme_color_override("font_color", Color.WHITE)
+	_album_count.add_theme_color_override("font_outline_color", Palette.INK)
+	_album_count.add_theme_constant_override("outline_size", 8)
 	_album_bar.add_child(_album_count)
 	_album_next = Label.new()
 	_album_next.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
