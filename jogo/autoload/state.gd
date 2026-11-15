@@ -29,6 +29,14 @@ const BAR_CAPS := {
 const HOUSE_UPGRADE_COST := {1: 18, 2: 55}   # upgrading the house always fits in the energy bar of its level
 const START_ITEMS := {"4,4": "habitat"}
 const START_INVENTORY := {"lettuce": 1}   # a snack that came from Earth, for the 1st expedition
+# Seeds (Design): the child starts with lettuce seeds only. The other seeds come in the packages from Earth.
+# A seed can only be planted after the plant is unlocked by harvests ("unlock" in PLANTS): that rule stays.
+const START_SEEDS := {"lettuce": 5}
+const PACKAGE_EVERY := 150            # with the antenna built, a package from Earth arrives after 150 sols without one (and also when "No signal" ends)
+## No antenna: no package (the countdown only starts when the antenna is built). "No signal": the countdown pauses until the signal is back.
+const PACKAGE_SEEDS := 3              # each package brings 3 random seeds (can be 3 of the same plant or mixed)
+const PACKAGE_CARDS_BY := 5           # the potato and tomato cards come at random in one of the first 5 packages
+const HARVEST_SEEDS := Vector2i(1, 3) # each harvest gives back 1 to 3 seeds of the same plant
 const MAX_LEVEL := 3
 ## The base area grows with Mike's House level: 4x4 at level 1, 7x7 at 2 and the whole grid (10x10) at 3.
 const ZONES := {1: Rect2i(3, 3, 4, 4), 2: Rect2i(2, 2, 7, 7), 3: Rect2i(0, 0, GRID_W, GRID_H)}
@@ -184,6 +192,9 @@ var music_on := true
 var sounds_on := true
 var tutorial := 0               # step of the first-minute tutorial (TUTORIAL_DONE = finished)
 const TUTORIAL_DONE := 99
+var seeds := {}                  # "plant" -> how many seeds the child has
+var next_package_sol := PACKAGE_EVERY
+var packages := 0                # how many packages from Earth have arrived
 var tube_card := 0               # card inside the tube that has not been opened yet (0 = none)
 var away := {}                   # what happened while the game was closed: {"sols", "plants"}
 
@@ -432,6 +443,9 @@ func new_game() -> void:
 	seen_cards = {}
 	next_break_sol = sol + BREAK_EVERY.x + 30
 	inventory = START_INVENTORY.duplicate()
+	seeds = START_SEEDS.duplicate()
+	next_package_sol = PACKAGE_EVERY
+	packages = 0
 	for k in START_ITEMS:
 		items[k] = _new_item(START_ITEMS[k])
 	changed.emit()
@@ -731,8 +745,9 @@ func unlocked_plants() -> Array:
 
 func plant(c: Vector2i, plant_type: String) -> bool:
 	var it := item_at(c)
-	if it.get("type") != "greenhouse" or it.plant != "" or not (plant_type in unlocked_plants()):
+	if it.get("type") != "greenhouse" or it.plant != "" or not (plant_type in unlocked_plants()) or int(seeds.get(plant_type, 0)) <= 0:
 		return false
+	seeds[plant_type] = int(seeds[plant_type]) - 1
 	it.plant = plant_type
 	it.growth = 0.0
 	_after_action()
@@ -754,11 +769,15 @@ func harvest(c: Vector2i) -> String:
 	it.growth = 0.0
 	harvests += 1
 	inventory[p] = int(inventory.get(p, 0)) + 1
+	var got := randi_range(HARVEST_SEEDS.x, HARVEST_SEEDS.y)   # the harvest gives back seeds of the same plant
+	seeds[p] = int(seeds.get(p, 0)) + got
 	if not cards.has(str(PLANTS[p].card)):
 		add_card(PLANTS[p].card)
 	if unlocked_plants().size() > before:
 		var new_plant: String = unlocked_plants()[-1]
 		event_message.emit("SEED_NEW", tr(PLANTS[new_plant].name))
+	else:
+		event_message.emit("HARVEST_SEEDS", "%d %s" % [got, tr(PLANTS[p].name)])
 	_after_action()
 	return p
 
@@ -1029,7 +1048,8 @@ func choose_nosignal(plan: String) -> bool:
 	nosignal_left = NOSIGNAL_SOLS
 	if plan == "plant":
 		for k in items:
-			if items[k].type == "greenhouse" and items[k].plant == "":
+			if items[k].type == "greenhouse" and items[k].plant == "" and int(seeds.get("lettuce", 0)) > 0:
+				seeds.lettuce = int(seeds.lettuce) - 1
 				items[k].plant = "lettuce"
 				items[k].growth = 0.0
 	_resume()
@@ -1044,14 +1064,36 @@ func _end_cold() -> void:
 
 func _end_nosignal() -> void:
 	nosignal_plan = ""
-	# The package opens by itself: its card shows up on the screen right away (no need to look for it).
-	var brought := ""
+	if count_items("antenna") > 0:
+		_send_package("EV_NOSIGNAL_BACK")
+	else:
+		event_message.emit("EV_SIGNAL_BACK", "")   # without the antenna, no package
+
+
+## Package from Earth: 3 random seeds (and, in the first 5 packages, the potato and tomato cards at random).
+## It opens by itself: the message says what came, and a card shows up on the screen right away.
+## Sols until the next package (for the antenna panel).
+func package_sols_left() -> int:
+	return maxi(next_package_sol - sol, 0)
+
+
+func _send_package(key: String) -> void:
+	packages += 1
+	next_package_sol = sol + PACKAGE_EVERY
+	var got := {}
+	for i in PACKAGE_SEEDS:
+		var p: String = PLANTS.keys().pick_random()
+		got[p] = int(got.get(p, 0)) + 1
+		seeds[p] = int(seeds.get(p, 0)) + 1
+	var parts := []
+	for p in got:
+		parts.append("%d %s" % [got[p], tr(PLANTS[p].name)])
+	var left := PACKAGE_CARDS_BY - packages + 1   # packages left until the 5th (the last one brings what is missing)
 	for id in PACKAGE_CARDS:
-		if not cards.has(str(id)):
-			brought = tr("CARD_%d_NAME" % id)
+		if not cards.has(str(id)) and (left <= 1 or randf() < 1.0 / left):
+			parts.append(tr("CARD_%d_NAME" % id))
 			add_card(id)
-			break
-	event_message.emit("EV_NOSIGNAL_BACK" if brought != "" else "EV_SIGNAL_BACK", brought)
+	event_message.emit(key, ", ".join(parts))
 
 
 func _reward_once(id: int) -> void:
@@ -1158,6 +1200,12 @@ func _tick() -> void:
 		nosignal_left -= 1
 		if nosignal_left == 0:
 			_end_nosignal()
+	if count_items("antenna") == 0:
+		next_package_sol = sol + PACKAGE_EVERY   # no antenna: the countdown has not started yet
+	elif nosignal_left > 0:
+		next_package_sol += 1                    # no signal: the countdown pauses
+	if not _offline and tutorial >= TUTORIAL_DONE and sol >= next_package_sol and nosignal_left == 0:
+		_send_package("PACKAGE_ARRIVED")
 	if not _offline and tutorial >= TUTORIAL_DONE and sol >= next_break_sol:
 		next_break_sol = sol + randi_range(BREAK_EVERY.x, BREAK_EVERY.y)
 		break_something()
@@ -1298,7 +1346,8 @@ func _ready_plants() -> int:
 const _SAVED := ["energy", "oxygen", "shield", "sol", "items", "cards", "harvests", "inventory", "locale", "paused",
 	"pending_event", "next_storm_sol", "storms_seen", "storm_left", "storm_shielded", "storm_event",
 	"next_event_sol", "dust_left", "cold_left", "cold_heated", "nosignal_left", "nosignal_plan",
-	"explore_left", "tube_card", "tutorial", "music_on", "sounds_on", "snack", "last_empty", "seen_cards", "next_break_sol"]
+	"explore_left", "tube_card", "tutorial", "music_on", "sounds_on", "snack", "last_empty", "seen_cards", "next_break_sol",
+	"seeds", "next_package_sol", "packages"]
 
 
 func save_game() -> void:
@@ -1337,6 +1386,10 @@ func load_game() -> bool:
 			moved[key(parse_key(k) + OLD_GRID_SHIFT)] = items[k]
 		items = moved
 	# Save from before the new album: the cards already owned count as seen.
+	# Save from before the seeds: starts with the lettuce seeds and the package counter running.
+	if not data.has("seeds"):
+		seeds = START_SEEDS.duplicate()
+		next_package_sol = sol + PACKAGE_EVERY
 	if not data.has("seen_cards"):
 		for k in cards:
 			seen_cards[k] = true

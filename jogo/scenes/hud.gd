@@ -438,11 +438,13 @@ func _refresh_panel() -> void:
 		return
 	# Each sol only the "Lettuce · 12/33 sols" text changes: the buttons stay as they are (they used to blink).
 	var sig := "%s|%s|%d|%s|%s|%s|%s|%s|%s|%s" % [selected, it.type, int(it.level), it.get("plant", ""), State.plant_ready(selected), it.get("broken", false),
-		State.base_locked_reason(), State.upgrade_block_reason(selected), State.unlocked_plants(), TranslationServer.get_locale()]
+		State.base_locked_reason(), State.upgrade_block_reason(selected), State.unlocked_plants(), TranslationServer.get_locale()] + str(State.seeds)
 	if sig == _panel_sig:
 		if it.type == "greenhouse" and str(it.get("plant", "")) != "" and not State.plant_ready(selected):
 			_panel_info.text = tr("PLANT_GROWING").format({
 				"plant": tr(State.PLANTS[it.plant].name), "n": int(it.growth), "max": State.PLANTS[it.plant].sols})
+		if it.type == "antenna" and not it.get("broken", false):
+			_panel_info.text = _package_text()
 		return
 	_panel_sig = sig
 	var def: Dictionary = State.ITEMS[it.type]
@@ -495,7 +497,10 @@ func _refresh_panel() -> void:
 			_panel_buttons.add_child(seeds)
 			for p in State.unlocked_plants():
 				var plant_def: Dictionary = State.PLANTS[p]
-				var pb := _add_panel_button("%s (%d)" % [tr(plant_def.name), plant_def.sols], _on_plant.bind(p), true)
+				var n_seeds := int(State.seeds.get(p, 0))
+				var pb := _add_panel_button("%s (%d)
+%s" % [tr(plant_def.name), plant_def.sols, tr("SEEDS_LEFT").format({"n": n_seeds})], _on_plant.bind(p), true)
+				pb.disabled = n_seeds <= 0   # no seeds: wait for a harvest or a package from Earth
 				pb.reparent(seeds)
 				pb.custom_minimum_size = Vector2(0, 128)
 				pb.add_theme_font_size_override("font_size", 23)
@@ -512,6 +517,10 @@ func _refresh_panel() -> void:
 			_panel_info.visible = true
 			_panel_info.text = tr("PLANT_GROWING").format({
 				"plant": tr(State.PLANTS[it.plant].name), "n": int(it.growth), "max": State.PLANTS[it.plant].sols})
+	# Antenna: how many sols (and how much time) until the next package from Earth.
+	if it.type == "antenna":
+		_panel_info.visible = true
+		_panel_info.text = _package_text()
 	# Shelf: the golden "View shelf" button (front camera and the slots to choose what to display).
 	if it.type == "shelf":
 		var shelf_key := State.key(State.anchor_of(selected))
@@ -1171,6 +1180,15 @@ func _refresh() -> void:
 
 
 ## "1 sóis" becomes "1 sol" (and "1 sols", "1 soles" too).
+## "Next package in 12 sols (0:42)". With no signal, the countdown is paused.
+func _package_text() -> String:
+	if State.nosignal_left > 0:
+		return tr("PACKAGE_PAUSED")
+	var n := State.package_sols_left()
+	var secs := int(ceil(n * State.SOL_SECONDS))
+	return _sols(tr("PACKAGE_NEXT").format({"n": n, "time": "%d:%02d" % [secs / 60, secs % 60]}))
+
+
 func _sols(text: String) -> String:
 	var re := RegEx.new()
 	re.compile("(^|[^0-9/])1 (sóis|sols|soles)")
@@ -1738,7 +1756,7 @@ func _process(delta: float) -> void:
 			p.size.y = want
 	if _tut_card.visible:
 		_tut_card.position.y = _bars_bottom()
-	if State.tutorial == 5 and _tut_done_at > 0.0 and Time.get_ticks_msec() / 1000.0 - _tut_done_at > 5.0:
+	if State.tutorial == 5 and _tut_done_at > 0.0 and Time.get_ticks_msec() / 1000.0 - _tut_done_at > 8.0:
 		State.finish_tutorial()
 		_tut_update()
 	var target: Variant = _tut_target()
