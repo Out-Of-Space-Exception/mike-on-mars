@@ -13,7 +13,8 @@ func _ready() -> void:
 	hud = main.get_node("Hud")
 	State.new_game()
 	State.tutorial = State.TUTORIAL_DONE
-	# Os testes de regra começam com as barras cheias (o começo devagar tem o teste dele).
+	# Os testes de regra começam com as barras cheias e sem teto (o teto tem o teste dele).
+	State.free_bars = true
 	State.energy = 100.0
 	State.oxygen = 100.0
 	State.shield = 100.0
@@ -32,6 +33,7 @@ func _ready() -> void:
 	_batata_e_album()
 	_quebrar_e_consertar()
 	_comeco_devagar()
+	_estante(main.get_node("Base"))
 	# O recado do tutorial tem o tamanho do texto (antes crescia até a tela inteira e não voltava).
 	State.restart_tutorial()
 	hud._start.visible = false
@@ -477,7 +479,7 @@ func _quebrar_e_consertar() -> void:
 	State.new_game()
 	State.tutorial = State.TUTORIAL_DONE
 	State.energy = 100.0
-	ok(State.upgrade_cost(Vector2i(4, 4)) == 30, "melhorar a casa para o nível 2 custa 30")
+	ok(State.upgrade_cost(Vector2i(4, 4)) == 18, "melhorar a casa para o nível 2 custa 18 (cabe na barra de 20)")
 	State.build("solar", Vector2i(3, 3))
 	ok(State.upgrade_cost(Vector2i(3, 3)) == 30, "painel solar: nível 2 custa 3 vezes o preço (30)")
 	State.energy = 100.0
@@ -493,15 +495,68 @@ func _quebrar_e_consertar() -> void:
 
 
 func _comeco_devagar() -> void:
+	State.free_bars = false
 	State.new_game()
 	ok(is_equal_approx(State.energy, 20.0) and is_equal_approx(State.oxygen, 40.0) and is_equal_approx(State.shield, 40.0), "começo devagar: energia 20, oxigênio e escudo 40")
 	State.build("solar", Vector2i(3, 3))
 	State.tutorial = 1
 	ok(State.tutorial_needs_energy() and not State.tutorial_holds_time(), "no tutorial, sem energia para a estufa o tempo anda")
 	State.tutorial = State.TUTORIAL_DONE
-	State.energy = 100.0
+	# Teto: a energia não passa de 20 com a casa no nível 1 (antes só começava em 20 e passava).
+	State.energy = 20.0
+	for i in 30:
+		State._tick()
+	ok(State.energy <= 20.0 and State.oxygen <= 40.0 and State.shield <= 40.0, "casa nível 1: energia até 20, oxigênio e escudo até 40")
+	ok(State.build_block_reason("rtg") == "NEED_BIGGER_BAR", "o RTG (30) não cabe na barra de 20: melhore a casa")
+	ok(State.upgrade_cost(Vector2i(4, 4)) <= 20, "melhorar a casa cabe na barra de 20 (custa %d)" % State.upgrade_cost(Vector2i(4, 4)))
+	ok(State.storm_shield_cost() <= 20.0, "o escudo da tempestade cabe na barra de 20")
+	State.energy = 20.0
+	ok(State.upgrade(Vector2i(4, 4)), "dá para melhorar a casa com a barra cheia")
+	ok(is_equal_approx(State.energy, 60.0) and is_equal_approx(State.oxygen, 60.0) and is_equal_approx(State.shield, 60.0), "casa no nível 2: as barras vão até 60 e enchem")
+	for i in 30:
+		State._tick()
+	ok(State.energy <= 60.0, "casa nível 2: a energia não passa de 60")
+	ok(State.upgrade_cost(Vector2i(4, 4)) <= 60, "melhorar a casa de novo cabe na barra de 60")
+	State.energy = 60.0
 	State.upgrade(Vector2i(4, 4))
-	ok(State.oxygen >= 60.0 and State.shield >= 60.0, "casa no nível 2: as barras sobem para 60")
+	ok(is_equal_approx(State.energy, 100.0) and is_equal_approx(State.oxygen, 100.0), "casa no nível 3: as barras vão até 100 e enchem")
+	State.free_bars = true
+
+
+func _estante(base: Node) -> void:
+	State.free_bars = true
+	State.new_game()
+	State.tutorial = State.TUTORIAL_DONE
 	State.energy = 100.0
+	ok(State.build_block_reason("shelf") == "NEED_HOUSE_2", "estante: com a casa no nível 1, não dá para construir")
 	State.upgrade(Vector2i(4, 4))
-	ok(is_equal_approx(State.energy, 100.0) and is_equal_approx(State.oxygen, 100.0), "casa no nível 3: as barras enchem")
+	State.energy = 100.0
+	ok(State.build_block_reason("shelf") == "", "estante: com a casa no nível 2, dá")
+	ok(State.build("shelf", Vector2i(3, 3)), "construiu a estante")
+	ok(State.build_block_reason("shelf") == "NEED_MAX", "só dá para ter 1 estante")
+	ok(State.upgrade_cost(Vector2i(3, 3)) < 0, "a estante não tem nível")
+	var E := preload("res://scenes/estante.gd")
+	ok(E.vagas_liberadas() == 3, "casa nível 2: 3 vagas")
+	var todos: Array = E._todos()
+	ok(not ("rock:hematita" in todos) and "rock:enxofre" in todos and "plant:lettuce" in todos and "plant:potato" in todos, "a estante só mostra o que dá para ter no álbum")
+	ok(not E._tem("rock:enxofre"), "pedra sem a carta: ainda trancada")
+	State.add_card(9)
+	ok(E._tem("rock:enxofre"), "ganhou a carta do enxofre: dá para expor")
+	State.add_card(4)
+	State.items["3,3"]["expo"] = ["rock:enxofre", "plant:potato", "", "rock:enxofre", "", ""]
+	State.changed.emit()
+	var node: Node3D = base._nodes.get("3,3")
+	var v1: Node = node.find_child("vaga-1", true, false) if node else null
+	var v2: Node = node.find_child("vaga-2", true, false) if node else null
+	var v4: Node = node.find_child("vaga-4", true, false) if node else null
+	ok(v1 != null and v1.get_node_or_null("Expo") != null, "a pedra aparece na vaga 1 da estante")
+	ok(v2 != null and v2.get_node_or_null("Expo") != null, "a batata (feita no código) aparece na vaga 2")
+	ok(v4 != null and v4.get_node_or_null("Expo") == null, "a vaga 4 fica trancada com a casa no nível 2")
+	hud._estante.abrir("3,3")
+	ok(hud._estante.visible and hud._estante._grade.get_child_count() == 6, "Ver estante: abre com as 6 vagas")
+	hud._estante._escolher(2)
+	ok(hud._estante._lista.get_child_count() > 3, "tocar numa vaga mostra a lista")
+	hud._estante._colocar("rock:enxofre")
+	ok(State.items["3,3"].expo[2] == "rock:enxofre" and State.items["3,3"].expo[0] == "", "a pedra muda de vaga (aparece uma vez só)")
+	hud._estante._voltar()
+	ok(not hud._estante.visible, "o X fecha a estante")

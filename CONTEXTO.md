@@ -36,6 +36,7 @@ Você está ajudando o time **Out of Space Exception** (Brasil) no NASA Space Ap
 ## 3. Como o jogo funciona
 
 - **3 barras, só 3:** ⚡ **Energia**, 🫁 **Oxigênio** e 🛡️ **Escudo** (a proteção do Mike contra a radiação do Sol).
+- **A Casa do Mike faz as barras crescerem:** no nível 1, a energia vai até 20 e o oxigênio e o escudo até 40; no nível 2, tudo vai até 60; no nível 3, até 100. Melhorar a casa também enche as barras.
 - **Construir:** toca no item, toca no chão (sem arrastar). Dá para **mover, girar, remover sem perder nada e melhorar** (o painel cresce, a estufa aumenta). O álbum destrava **decorações**.
 - **A Casa do Mike manda na base:** o nível dela abre área nova para construir (4 x 4 casas no nível 1, 6 x 6 no 2, 6 x 8 no 3) e é o nível máximo das outras construções. O planetinha cresce junto.
 - **Plantar:** na estufa. A luz da estufa gasta energia. As plantas crescem num tempo proporcional ao real (alface ≈ 1 min 20 s; pimenta ≈ 5 min).

@@ -22,9 +22,18 @@
   "chao": "terreno-marte.glb",
   "efeito-poeira": "poeira_flutuando.gd",
   "plataforma-pouso": "plataforma-pouso-n1.glb",
-  "kilopower": "kilopower.glb"
+  "kilopower": "kilopower.glb",
+  "estante": "estante.glb",
+  "john-klein-a": "john-klein-a.glb",
+  "john-klein-b": "john-klein-b.glb",
+  "john-klein-c": "john-klein-c.glb",
+  "meteorito-lebanon": "meteorito-lebanon.glb",
+  "oxido-de-manganes": "oxido-de-manganes.glb",
+  "rocknest-3": "rocknest-3.glb",
+  "veios-brancos": "veios-brancos.glb"
  },
  "heights": {
+  "shelf": 1.8,
   "habitat": 3.5,
   "greenhouse": 2,
   "solar": 1.4,

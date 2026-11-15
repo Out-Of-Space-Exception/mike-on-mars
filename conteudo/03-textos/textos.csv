@@ -128,7 +128,7 @@ B_KILOPOWER,Kilopower,Kilopower,Kilopower,Kilopower
 B_KILOPOWER_DESC,"Uma mini usina nuclear: energia forte, de dia e de noite.","A mini nuclear power plant: strong energy, day and night.","Una mini planta nuclear: energía fuerte, de día y de noche.","Une mini centrale nucléaire : beaucoup d'énergie, jour et nuit."
 NEED_SPACE,Falta espaço livre ao lado.,It needs free space next to it.,Falta espacio libre al lado.,Il faut de la place à côté.
 NEED_HOUSE,"Primeiro, melhore a Casa do Mike.","First, upgrade Mike's habitat.","Primero, mejora la Casa de Mike.","D'abord, améliore la Maison de Mike."
-MAP_GROW,A base cresceu e as barras subiram!,The base grew and the bars went up!,¡La base creció y las barras subieron!,La base a grandi et les barres sont montées !
+MAP_GROW,A base cresceu e as barras ficaram maiores!,The base grew and the bars got bigger!,¡La base creció y las barras se hicieron más grandes!,La base a grandi et les barres sont plus grandes !
 MAP_LOCKED,Melhore a Casa do Mike para abrir aqui.,Upgrade Mike's habitat to open this.,Mejora la Casa de Mike para abrir aquí.,Améliore la Maison de Mike pour ouvrir ici.
 HOW_TITLE,Como ganhar esta carta,How to get this card,Cómo ganar esta carta,Comment gagner cette carte
 HOW_HARVEST,Colha {name} na estufa.,Harvest {name} in the greenhouse.,Cosecha {name} en el invernadero.,Récolte {name} dans la serre.
@@ -197,3 +197,5 @@ ITEM_FIXED,Consertado!,Fixed!,¡Arreglado!,Réparé !
 BTN_REPAIR,Consertar,Fix,Arreglar,Réparer
 BROKEN_TEXT,Quebrado: parou de funcionar.,Broken: it stopped working.,Roto: dejó de funcionar.,Cassé : il ne marche plus.
 TUTO_WAIT_ENERGY,Falta energia. Espere a barra amarela encher um pouco!,Not enough energy. Wait for the yellow bar to fill a bit!,Falta energía. ¡Espera a que la barra amarilla se llene un poco!,Pas assez d'énergie. Attends que la barre jaune se remplisse un peu !
+NEED_BIGGER_BAR,A barra de energia ainda é pequena. Melhore a Casa do Mike!,The energy bar is still small. Upgrade Mike's house!,¡La barra de energía aún es pequeña. Mejora la casa de Mike!,La barre d'énergie est encore petite. Améliore la maison de Mike !
+INFO_SHELF,Uma estante para mostrar o que você achou em Marte: plantas da estufa e pedras das expedições. Toque nela e escolha!,A shelf to show off what you found on Mars: greenhouse plants and rocks from your trips. Tap it and choose!,Un estante para mostrar lo que encontraste en Marte: plantas del invernadero y rocas de las expediciones. ¡Tócalo y elige!,Une étagère pour montrer ce que tu as trouvé sur Mars : plantes de la serre et roches des expéditions. Touche-la et choisis !

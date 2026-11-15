@@ -129,6 +129,7 @@ var _album_page_title: Label
 var _album_page := 0
 var _album_badge: PanelContainer
 var _album_box: StyleBoxFlat
+var _estante: Control
 const ALBUM_MAX_W := 1000.0   # no PC o álbum fica no meio, no máximo desta largura   # bolinha vermelha no botão Álbum: quantas cartas novas
 var _nasa: PanelContainer
 var _nasa_text: Label
@@ -160,6 +161,10 @@ func _ready() -> void:
 	_info_construcao.icons = {"energy": _icon("energy"), "oxygen": _icon("oxygen"), "shield": _icon("shield"), "card": _icon("card")}
 	_info_construcao.model_for = func(type: String) -> Node3D: return _item_model(type, 1.25)
 	_root.add_child(_info_construcao)
+	_estante = preload("res://scenes/estante.gd").new()
+	_estante.hud = self
+	_estante.red_x = _red_x
+	_root.add_child(_estante)
 	_info_construcao.construir.connect(_on_build_item)
 	_build_settings()
 	_build_postcard()
@@ -504,6 +509,16 @@ func _refresh_panel() -> void:
 			_panel_info.visible = true
 			_panel_info.text = tr("PLANT_GROWING").format({
 				"plant": tr(State.PLANTS[it.plant].name), "n": int(it.growth), "max": State.PLANTS[it.plant].sols})
+	# Estante: o botão dourado "Ver estante" (câmera de frente e as vagas para escolher o que expor).
+	if it.type == "shelf":
+		var chave := State.key(State.anchor_of(selected))
+		var ver := _add_panel_button(tr("BTN_SHELF"), func() -> void:
+			Sfx.play("abrir-menu")
+			_close_panel()
+			_estante.abrir(chave), true)
+		ver.custom_minimum_size.y = 88
+		ver.set_meta("base_color", Palette.GOLD)
+		_style_key(ver, true)
 	if State.base_locked_reason() != "":
 		return
 	# Quebrada: a ação principal é consertar (e ela não melhora enquanto estiver quebrada).
@@ -682,7 +697,7 @@ func _show_event(type: String) -> void:
 			Sfx.play("energia-volta")
 		"cold":
 			_show_choice(tr("EV_COLD_TITLE"), [tr("EV_COLD_TEXT"), tr("EV_COLD_Q")],
-				"%s  ·  -%d %s" % [tr("EV_COLD_A"), int(State.COLD_HEAT_COST), tr("BAR_ENERGY").to_lower()], State.can_afford(State.COLD_HEAT_COST),
+				"%s  ·  -%d %s" % [tr("EV_COLD_A"), int(State.cold_cost()), tr("BAR_ENERGY").to_lower()], State.can_afford(State.cold_cost()),
 				func() -> void: State.choose_cold(true),
 				tr("EV_COLD_B"), func() -> void: State.choose_cold(false))
 			Sfx.play("alerta")
@@ -1094,14 +1109,15 @@ func _refresh() -> void:
 		var value: float = State.get(bar)
 		_bars[bar].value = value
 		_bar_nums[bar].text = str(int(floor(value)))
-		_bar_nums[bar].add_theme_color_override("font_color", Color.WHITE if value < State.LOW else Palette.INK)
+		_bar_nums[bar].add_theme_color_override("font_color", Color.WHITE if value < State.low_line(bar) else Palette.INK)
+		_bars[bar].cap = State.bar_cap(bar)
 		var r: float = rates[bar]
 		var rl: Label = _bar_rates[bar]
 		rl.get_parent().modulate.a = 1.0 if absf(r) >= 0.05 else 0.0
 		rl.text = ("%+d/sol" % roundi(r)) if absf(r) >= 1.0 else ("%+.1f/sol" % r)
 		rl.add_theme_color_override("font_color", Palette.UP if r > 0.0 else Palette.DOWN)
 		_bar_labels[bar].text = tr(BAR_KEYS[bar])
-		_bars[bar].color = Palette.ALERT if value < State.LOW else Palette.BAR[bar]
+		_bars[bar].color = Palette.ALERT if value < State.low_line(bar) else Palette.BAR[bar]
 	_sol_label.text = "%s  •  %s" % [tr("HUD_SOL").format({"n": State.sol}), tr("HUD_PLACE")]
 	_start_lang.text = LANG_NAMES.get(State.locale, "EN")
 	_start_lang.icon = _icon("flag_" + State.locale)

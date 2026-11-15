@@ -17,9 +17,16 @@ const SAVE_EVERY := 10.0
 const GRID_W := 10
 const GRID_H := 10
 const BAR_MAX := 100.0
-const LOW := 20.0                   # barra abaixo disso trava ou desacelera
+const LOW_PART := 0.2               # barra abaixo de 1/5 do teto: desacelera (no nível 3, abaixo de 20)
 const START := {"energy": 20.0, "oxygen": 40.0, "shield": 40.0}   # começo devagar: a casa faz as barras subirem
-const HOUSE_BARS := {2: 60.0, 3: 100.0}   # casa no nível 2: as 3 barras sobem para 60; no nível 3, enchem
+## Teto das barras: a Casa do Mike faz as barras crescerem. Nível 1: energia até 20, oxigênio e escudo até 40;
+## nível 2: tudo até 60; nível 3: tudo até 100. Melhorar a casa também enche as barras até o teto novo.
+const BAR_CAPS := {
+	1: {"energy": 20.0, "oxygen": 40.0, "shield": 40.0},
+	2: {"energy": 60.0, "oxygen": 60.0, "shield": 60.0},
+	3: {"energy": 100.0, "oxygen": 100.0, "shield": 100.0},
+}
+const HOUSE_UPGRADE_COST := {1: 18, 2: 55}   # melhorar a casa sempre cabe na barra de energia do nível dela
 const START_ITEMS := {"4,4": "habitat"}
 const START_INVENTORY := {"lettuce": 1}   # um lanche que veio da Terra, para a 1ª expedição
 const MAX_LEVEL := 3
@@ -35,7 +42,7 @@ const BREAK_EVERY := Vector2i(110, 170)  # sóis entre uma quebra e outra
 const BREAK_AFTER_STORM := 0.5           # sem escudo: chance de quebrar algo
 const REPAIR_FACTOR := 0.4               # consertar custa 40% do preço de construir (no mínimo 6)
 const BREAKABLE := ["greenhouse", "solar", "rtg", "moxie", "antenna"]
-const SHIELD_RECHARGE := 2.0        # por sol, se a energia estiver acima de LOW
+const SHIELD_RECHARGE := 2.0        # por sol, se a energia não estiver baixa
 const OXYGEN_BREATH := 0.5          # o Mike respira: gasta oxigênio todo sol
 const PLANT_OXYGEN := 0.3           # cada planta crescendo na estufa faz um pouco de oxigênio
 const EMERGENCY_ENERGY := 0.5       # bateria de emergência da casa, quando a energia está baixa
@@ -53,8 +60,10 @@ const ITEMS := {
 	"flag": {"name": "D_FLAG", "cost": 0, "height": 1.4, "model": "decoracao-bandeira", "decor": 5},
 	"lights": {"name": "D_LIGHTS", "cost": 0, "height": 1.2, "model": "decoracao-luzinhas", "decor": 10},
 	"pot": {"name": "D_POT", "cost": 0, "height": 0.6, "model": "decoracao-vaso", "decor": 15},
+	# Estante de exposição (Design): só 1, com a Casa do Mike no nível 2. Quem libera as vagas é a casa.
+	"shelf": {"name": "D_SHELF", "cost": 0, "height": 1.8, "model": "estante", "max": 1, "house": 2},
 }
-const BUILDABLE := ["greenhouse", "solar", "rtg", "moxie", "antenna", "pad", "flag", "lights", "pot"]
+const BUILDABLE := ["greenhouse", "solar", "rtg", "moxie", "antenna", "pad", "flag", "lights", "pot", "shelf"]
 const CARD_KILOPOWER := 14          # RTG no nível 3 vira uma mini usina (carta Kilopower)
 const KILOPOWER_ENERGY := 4.0       # o Kilopower (RTG nível 3) dá 4 de energia por sol, dia e noite
 # Quantas casas da grade cada nível ocupa (os modelos do design/03 crescem para o lado: nível 3 = 3 casas)
@@ -126,6 +135,7 @@ const OFFLINE_MAX_SOLS := 2000      # ~1h20 de jogo; depois disso para de contar
 const SAVE_PATH := "user://save.json"
 const SAVE_VERSION := 1
 
+var free_bars := false   # só nos testes de regra: barras sem teto (o teto tem o teste dele)
 var started := false             # o tempo só corre depois do "Jogar"
 var energy := 0.0
 var oxygen := 0.0
@@ -187,6 +197,7 @@ func _ready() -> void:
 	var saved_at := 0
 	if load_game():
 		saved_at = int(_read_json(SAVE_PATH).get("saved_at", 0))
+		clamp_bars()   # saves antigos: as barras passavam do teto da casa
 	else:
 		new_game()
 	if locale == "":
@@ -199,6 +210,27 @@ func _ready() -> void:
 	# Atalho para testar e gravar o vídeo: ?tubo traz um tubo de amostra esperando para abrir.
 	if OS.has_feature("web") and str(JavaScriptBridge.eval("location.search", true)).contains("tubo") and tube_card == 0:
 		tube_card = _draw_tube()
+	# Atalho para testar a estante: ?estante deixa a casa no nível 2, com a estante e algumas cartas.
+	if OS.has_feature("web") and str(JavaScriptBridge.eval("location.search", true)).contains("estante") and count_items("shelf") == 0:
+		_test_shelf()
+
+
+## Só para testar (atalho ?estante): casa no nível 2, estante construída e algumas cartas no álbum.
+func _test_shelf() -> void:
+	tutorial = TUTORIAL_DONE
+	for k in items:
+		if items[k].type == "habitat":
+			items[k].level = maxi(int(items[k].level), 2)
+	for id in [1, 2, 9, 26, 35]:
+		if not cards.has(str(id)):
+			add_card(id)
+	var area: Rect2i = ZONES[2]
+	for y in range(area.position.y, area.end.y):
+		for x in range(area.position.x, area.end.x):
+			if count_items("shelf") == 0 and can_place("shelf", 1, Vector2i(x, y)):
+				items[key(Vector2i(x, y))] = _new_item("shelf")
+	clamp_bars()
+	save_game()
 
 
 func card_info(id: int) -> Dictionary:
@@ -420,6 +452,25 @@ func house_level() -> int:
 	return lv
 
 
+## O teto de cada barra agora: cresce com a Casa do Mike (20/40/40, depois 60 e 100).
+func bar_cap(bar: String) -> float:
+	if free_bars:
+		return BAR_MAX
+	return float(BAR_CAPS[clampi(house_level(), 1, MAX_LEVEL)][bar])
+
+
+## "Pouco" é abaixo de 1/5 do teto (com a energia até 20, pouco é abaixo de 4).
+func low_line(bar: String) -> float:
+	return bar_cap(bar) * LOW_PART
+
+
+## Nenhuma barra passa do teto.
+func clamp_bars() -> void:
+	energy = clampf(energy, 0.0, bar_cap("energy"))
+	oxygen = clampf(oxygen, 0.0, bar_cap("oxygen"))
+	shield = clampf(shield, 0.0, bar_cap("shield"))
+
+
 ## A área aberta para construir com a casa no nível "level" (0 = o nível de agora).
 func zone(level := 0) -> Rect2i:
 	return ZONES[clampi(level if level > 0 else house_level(), 1, MAX_LEVEL)]
@@ -562,8 +613,12 @@ func build_block_reason(type: String) -> String:
 		return base_locked_reason()
 	if not is_unlocked(type):
 		return "LOCKED_DECOR"
+	if house_level() < int(def.get("house", 1)):
+		return "NEED_HOUSE_%d" % int(def.house)
 	if def.has("max") and count_items(type) >= int(def.max):
 		return "NEED_MAX"
+	if float(def.cost) > bar_cap("energy"):
+		return "NEED_BIGGER_BAR"
 	if not can_afford(def.cost):
 		return "NEED_ENERGY"
 	return ""
@@ -596,11 +651,13 @@ func move(from: Vector2i, to: Vector2i) -> bool:
 
 func upgrade_cost(c: Vector2i) -> int:
 	var it := item_at(c)
-	if it.is_empty():
-		return -1
+	if it.is_empty() or it.type == "shelf":
+		return -1   # a estante não tem nível: quem libera as vagas é a Casa do Mike
 	var lv := int(it.level)
 	if lv >= MAX_LEVEL:
 		return -1
+	if it.type == "habitat":
+		return int(HOUSE_UPGRADE_COST.get(lv, -1))
 	var base := float(ITEMS[it.type].cost)
 	if base <= 0.0:
 		base = UPGRADE_BASE_FREE
@@ -620,6 +677,8 @@ func upgrade_block_reason(c: Vector2i) -> String:
 		return "NEED_HOUSE"
 	if not can_place(it.type, int(it.level) + 1, c, key(c), int(it.get("rot", 0))):
 		return "NEED_SPACE"
+	if float(cost) > bar_cap("energy"):
+		return "NEED_BIGGER_BAR"
 	if not can_afford(cost):
 		return "NEED_ENERGY"
 	return ""
@@ -635,10 +694,9 @@ func upgrade(c: Vector2i) -> bool:
 	if items[key(c)].type == "rtg" and int(items[key(c)].level) == MAX_LEVEL and not cards.has(str(CARD_KILOPOWER)):
 		add_card(CARD_KILOPOWER)
 	if items[key(c)].type == "habitat":
-		var fill: float = HOUSE_BARS.get(int(items[key(c)].level), 0.0)
-		energy = maxf(energy, fill)
-		oxygen = maxf(oxygen, fill)
-		shield = maxf(shield, fill)
+		energy = maxf(energy, bar_cap("energy"))
+		oxygen = maxf(oxygen, bar_cap("oxygen"))
+		shield = maxf(shield, bar_cap("shield"))
 		event_message.emit("MAP_GROW", "")
 	_after_action()
 	return true
@@ -649,7 +707,7 @@ func remove(c: Vector2i) -> bool:
 	var it := item_at(c)
 	if base_locked_reason() != "" or it.is_empty() or not ITEMS[it.type].get("removable", true):
 		return false
-	energy = minf(BAR_MAX, energy + float(it.spent))
+	energy = minf(bar_cap("energy"), energy + float(it.spent))
 	items.erase(key(anchor_of(c)))
 	_after_action()
 	return true
@@ -829,7 +887,17 @@ func mike_inside() -> bool:
 
 ## Quanto custa levantar o escudo: com a antena (aviso da NASA), sai mais barato.
 func storm_shield_cost() -> float:
-	return STORM_SHIELD_COST_WARNED if count_items("antenna") > 0 else STORM_SHIELD_COST
+	return event_cost(STORM_SHIELD_COST_WARNED if count_items("antenna") > 0 else STORM_SHIELD_COST)
+
+
+## Aquecer a estufa no frio.
+func cold_cost() -> float:
+	return event_cost(COLD_HEAT_COST)
+
+
+## Os eventos cabem na barra pequena do começo: com a energia até 20, custam a metade.
+func event_cost(base: float) -> float:
+	return roundf(base * clampf(bar_cap("energy") / 40.0, 0.5, 1.0))
 
 
 func choose_storm(raise_shield: bool) -> bool:
@@ -928,11 +996,11 @@ func ack_event() -> void:
 
 
 func choose_cold(heat: bool) -> bool:
-	if pending_event != "cold" or (heat and not can_afford(COLD_HEAT_COST)):
+	if pending_event != "cold" or (heat and not can_afford(cold_cost())):
 		return false
 	cold_heated = heat
 	if heat:
-		energy -= COLD_HEAT_COST
+		energy -= cold_cost()
 	cold_left = COLD_SOLS
 	_resume()
 	return true
@@ -993,6 +1061,7 @@ func _tick() -> void:
 	var d_energy := 0.0
 	var d_oxygen := 0.0
 	var greenhouse_off := nosignal_left > 0 and nosignal_plan == "save"
+	var low_e := low_line("energy")
 	for k in items:
 		var it: Dictionary = items[k]
 		var def: Dictionary = ITEMS[it.type]
@@ -1005,8 +1074,8 @@ func _tick() -> void:
 		if it.type == "rtg" and int(it.level) >= MAX_LEVEL:
 			e = KILOPOWER_ENERGY
 			bonus = 1.0
-		if def.has("shield") and energy > LOW:
-			shield = minf(BAR_MAX, shield + def.shield * (int(it.level) - 1))
+		if def.has("shield") and energy > low_e:
+			shield = minf(bar_cap("shield"), shield + def.shield * (int(it.level) - 1))
 		if it.type == "greenhouse":
 			e = def.energy_when_planted if it.plant != "" and not greenhouse_off else 0.0
 		d_energy += e * bonus if e > 0.0 else e
@@ -1014,7 +1083,7 @@ func _tick() -> void:
 		if def.has("oxygen") and energy > 0.0:
 			d_oxygen += def.oxygen * bonus
 		if it.type == "greenhouse" and it.plant != "" and not greenhouse_off and energy > 0.0:
-			var speed := 1.0 if energy >= LOW else SLOW_GROWTH
+			var speed := 1.0 if energy >= low_e else SLOW_GROWTH
 			if cold_left > 0 and not cold_heated:
 				speed = COLD_GROWTH
 			it.growth += speed * (1.0 + GREENHOUSE_LEVEL_SPEED * (int(it.level) - 1))
@@ -1023,19 +1092,19 @@ func _tick() -> void:
 	# O Mike respira. E a casa tem uma bateria de emergência: com pouca energia, ela ajuda devagar
 	# (assim a criança nunca fica presa sem conseguir construir nada).
 	d_oxygen -= OXYGEN_BREATH
-	if energy < LOW:
+	if energy < low_e:
 		d_energy += EMERGENCY_ENERGY
 	var had_energy := energy > 0.0
 	var had_oxygen := oxygen > 0.0
-	energy = clampf(energy + d_energy, 0.0, BAR_MAX)
-	oxygen = clampf(oxygen + d_oxygen, 0.0, BAR_MAX)
+	energy = clampf(energy + d_energy, 0.0, bar_cap("energy"))
+	oxygen = clampf(oxygen + d_oxygen, 0.0, bar_cap("oxygen"))
 	if not _offline:
 		if had_energy and energy <= 0.0:
 			event_message.emit("OUT_ENERGY", "")
 		if had_oxygen and oxygen <= 0.0:
 			event_message.emit("OUT_OXYGEN", "")
-	if energy > LOW:
-		shield = minf(BAR_MAX, shield + SHIELD_RECHARGE)
+	if energy > low_e:
+		shield = minf(bar_cap("shield"), shield + SHIELD_RECHARGE)
 	sol += 1
 	if explore_left > 0:
 		explore_left -= 1
@@ -1163,7 +1232,7 @@ func current_rates() -> Dictionary:
 		var ir := item_rates(items[k])
 		for b in r:
 			r[b] += ir[b]
-	if energy < LOW:
+	if energy < low_line("energy"):
 		r.energy += EMERGENCY_ENERGY
 	else:
 		r.shield += SHIELD_RECHARGE
@@ -1264,6 +1333,7 @@ func _new_item(type: String) -> Dictionary:
 
 
 func _after_action() -> void:
+	clamp_bars()
 	changed.emit()
 	save_game()
 

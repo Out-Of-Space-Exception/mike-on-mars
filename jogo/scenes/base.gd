@@ -8,6 +8,7 @@ signal mike_tapped
 const CELL := 2.0
 const OUTSIDE := Vector2i(-1, -1)
 const ITEMS_DIR := "res://models/items/"
+const Estante := preload("res://scenes/estante.gd")
 const MIKE_SCENE := "res://models/mike/mike.glb"
 const MIKE_SUIT := "res://models/mike/mike-astronauta.glb"   # o Mike de traje, para a expedição
 const MIKE_MODEL_HEIGHT := 4.0   # altura do mike.glb em unidades do arquivo
@@ -1172,6 +1173,8 @@ func _sync_items() -> void:
 		label.text = tr(State.item_name(it))
 		_update_plant(node, it)
 		_update_broken(node, it, label.position.y)
+		if it.type == "shelf":
+			Estante.vestir(self, node, it)
 		if obra:
 			_obra(node, it.type, State.parse_key(k), w, rot)
 	var flat: float = FLAT_BY_LEVEL[clampi(State.house_level(), 1, State.MAX_LEVEL)]

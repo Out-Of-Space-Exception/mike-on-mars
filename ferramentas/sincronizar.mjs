@@ -30,8 +30,10 @@ const add = (key, porIdioma) => {
 };
 for (const t of textos) add(t.keys, t);
 // Textos que vêm junto com uma tela do Design (ex.: painel de informação da construção)
-const textosDesign = join(RAIZ, 'design/05-telas/info-construcao/textos.csv');
-if (existsSync(textosDesign)) for (const t of objetos(parse(readFileSync(textosDesign, 'utf8')))) add(t.keys, t);
+for (const tela of ['info-construcao', 'estante']) {
+  const textosDesign = join(RAIZ, 'design/05-telas', tela, 'textos.csv');
+  if (existsSync(textosDesign)) for (const t of objetos(parse(readFileSync(textosDesign, 'utf8')))) add(t.keys, t);
+}
 for (const c of cartas) {
   add(`CARD_${c.id}_NAME`, {pt_BR: c.nome_pt, en: c.nome_en, es: c.nome_es, fr: c.nome_fr});
   add(`CARD_${c.id}_FACT`, {pt_BR: c.fato_pt, en: c.fato_en, es: c.fato_es, fr: c.fato_fr});
@@ -107,7 +109,16 @@ if (existsSync(itensCsv)) {
 // Os 3 níveis (niveis/<item>-n1.glb, -n2, -n3) e a altura de cada item (tamanhos.csv, com o Mike = 2,2)
 const niveis = join(RAIZ, 'design/03-itens-do-jogo/niveis');
 if (existsSync(niveis)) for (const f of readdirSync(niveis)) if (f.endsWith('.glb')) copyFileSync(join(niveis, f), join(RAIZ, 'jogo/models/items', f));
-const alturas = {};
+// A estante de exposição e as pedras das descobertas (design/03: estante/ e descobertas/)
+for (const [pasta, quais] of [['estante', /^estante\.glb$/], ['descobertas', /\.glb$/]]) {
+  const dir = join(RAIZ, 'design/03-itens-do-jogo', pasta);
+  if (!existsSync(dir)) continue;
+  for (const f of readdirSync(dir)) if (quais.test(f)) {
+    copyFileSync(join(dir, f), join(RAIZ, 'jogo/models/items', f));
+    itens[f.replace(/\.glb$/, '')] = f;
+  }
+}
+const alturas = {shelf: 1.8};
 const tamanhosCsv = join(RAIZ, 'design/03-itens-do-jogo/tamanhos.csv');
 if (existsSync(tamanhosCsv)) {
   for (const t of objetos(parse(readFileSync(tamanhosCsv, 'utf8')))) {

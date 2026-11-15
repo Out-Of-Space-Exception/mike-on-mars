@@ -6,6 +6,11 @@ extends Control
 var value := 0.0:          # 0 a 100
 	set(v):
 		value = clampf(v, 0.0, 100.0)
+var cap := 100.0:          # acima do teto, o tubo fica trancado (listrado)
+	set(c):
+		if not is_equal_approx(c, cap):
+			cap = clampf(c, 0.0, 100.0)
+			queue_redraw()
 var color := Color.WHITE:
 	set(c):
 		color = c
@@ -52,5 +57,17 @@ func _draw() -> void:
 		draw_style_box(_cap(color.darkened(0.22), false, true), low)
 		if fill.size.x > h:
 			draw_style_box(_cap(Color(1, 1, 1, 0.38)), Rect2(fill.position + Vector2(h * 0.35, 3.0), Vector2(fill.size.x - h * 0.7, fill.size.y * 0.26)))
+	# Acima do teto (a Casa do Mike ainda é pequena): o tubo fica trancado, escuro e listrado.
+	if cap < 99.5:
+		var x0 := 3.0 + (size.x - 6.0) * cap / 100.0
+		var lock := Rect2(Vector2(x0, 3.0), Vector2(size.x - 3.0 - x0, h - 6.0))
+		draw_style_box(_cap(Color(0.05, 0.0, 0.02, 0.72), false, false), Rect2(lock.position, lock.size - Vector2(h * 0.5, 0.0)))
+		draw_style_box(_cap(Color(0.05, 0.0, 0.02, 0.72)), Rect2(lock.end - Vector2(h - 6.0, h - 6.0), Vector2(h - 6.0, h - 6.0)))
+		var step := 12.0
+		var x := x0 + 4.0
+		while x < size.x - h * 0.5:
+			draw_line(Vector2(x, h - 5.0), Vector2(minf(x + h * 0.5, size.x - h * 0.5), 5.0), Color(1, 1, 1, 0.16), 3.0, true)
+			x += step
+		draw_line(Vector2(x0, 2.0), Vector2(x0, h - 2.0), Color(1, 1, 1, 0.75), 3.0)
 	# Reflexo do vidro por cima de tudo.
 	draw_style_box(_cap(Color(1, 1, 1, 0.12)), Rect2(Vector2(h * 0.5, 3.0), Vector2(maxf(size.x - h, 0.0), h * 0.2)))

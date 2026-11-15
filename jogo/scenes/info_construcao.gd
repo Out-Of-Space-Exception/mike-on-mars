@@ -6,7 +6,7 @@ extends Control
 
 signal construir(type: String)
 
-const COM_INFO := ["greenhouse", "solar", "rtg", "moxie", "antenna", "pad", "flag", "lights", "pot"]
+const COM_INFO := ["greenhouse", "solar", "rtg", "moxie", "antenna", "pad", "flag", "lights", "pot", "shelf"]
 const VERDE := Color("9be27a")
 const VERMELHO := Color("ff9a8a")
 
