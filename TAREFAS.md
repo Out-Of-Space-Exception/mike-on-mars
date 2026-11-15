@@ -13,7 +13,7 @@
 - [x] 12h30 · [Os itens do jogo](design/03-itens-do-jogo/PASSO.md)
 - [x] 14h30 · [As cores das coisas](design/04-cores-das-coisas/PASSO.md)
 - [x] 17h · [As telas](design/05-telas/PASSO.md)
-- [ ] 18h · [Logo e ícone](design/06-logo-e-icone/PASSO.md)
+- [x] 18h · [Logo e ícone](design/06-logo-e-icone/PASSO.md)
 - [x] 19h · [Ícones dos botões](design/07-icones-dos-botoes/PASSO.md)
 - [x] 19h30 · [Teste no celular](design/08-teste-no-celular/PASSO.md)
 - [ ] 20h · [Entrega](design/09-entrega/PASSO.md)
@@ -56,3 +56,4 @@
 - [ ] **Dev → Conteúdo:** faltam 2 sons do `sons.csv` em `conteudo/01-sons/sons/`: `passos` e `vento-poeira` (os outros já chegaram).
 - [ ] **Dev → Conteúdo:** o jogo agora tem **35 cartas** (as 5 "em breve" de Meridiani e Jezero saíram: ids 7, 8, 10, 17 e 18). Trocar "40 cards" por "35 cards" no [slides.md](conteudo/04-slides/slides.md) e no [pagina.md](conteudo/06-pagina-do-projeto/pagina.md).
 - [x] **Dev → Conteúdo:** subir as fotos das cartas em `conteudo/02-cartas/fotos/` com os nomes do item 6 do [PASSO das cartas](conteudo/02-cartas/PASSO.md) (as de 7, 8, 10, 17 e 18 não precisam mais). As molduras do Design já estão prontas e entram no jogo junto com as fotos.
+- [ ] **Design → Dev:** colocar no jogo a **estante de exposição** (6 vagas, zoom ao tocar, a criança escolhe o que expor). Passo a passo testado numa cópia do jogo em [design/05-telas/estante/leiame.md](design/05-telas/estante/LEIAME.md).
