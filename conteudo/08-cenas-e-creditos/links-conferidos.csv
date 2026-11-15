@@ -1,0 +1,76 @@
+link,http,destino,resultado
+https://chatgpt.com,200,https://chatgpt.com,acessivel
+https://claude.ai,403,https://claude.ai,bloqueio ou erro HTTP; revisar manualmente
+https://fonts.google.com/specimen/Rubik,200,https://fonts.google.com/specimen/Rubik,acessivel
+https://gemini.google.com,200,https://gemini.google.com,acessivel
+https://github.com/rany2/edge-tts,200,https://github.com/rany2/edge-tts,acessivel
+https://godotengine.org/license/,200,https://godotengine.org/license/,acessivel
+https://images.nasa.gov/details/KSC-95pc1197,200,https://images.nasa.gov/details/KSC-95pc1197,acessivel
+https://images.nasa.gov/details/PIA16452,200,https://images.nasa.gov/details/PIA16452,acessivel
+https://images.nasa.gov/details/PIA16568,200,https://images.nasa.gov/details/PIA16568,acessivel
+https://images.nasa.gov/details/PIA16705,200,https://images.nasa.gov/details/PIA16705,acessivel
+https://images.nasa.gov/details/PIA18387,200,https://images.nasa.gov/details/PIA18387,acessivel
+https://images.nasa.gov/details/PIA20752,200,https://images.nasa.gov/details/PIA20752,acessivel
+https://images.nasa.gov/details/iss075e0250227,200,https://images.nasa.gov/details/iss075e0250227,acessivel
+https://kauai.ccmc.gsfc.nasa.gov/DONKI/,,https://kauai.ccmc.gsfc.nasa.gov/DONKI/,URLError: <urlopen error timed out>
+https://kenney.nl/assets/animated-characters-protagonists,200,https://kenney.nl/assets/animated-characters-protagonists,acessivel
+https://kenney.nl/assets/board-game-icons,200,https://kenney.nl/assets/board-game-icons,acessivel
+https://kenney.nl/assets/flag-pack,200,https://kenney.nl/assets/flag-pack,acessivel
+https://kenney.nl/assets/food-kit,200,https://kenney.nl/assets/food-kit,acessivel
+https://kenney.nl/assets/furniture-kit,200,https://kenney.nl/assets/furniture-kit,acessivel
+https://kenney.nl/assets/game-icons,200,https://kenney.nl/assets/game-icons,acessivel
+https://kenney.nl/assets/game-icons-expansion,200,https://kenney.nl/assets/game-icons-expansion,acessivel
+https://kenney.nl/assets/interface-sounds,200,https://kenney.nl/assets/interface-sounds,acessivel
+https://kenney.nl/assets/modular-dungeon-kit,200,https://kenney.nl/assets/modular-dungeon-kit,acessivel
+https://kenney.nl/assets/nature-kit,200,https://kenney.nl/assets/nature-kit,acessivel
+https://kenney.nl/assets/sci-fi-sounds,200,https://kenney.nl/assets/sci-fi-sounds,acessivel
+https://kenney.nl/assets/skyboxes,200,https://kenney.nl/assets/skyboxes,acessivel
+https://kenney.nl/assets/space-kit,200,https://kenney.nl/assets/space-kit,acessivel
+https://kenney.nl/assets/space-station-kit,200,https://kenney.nl/assets/space-station-kit,acessivel
+https://openai.com/codex,403,https://openai.com/codex,bloqueio ou erro HTTP; revisar manualmente
+https://opengameart.org/content/happy-lullaby-song17,200,https://opengameart.org/content/happy-lullaby-song17,acessivel
+https://opengameart.org/content/magic-space,200,https://opengameart.org/content/magic-space,acessivel
+https://science.nasa.gov/photojournal/curiosity-looks-downslope-from-the-sulfate-unit/,200,https://science.nasa.gov/photojournal/curiosity-looks-downslope-from-the-sulfate-unit/,acessivel
+https://science.nasa.gov/photojournal/curiositys-selfie-at-mont-mercou/,200,https://science.nasa.gov/photojournal/curiositys-selfie-at-mont-mercou/,acessivel
+https://science.nasa.gov/photojournal/ice-on-mars/,200,https://science.nasa.gov/photojournal/ice-on-mars/,acessivel
+https://science.nasa.gov/photojournal/ingenuity-deployed-on-mars/,200,https://science.nasa.gov/photojournal/ingenuity-deployed-on-mars/,acessivel
+https://science.nasa.gov/photojournal/martian-moon-deimos-in-high-resolution/,200,https://science.nasa.gov/photojournal/martian-moon-deimos-in-high-resolution/,acessivel
+https://science.nasa.gov/photojournal/melas-dust-storm/,200,https://science.nasa.gov/photojournal/melas-dust-storm/,acessivel
+https://science.nasa.gov/photojournal/moxie-all-tucked-in/,200,https://science.nasa.gov/photojournal/moxie-all-tucked-in/,acessivel
+https://science.nasa.gov/photojournal/opportunitys-first-selfie/,200,https://science.nasa.gov/photojournal/opportunitys-first-selfie/,acessivel
+https://science.nasa.gov/photojournal/perseverances-three-forks-sample-depot-selfie/,200,https://science.nasa.gov/photojournal/perseverances-three-forks-sample-depot-selfie/,acessivel
+https://science.nasa.gov/photojournal/phobos-from-5800-kilometers-color/,200,https://science.nasa.gov/photojournal/phobos-from-5800-kilometers-color/,acessivel
+https://science.nasa.gov/photojournal/strata-at-base-of-mount-sharp/,200,https://science.nasa.gov/photojournal/strata-at-base-of-mount-sharp/,acessivel
+https://science.nasa.gov/resource/bright-evening-star-seen-from-mars-is-earth/,200,https://science.nasa.gov/resource/bright-evening-star-seen-from-mars-is-earth/,acessivel
+https://science.nasa.gov/resource/cumberland-target-drilled-by-curiosity/,200,https://science.nasa.gov/resource/cumberland-target-drilled-by-curiosity/,acessivel
+https://science.nasa.gov/resource/curiosity-sees-streaks-and-specks-during-2024-solar-storm/,200,https://science.nasa.gov/resource/curiosity-sees-streaks-and-specks-during-2024-solar-storm/,acessivel
+https://science.nasa.gov/resource/curiosity-views-sulfur-crystals-within-a-crushed-rock/,200,https://science.nasa.gov/resource/curiosity-views-sulfur-crystals-within-a-crushed-rock/,acessivel
+https://science.nasa.gov/resource/high-dune-is-first-martian-dune-studied-up-close-2/,200,https://science.nasa.gov/resource/high-dune-is-first-martian-dune-studied-up-close-2/,acessivel
+https://science.nasa.gov/resource/insights-dusty-solar-panel/,200,https://science.nasa.gov/resource/insights-dusty-solar-panel/,acessivel
+https://science.nasa.gov/resource/installing-the-mmrtg-power-source/,200,https://science.nasa.gov/resource/installing-the-mmrtg-power-source/,acessivel
+https://science.nasa.gov/resource/mars-ingenuity-helicopter-3d-model/,200,https://science.nasa.gov/resource/mars-ingenuity-helicopter-3d-model/,acessivel
+https://science.nasa.gov/resource/sunrise-on-mars-viking-2/,200,https://science.nasa.gov/resource/sunrise-on-mars-viking-2/,acessivel
+https://science.nasa.gov/resource/veins-in-sheepbed-outcrop/,200,https://science.nasa.gov/resource/veins-in-sheepbed-outcrop/,acessivel
+https://science.nasa.gov/solar-system/planets/mars/nasa-observes-first-visible-light-auroras-at-mars/,200,https://science.nasa.gov/solar-system/planets/mars/nasa-observes-first-visible-light-auroras-at-mars/,acessivel
+https://www.audacityteam.org/,200,https://www.audacityteam.org/,acessivel
+https://www.blender.org/about/license/,403,https://www.blender.org/about/license/,bloqueio ou erro HTTP; revisar manualmente
+https://www.jpl.nasa.gov/images/pia16174-wind-blown-martian-sand/,,https://www.jpl.nasa.gov/images/pia16174-wind-blown-martian-sand/,URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1010)>
+https://www.jpl.nasa.gov/images/pia16726-curiositys-first-sample-drilling/,,https://www.jpl.nasa.gov/images/pia16726-curiositys-first-sample-drilling/,URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1010)>
+https://www.jpl.nasa.gov/images/pia16769-mount-sharp-panorama-in-raw-colors/,,https://www.jpl.nasa.gov/images/pia16769-mount-sharp-panorama-in-raw-colors/,URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1010)>
+https://www.jpl.nasa.gov/images/pia17935-curiosity-mars-rovers-first-image-of-earth-and-earths-moon/,,https://www.jpl.nasa.gov/images/pia17935-curiosity-mars-rovers-first-image-of-earth-and-earths-moon/,URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1010)>
+https://www.jpl.nasa.gov/images/pia18387-curiosity-finds-iron-meteorite-on-mars/,,https://www.jpl.nasa.gov/images/pia18387-curiosity-finds-iron-meteorite-on-mars/,URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1010)>
+https://www.jpl.nasa.gov/images/pia19113-martian-concretions-near-fram-crater/,,https://www.jpl.nasa.gov/images/pia19113-martian-concretions-near-fram-crater/,URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1010)>
+https://www.jpl.nasa.gov/images/pia19400-sunset-in-mars-gale-crater/,,https://www.jpl.nasa.gov/images/pia19400-sunset-in-mars-gale-crater/,URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1010)>
+https://www.jpl.nasa.gov/images/pia20371-jarosite-in-noctis-labyrinthus/,,https://www.jpl.nasa.gov/images/pia20371-jarosite-in-noctis-labyrinthus/,URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1010)>
+https://www.jpl.nasa.gov/images/pia20752-nasas-curiosity-at-site-of-clues-about-ancient-oxygen/,,https://www.jpl.nasa.gov/images/pia20752-nasas-curiosity-at-site-of-clues-about-ancient-oxygen/,URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1010)>
+https://www.jpl.nasa.gov/images/pia21251-boron-in-calcium-sulfate-vein-at-catabola-mars/,,https://www.jpl.nasa.gov/images/pia21251-boron-in-calcium-sulfate-vein-at-catabola-mars/,URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1010)>
+https://www.jpl.nasa.gov/images/pia21457-a-dust-devil-on-hilly-terrain/,,https://www.jpl.nasa.gov/images/pia21457-a-dust-devil-on-hilly-terrain/,URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1010)>
+https://www.jpl.nasa.gov/images/pia26368-perseverance-finds-a-rock-with-leopard-spots/,,https://www.jpl.nasa.gov/images/pia26368-perseverance-finds-a-rock-with-leopard-spots/,URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1010)>
+https://www.jpl.nasa.gov/news/cracks-in-ancient-martian-mud-surprise-nasas-curiosity-rover-team/,,https://www.jpl.nasa.gov/news/cracks-in-ancient-martian-mud-surprise-nasas-curiosity-rover-team/,URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1010)>
+https://www.larabiefonts.com/,200,https://www.larabiefonts.com/,acessivel
+https://www.nasa.gov/image-article/a-bloom-in-space/,200,https://www.nasa.gov/image-article/a-bloom-in-space/,acessivel
+https://www.nasa.gov/image-article/kilopower-13/,200,https://www.nasa.gov/image-article/kilopower-13/,acessivel
+https://www.nasa.gov/image-article/radish-bulbs-are-pictured-inside-stations-advanced-plant-habitat/,200,https://www.nasa.gov/image-article/radish-bulbs-are-pictured-inside-stations-advanced-plant-habitat/,acessivel
+https://www.nasa.gov/image-article/tending-your-garden-space/,200,https://www.nasa.gov/image-article/tending-your-garden-space/,acessivel
+https://www.nasa.gov/missions/station/nasa-teams-persevere-through-plant-challenges-in-space/,200,https://www.nasa.gov/missions/station/nasa-teams-persevere-through-plant-challenges-in-space/,acessivel
+https://www.nasa.gov/missions/station/nasas-second-pepper-harvest-sets-record-on-space-station/,200,https://www.nasa.gov/missions/station/nasas-second-pepper-harvest-sets-record-on-space-station/,acessivel

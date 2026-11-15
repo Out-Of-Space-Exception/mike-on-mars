@@ -1,6 +1,6 @@
 tipo,o_que,arquivo_ou_uso,autor,licenca,link,dupla
 ferramenta,Godot Engine 4.7.2,motor do jogo,Godot Engine contributors,MIT,https://godotengine.org/license/,Dev
-dado,DONKI (tempestades solares reais),eventos de tempestade solar,NASA,dado público da NASA,https://kauai.ccmc.gsfc.nasa.gov/DONKI/,Dev
+dado,DONKI (tempestades solares reais),eventos de tempestade solar,NASA,dado público da NASA,https://ccmc.gsfc.nasa.gov/DONKI/,Dev
 fonte,Rubik,interface do jogo,"Hubert and Fischer, Meir Sadan, Cyreal, Daniel Grumer, Omaima Dajani",OFL,https://fonts.google.com/specimen/Rubik,Design
 ia,Claude (Anthropic): sugeriu a paleta de 5 cores e a fonte e conferiu o contraste,design/02-cores-e-fonte,Anthropic,-,https://claude.ai,Design
 modelo,Animated Characters Protagonists (pacote 3D),Mike (characterMedium + skin repintada de criminalMaleA + cabelo 3D do time),Kenney,CC0,https://kenney.nl/assets/animated-characters-protagonists,Design
@@ -113,3 +113,9 @@ ia,Claude (Anthropic): converteu o magical_3.ogg para WAV (Blender/audaspace) e 
 ia,Claude (Anthropic): texto curto do botão Explorar (EXPLORING_SHORT) em pt_BR/en/es/fr a partir das frases já traduzidas do EXPLORING; botão com 2 linhas e álbum que rola arrastando (hud.gd),conteudo/03-textos/textos.csv + jogo/data/textos.csv + jogo/scenes/hud.gd,Anthropic,-,https://claude.ai,Design
 ia,Claude (Anthropic): mensagens dos eventos conforme a base (poeira e redemoinho sem painel solar ganham texto próprio em pt_BR/en/es/fr; Sem sinal sem estufa vira só aviso) e testou numa cópia do jogo,jogo/autoload/state.gd + jogo/scenes/hud.gd,Anthropic,-,https://claude.ai,Design
 ia,Claude (Anthropic): hematita nova (hematita.py) + John Klein C mais cinza + óxido de manganês e meteorito em pé para a estante,design/04-cores-das-coisas e design/03-itens-do-jogo/descobertas,Anthropic,-,https://claude.ai,Design
+ferramenta,Pillow,composicao de imagens dos exemplos de video,Pillow contributors,MIT-CMU,https://github.com/python-pillow/Pillow,Conteudo
+ferramenta,imageio-ffmpeg,codificacao dos exemplos de video por Python,imageio contributors,BSD-2-Clause,https://github.com/imageio/imageio-ffmpeg,Conteudo
+ferramenta,FFmpeg,codificador H264 e AAC dos exemplos de video,FFmpeg developers,GPL-3.0-or-later (build consultado por -L),https://ffmpeg.org/legal.html,Conteudo
+ferramenta,edge-tts,sintese de voz dos exemplos; licenca do codigo nao confirma termos das vozes,edge-tts contributors,LGPLv3 (codigo da ferramenta),https://github.com/rany2/edge-tts,Conteudo
+ia,Microsoft AndrewMultilingualNeural via edge-tts: voz escolhida para narracao em ingles; amostra com roteiro 2 aprovado,conteudo/08-cenas-e-creditos/amostra-voz-andrew-en.mp3; conteudo/08-cenas-e-creditos/amostra-voz-andrew-en.wav,Microsoft,CONFERIR termos de uso da voz antes de publicar; voz aprovada pelo time,https://www.microsoft.com/servicesagreement,Conteudo
+ia,OpenAI Codex: plano de captacao do roteiro 2 e conferencia documental de creditos; atualizacao das referencias e declaracoes de IA,conteudo/08-cenas-e-creditos/; conteudo/06-pagina-do-projeto/pagina.md,OpenAI,nao se aplica,https://openai.com/codex,Conteudo
