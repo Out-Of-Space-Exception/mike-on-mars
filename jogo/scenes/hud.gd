@@ -26,6 +26,10 @@ var _bars := {}
 var _bar_labels := {}
 var _bar_fill := {}
 var _bar_box: Control
+var _top_box: Control
+var _bottom_box: Control
+var _popups: Array[PanelContainer] = []
+const MAX_W := 680.0          # largura máxima da interface; em tela larga fica no meio, com respiro dos lados
 var _bar_nums := {}           # o número de agora dentro da barra
 var _bar_rates := {}          # quanto ganha ou perde por sol
 var _sol_label: Label
@@ -137,6 +141,8 @@ func _ready() -> void:
 	_build_postcard()
 	_build_tutorial()
 	_build_start()
+	_fit_layout()
+	get_viewport().size_changed.connect(_fit_layout)
 	State.changed.connect(_refresh)
 	State.storm_started.connect(_show_storm)
 	State.storm_ended.connect(func(_s: bool) -> void: _show_toast(tr("STORM_OVER")))
@@ -486,6 +492,7 @@ func _place_panel(delta: float) -> void:
 	if anchor == Vector2.INF:
 		return
 	var vp := get_viewport().get_visible_rect().size
+	_panel.size = _panel.get_combined_minimum_size()   # 3 botões ou 4: o cartão tem o tamanho certo
 	var sz := _panel.size
 	var target := Vector2(anchor.x - sz.x / 2.0, anchor.y - sz.y - 34.0)
 	target.x = clampf(target.x, 12.0, vp.x - sz.x - 12.0)
@@ -546,7 +553,7 @@ func _show_storm(event: Dictionary) -> void:
 		lines.append(tr("EV_SOLAR_CURIOSITY"))
 	lines.append(tr("EV_SOLAR_Q"))
 	_show_choice(tr("EV_SOLAR_TITLE"), lines,
-		"%s  ·  -%d %s" % [tr("EV_SOLAR_A"), int(State.STORM_SHIELD_COST), tr("BAR_ENERGY").to_lower()], State.can_afford(State.STORM_SHIELD_COST),
+		"%s  ·  -%d %s" % [tr("EV_SOLAR_A"), int(State.storm_shield_cost()), tr("BAR_ENERGY").to_lower()], State.can_afford(State.storm_shield_cost()),
 		_storm_shield, tr("EV_SOLAR_B"), _storm_inside)
 	Sfx.play("alerta")
 
@@ -973,9 +980,19 @@ func _show_toast(text: String, shake := false) -> void:
 	if shake:
 		for d in [14.0, -12.0, 8.0, -4.0, 0.0]:
 			_toast_tween.tween_property(_toast, "position:x", 16.0 + d, 0.05)
-	_toast_tween.tween_interval(2.4)
+	_toast_tween.tween_interval(5.0)
 	_toast_tween.tween_callback(func() -> void: _toast_down = false)
 	_toast_tween.tween_property(_toast, "modulate:a", 0.0, 0.3)
+
+
+## Barras e botões no meio da tela, no máximo MAX_W de largura, com respiro dos lados.
+func _fit_layout() -> void:
+	var vw := get_viewport().get_visible_rect().size.x
+	var side := maxf(20.0, (vw - MAX_W) / 2.0)
+	for box in [_top_box, _bottom_box]:
+		if box:
+			box.offset_left = side
+			box.offset_right = -side
 
 
 func _bars_bottom() -> float:
@@ -1145,6 +1162,13 @@ func _process(delta: float) -> void:
 	if _tut_card == null:
 		return
 	_place_panel(delta)
+	var vp := get_viewport().get_visible_rect().size
+	for p in _popups:
+		if p.visible:
+			var m: Vector2 = p.get_combined_minimum_size()
+			if not p.size.is_equal_approx(m):
+				p.size = m
+			p.position = ((vp - m) / 2.0).round()
 	for p in [_tut_card, _toast]:
 		var want: float = p.get_combined_minimum_size().y
 		if p.visible and absf(p.size.y - want) > 1.0:
@@ -1350,6 +1374,7 @@ func _juice(b: Button) -> void:
 # ───────────── Montagem da tela ─────────────
 func _build_top() -> void:
 	var top := VBoxContainer.new()
+	_top_box = top
 	top.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	top.offset_left = 24
 	top.offset_right = -24
@@ -1412,31 +1437,18 @@ func _build_top() -> void:
 	# O "Sol N · Cratera Gale" é uma placa no canto, um pouco torta (nada de tudo centralizado).
 	var pill := PanelContainer.new()
 	pill.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	pill.add_theme_stylebox_override("panel", Palette.paper(Palette.GOLD.darkened(0.25)))
-	pill.rotation_degrees = -2.0
+	pill.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var pill_row := HBoxContainer.new()
 	pill_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	top.add_child(pill_row)
 	pill_row.add_child(pill)
-	var gap := Control.new()
-	gap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	pill_row.add_child(gap)
-	_gear = Button.new()
-	_gear.custom_minimum_size = Vector2(96, 96)
-	_gear.icon = _icon("settings")
-	_gear.expand_icon = true
-	_gear.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	for s in ["normal", "hover", "focus"]:
-		_gear.add_theme_stylebox_override(s, Palette.key(Palette.BUTTON))
-	_gear.add_theme_stylebox_override("pressed", Palette.key(Palette.BUTTON, true))
-	_gear.pressed.connect(_open_settings)
-	_juice(_gear)
-	pill_row.add_child(_gear)
+
 	_sol_label = Label.new()
-	_sol_label.add_theme_font_size_override("font_size", 28)
-	_sol_label.add_theme_color_override("font_color", Palette.INK)
+	_sol_label.add_theme_font_size_override("font_size", 22)
+	_sol_label.add_theme_color_override("font_color", Palette.TEXT)
+	_sol_label.add_theme_color_override("font_outline_color", Palette.BG.darkened(0.3))
+	_sol_label.add_theme_constant_override("outline_size", 8)
 	pill.add_child(_sol_label)
 
 	_inventory = HFlowContainer.new()
@@ -1455,6 +1467,7 @@ func _build_top() -> void:
 
 func _build_bottom() -> void:
 	var bottom := VBoxContainer.new()
+	_bottom_box = bottom
 	bottom.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	bottom.offset_left = 24
 	bottom.offset_right = -24
@@ -1547,13 +1560,13 @@ func _build_bottom() -> void:
 	row.add_theme_constant_override("separation", 12)
 	row.alignment = BoxContainer.ALIGNMENT_END
 	bottom.add_child(row)
-	for k in ["build", "explore", "album", "photo"]:
+	for k in ["build", "explore", "album", "photo", "settings"]:
 		var main_action: bool = k == "explore"
 		var b := Button.new()
 		b.custom_minimum_size = Vector2(0, 176 if main_action else 140)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.size_flags_vertical = Control.SIZE_SHRINK_END
-		b.size_flags_stretch_ratio = 1.5 if main_action else 1.0
+		b.size_flags_stretch_ratio = 1.5 if main_action else (0.7 if k == "settings" else 1.0)
 		b.add_theme_font_size_override("font_size", 32 if main_action else 26)
 		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		var color := Palette.GOLD if main_action else Palette.BUTTON
@@ -1572,6 +1585,9 @@ func _build_bottom() -> void:
 	_buttons.explore.pressed.connect(_on_explore)
 	_buttons.album.pressed.connect(_on_album)
 	_buttons.photo.pressed.connect(_on_photo)
+	_buttons.settings.pressed.connect(_open_settings)
+	_buttons.settings.vertical_icon_alignment = VERTICAL_ALIGNMENT_CENTER
+	_gear = _buttons.settings
 
 
 func _build_messages() -> void:
@@ -1980,6 +1996,7 @@ func _popup(width: int, kind := "plate") -> PanelContainer:
 	box.add_theme_constant_override("separation", 16)
 	p.add_child(box)
 	_root.add_child(p)
+	_popups.append(p)
 	return p
 
 

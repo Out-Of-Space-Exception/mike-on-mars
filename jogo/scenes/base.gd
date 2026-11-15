@@ -17,7 +17,7 @@ const INGENUITY := "res://models/nasa/ingenuity.glb"
 const INGENUITY_WIDTH := 1.3
 const CAM_MIN := 12.0            # câmera mais perto (base pequena)
 const CAM_START := 26.0          # na tela inicial: o planetinha inteiro, com o céu em volta
-const CAM_MAX := 19.5            # câmera mais longe (a grade inteira)
+const CAM_MAX := 30.0            # câmera mais longe (a grade inteira, 10 x 10)
 # Cores do Ingenuity (design/04): corpo branco, faixas azul e vermelha, detalhes dourados
 const INGENUITY_COLORS := {
 	"aluminum": Palette.SUIT, "grey_brushed": Palette.SUIT, "chopper_sp": Palette.SUIT, "foil_silver": Palette.SUIT,
@@ -98,7 +98,7 @@ var _tile_lock_mat: StandardMaterial3D
 
 # Planetinha: o chão é plano onde fica a base e faz a curva para baixo depois, como uma bola.
 # Ele cresce junto com a Casa do Mike (a área aberta sempre cabe no plano).
-const FLAT_BY_LEVEL := {1: 6.0, 2: 9.0, 3: 10.5}   # metros do meio até onde o chão é plano
+const FLAT_BY_LEVEL := {1: 6.0, 2: 10.5, 3: 14.5}   # metros do meio até onde o chão é plano (a área aberta cabe)
 const PLANET := 14.0            # raio da curva depois do plano (grande: o planeta fica redondo como uma bola)
 var _flat_r := 6.0
 const JOIN := 0.7071            # o terreno termina onde a curva chega a 45° (sen 45°)
@@ -933,6 +933,9 @@ func _rebend() -> void:
 			bent.surface_set_material(s, src[3][s])
 		mi.mesh = bent
 	_build_planet_bottom(rim, floor_y - planet_drop(rim))
+	if _dome:
+		(_dome.mesh as SphereMesh).radius = _flat_r + 1.5
+		(_dome.mesh as SphereMesh).height = (_flat_r + 1.5) * 0.63
 
 
 ## O corpo do planeta: uma esfera lisa (feita aqui, em anéis) que continua a curva do terreno a partir
@@ -1016,8 +1019,8 @@ func _build_dome() -> void:
 	_dome = MeshInstance3D.new()
 	var sph := SphereMesh.new()
 	sph.is_hemisphere = true
-	sph.radius = 9.5
-	sph.height = 6.0
+	sph.radius = _flat_r + 1.5   # o escudo cobre a base inteira (cresce com a casa)
+	sph.height = sph.radius * 0.63
 	_dome.mesh = sph
 	var m := StandardMaterial3D.new()
 	m.albedo_color = Palette.DOME
@@ -1034,7 +1037,7 @@ func _build_dome() -> void:
 func _build_mike() -> void:
 	mike = Node3D.new()
 	add_child(mike)
-	mike.position = cell_center(Vector2i(2, 4)) + Vector3(0.0, 0.0, CELL * 0.62)
+	mike.position = cell_center(Vector2i(4, 5)) + Vector3(0.0, 0.0, CELL * 0.62)
 	for skin in [["casual", MIKE_SCENE], ["suit", MIKE_SUIT]]:
 		if not ResourceLoader.exists(skin[1]):
 			continue
