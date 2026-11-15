@@ -180,3 +180,13 @@ CARD_NEW_BADGE,NOVA!,NEW!,¡NUEVA!,NOUVELLE !
 BTN_SETTINGS,Ajustes,Settings,Ajustes,Réglages
 STORM_SOON,Tempestade solar em {n} sóis,Solar storm in {n} sols,Tormenta solar en {n} soles,Tempête solaire dans {n} sols
 EXPLORE_EMPTY,Desta vez o Mike não achou nada. O lanche voltou!,Mike found nothing this time. The snack is back!,Esta vez Mike no encontró nada. ¡La merienda volvió!,"Cette fois, Mike n'a rien trouvé. Le goûter est revenu !"
+ALBUM_TITLE,Álbum do Mike,Mike's Album,Álbum de Mike,Album de Mike
+ALBUM_PLANTS,Plantas,Plants,Plantas,Plantes
+ALBUM_TECH,Tecnologia,Technology,Tecnología,Technologie
+ALBUM_MINERALS,Minerais,Minerals,Minerales,Minéraux
+ALBUM_DISCOVERIES,Descobertas,Discoveries,Descubrimientos,Découvertes
+ALBUM_SKY,Céu e clima,Sky and weather,Cielo y clima,Ciel et météo
+ALBUM_NEXT,Faltam {n} cartas para ganhar: {name},{n} more cards to win: {name},Faltan {n} cartas para ganar: {name},Encore {n} cartes pour gagner : {name}
+ALBUM_PAGES_GOAL,Páginas completas: {n} de {total},Pages complete: {n} of {total},Páginas completas: {n} de {total},Pages complètes : {n} sur {total}
+ALBUM_PAGE_DONE,Página completa: {name}!,Page complete: {name}!,¡Página completa: {name}!,Page complète : {name} !
+CARD_NUMBER,Nº {n},No. {n},Nº {n},N° {n}

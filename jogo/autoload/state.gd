@@ -57,6 +57,8 @@ const PLANTS := {
 	"lettuce": {"name": "P_LETTUCE", "sols": 33, "card": 1, "model": "alface", "unlock": 0},
 	"radish": {"name": "P_RADISH", "sols": 27, "card": 2, "model": "rabanete", "unlock": 0},
 	"kale": {"name": "P_KALE", "sols": 28, "card": 3, "model": "couve", "unlock": 1},
+	# Batata: cresce em uns 3 meses na Terra (aqui, 90 sóis). Plantada em simuladores de Marte (CONFERIR fonte no cartas.csv).
+	"potato": {"name": "P_POTATO", "sols": 90, "card": 4, "model": "batata", "unlock": 2},
 	"zinnia": {"name": "P_ZINNIA", "sols": 60, "card": 5, "model": "zinia", "unlock": 3},
 	"chile": {"name": "P_CHILE", "sols": 120, "card": 6, "model": "pimenta", "unlock": 5},
 }
@@ -141,7 +143,17 @@ var nosignal_left := 0
 var nosignal_plan := ""
 var explore_left := 0            # sóis que faltam para o Mike voltar
 var storm_warned := false
-var last_empty := false         # a última expedição voltou sem nada       # a antena já avisou a próxima tempestade
+var last_empty := false
+var seen_cards := {}            # cartas que a criança já viu no álbum (as outras ganham o selo "NOVA")
+
+## Páginas do álbum, pela coluna "categoria" do cartas.csv (Robôs entra junto com Tecnologia).
+const ALBUM_PAGES := [
+	["plants", "ALBUM_PLANTS", ["Plantas"]],
+	["tech", "ALBUM_TECH", ["Tecnologias", "Robôs"]],
+	["minerals", "ALBUM_MINERALS", ["Minerais"]],
+	["discoveries", "ALBUM_DISCOVERIES", ["Descobertas"]],
+	["sky", "ALBUM_SKY", ["Céu e clima"]],
+]         # a última expedição voltou sem nada       # a antena já avisou a próxima tempestade
 var snack := ""                 # o lanche (uma colheita) que o Mike levou na expedição de agora
 var music_on := true
 var sounds_on := true
@@ -186,6 +198,43 @@ func card_info(id: int) -> Dictionary:
 
 func cards_total() -> int:
 	return _cards_info.size()
+
+
+## As cartas de uma página do álbum (em ordem).
+func page_cards(page: int) -> Array:
+	var cats: Array = ALBUM_PAGES[page][2]
+	var out := []
+	for id in card_ids():
+		if str(card_info(id).get("category", "")) in cats:
+			out.append(id)
+	return out
+
+
+func page_owned(page: int) -> int:
+	var n := 0
+	for id in page_cards(page):
+		if cards.has(str(id)):
+			n += 1
+	return n
+
+
+## Quantas cartas a criança ganhou e ainda não viu no álbum.
+func unseen_count() -> int:
+	var n := 0
+	for k in cards:
+		if not seen_cards.has(k):
+			n += 1
+	return n
+
+
+## A próxima decoração que o álbum destrava: {"name": chave do nome, "left": quantas cartas faltam}.
+func next_album_reward() -> Dictionary:
+	var best := {}
+	for t in ITEMS:
+		var need := int(ITEMS[t].get("decor", 0))
+		if need > cards.size() and (best.is_empty() or need < int(best.need)):
+			best = {"name": ITEMS[t].name, "need": need, "left": need - cards.size()}
+	return best
 
 
 ## Os números das cartas do álbum, em ordem.
@@ -322,6 +371,7 @@ func new_game() -> void:
 	tube_card = 0
 	tutorial = 0
 	snack = ""
+	seen_cards = {}
 	inventory = START_INVENTORY.duplicate()
 	for k in START_ITEMS:
 		items[k] = _new_item(START_ITEMS[k])
@@ -1080,7 +1130,7 @@ func _ready_plants() -> int:
 const _SAVED := ["energy", "oxygen", "shield", "sol", "items", "cards", "harvests", "inventory", "locale", "paused",
 	"pending_event", "next_storm_sol", "storms_seen", "storm_left", "storm_shielded", "storm_event",
 	"next_event_sol", "dust_left", "cold_left", "cold_heated", "nosignal_left", "nosignal_plan",
-	"explore_left", "tube_card", "tutorial", "music_on", "sounds_on", "snack", "last_empty"]
+	"explore_left", "tube_card", "tutorial", "music_on", "sounds_on", "snack", "last_empty", "seen_cards"]
 
 
 func save_game() -> void:
@@ -1118,6 +1168,10 @@ func load_game() -> bool:
 		for k in items:
 			moved[key(parse_key(k) + OLD_GRID_SHIFT)] = items[k]
 		items = moved
+	# Save de antes do álbum novo: as cartas que já tinha contam como vistas.
+	if not data.has("seen_cards"):
+		for k in cards:
+			seen_cards[k] = true
 	# Save de antes do tutorial: quem já construiu algo não precisa dele.
 	if not data.has("tutorial"):
 		tutorial = TUTORIAL_DONE if items.size() > 1 else 0

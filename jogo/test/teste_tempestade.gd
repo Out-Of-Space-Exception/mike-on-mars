@@ -25,6 +25,7 @@ func _ready() -> void:
 	_caminho_do_mike(main.get_node("Base"))
 	_tutorial()
 	_regras_novas()
+	_batata_e_album()
 	# O recado do tutorial tem o tamanho do texto (antes crescia até a tela inteira e não voltava).
 	State.restart_tutorial()
 	hud._start.visible = false
@@ -442,3 +443,24 @@ func _regras_novas() -> void:
 	hud._card_queue.clear()
 	hud._choice.visible = false
 	hud._info.visible = false
+
+
+func _batata_e_album() -> void:
+	State.new_game()
+	State.tutorial = State.TUTORIAL_DONE
+	ok(not ("potato" in State.unlocked_plants()), "a batata ainda não aparece no começo")
+	State.harvests = 2
+	ok("potato" in State.unlocked_plants(), "depois de 2 colheitas, a semente de batata aparece")
+	var soma := 0
+	for p in State.ALBUM_PAGES.size():
+		soma += State.page_cards(p).size()
+	ok(soma == State.cards_total(), "as 5 páginas do álbum têm todas as %d cartas" % State.cards_total())
+	State.add_card(1)
+	ok(State.unseen_count() >= 1, "carta ganha e ainda não vista conta como nova")
+	hud._start.visible = false
+	hud._on_album()
+	ok(hud._album.visible and hud._album_grid.get_child_count() == State.page_cards(hud._album_page).size(), "o álbum abre na página da carta nova")
+	ok(State.seen_cards.has("1"), "depois de ver a página, a carta deixa de ser nova")
+	hud._album.visible = false
+	hud._card.visible = false
+	hud._card_queue.clear()

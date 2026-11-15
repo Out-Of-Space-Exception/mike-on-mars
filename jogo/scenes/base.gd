@@ -1340,6 +1340,9 @@ func _update_plant(node: Node3D, it: Dictionary) -> void:
 		if it.plant != "":
 			var plant_h := State.model_height(it.plant) * MIKE_HEIGHT / DESIGN_MIKE
 			var model := _load_model(State.model_file(State.PLANTS[it.plant].model), CELL * 0.5, plant_h if plant_h > 0.0 else 0.6)
+			if model == null and it.plant == "potato":
+				model = potato_model()
+				model.scale = Vector3.ONE * 0.6
 			if model:
 				holder.add_child(model)
 	var p := 0.0
@@ -1347,6 +1350,43 @@ func _update_plant(node: Node3D, it: Dictionary) -> void:
 		p = clampf(it.growth / float(State.PLANTS[it.plant].sols), 0.0, 1.0)
 	holder.scale = Vector3.ONE * lerpf(0.25, 1.0, p)
 	ready_mark.visible = it.plant != "" and p >= 1.0
+
+
+## Batateira (feita em código, a Kenney não tem): um montinho de terra, folhas verdes em cima
+## e três batatas aparecendo. Tem cerca de 1 de altura, em pé no chão.
+func potato_model() -> Node3D:
+	var root := Node3D.new()
+	var soil := MeshInstance3D.new()
+	var mound := SphereMesh.new()
+	mound.radius = 0.42
+	mound.height = 0.36
+	soil.mesh = mound
+	soil.material_override = _mat(Color("6b3f26"))
+	soil.position.y = 0.06
+	root.add_child(soil)
+	for i in 3:
+		var potato := MeshInstance3D.new()
+		var tuber := SphereMesh.new()
+		tuber.radius = 0.13
+		tuber.height = 0.2
+		potato.mesh = tuber
+		potato.material_override = _mat(Color("c9955a"))
+		var a := TAU * i / 3.0 + 0.4
+		potato.position = Vector3(cos(a) * 0.3, 0.12, sin(a) * 0.3)
+		potato.rotation = Vector3(0.4, a, 0.3)
+		root.add_child(potato)
+	for i in 7:
+		var leaf := MeshInstance3D.new()
+		var blob := SphereMesh.new()
+		blob.radius = 0.16
+		blob.height = 0.2
+		leaf.mesh = blob
+		leaf.material_override = _mat(Color("5aa83c") if i % 2 == 0 else Color("4a8f30"))
+		var a := TAU * i / 7.0
+		var r := 0.0 if i == 0 else 0.17
+		leaf.position = Vector3(cos(a) * r, 0.45 + (0.18 if i == 0 else 0.0) + (i % 3) * 0.05, sin(a) * r)
+		root.add_child(leaf)
+	return root
 
 
 ## Carrega um .glb de jogo/models/items/ e ajusta ao tamanho da casa da grade (fica em pé no chão).

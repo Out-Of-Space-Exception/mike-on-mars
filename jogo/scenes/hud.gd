@@ -121,6 +121,13 @@ var _tube_tween: Tween
 var _album: PanelContainer
 var _album_title: Label
 var _album_grid: GridContainer
+var _album_bar: TubeBar
+var _album_count: Label
+var _album_next: Label
+var _album_tabs: HBoxContainer
+var _album_page_title: Label
+var _album_page := 0
+var _album_badge: PanelContainer   # bolinha vermelha no botão Álbum: quantas cartas novas
 var _nasa: PanelContainer
 var _nasa_text: Label
 var _start: Control
@@ -363,8 +370,14 @@ func _on_album() -> void:
 	Sfx.play("abrir-menu")
 	_build_menu.visible = false
 	_close_panel()
+	for p in State.ALBUM_PAGES.size():
+		for id in State.page_cards(p):
+			if State.cards.has(str(id)) and not State.seen_cards.has(str(id)):
+				_album_page = p
+				break
 	_refresh_album()
 	_album.visible = true
+	State.save_game()
 
 
 ## Cartão-postal: esconde a interface, põe "Sol N · Gale Crater" e baixa a foto da base.
@@ -863,6 +876,10 @@ func _tube_smoke(color: Color) -> void:
 
 # ───────────── Carta ─────────────
 func _queue_card(id: int, is_new: bool = true) -> void:
+	if is_new:
+		for p in State.ALBUM_PAGES.size():
+			if id in State.page_cards(p) and State.page_owned(p) == State.page_cards(p).size():
+				_show_toast(tr("ALBUM_PAGE_DONE").format({"name": tr(State.ALBUM_PAGES[p][1])}))
 	_card_queue.append(id)
 	_card_new.append(is_new)
 	if not _card.visible:
@@ -952,44 +969,86 @@ func _on_card_source() -> void:
 
 # ───────────── Álbum ─────────────
 func _refresh_album() -> void:
-	_album_title.text = tr("ALBUM_COUNT").format({"n": State.cards.size(), "total": State.cards_total()})
+	_album_title.text = tr("ALBUM_TITLE")
+	var total := State.cards_total()
+	_album_bar.value = 100.0 * State.cards.size() / maxf(total, 1)
+	_album_count.text = "%d / %d" % [State.cards.size(), total]
+	var reward := State.next_album_reward()
+	var pages_done := 0
+	for p in State.ALBUM_PAGES.size():
+		if State.page_owned(p) == State.page_cards(p).size():
+			pages_done += 1
+	if not reward.is_empty():
+		_album_next.text = tr("ALBUM_NEXT").format({"n": reward.left, "name": tr(reward.name)})
+	else:
+		_album_next.text = tr("ALBUM_PAGES_GOAL").format({"n": pages_done, "total": State.ALBUM_PAGES.size()})
+	# Abas
+	for c in _album_tabs.get_children():
+		c.queue_free()
+	for p in State.ALBUM_PAGES.size():
+		var owned := State.page_owned(p)
+		var count := State.page_cards(p).size()
+		var tab := Button.new()
+		tab.custom_minimum_size = Vector2(0, 112)
+		tab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		tab.set_meta("base_color", Palette.GOLD if p == _album_page else Palette.BUTTON)
+		var col := VBoxContainer.new()
+		col.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		col.offset_top = 8
+		col.offset_bottom = -16
+		col.alignment = BoxContainer.ALIGNMENT_CENTER
+		col.add_theme_constant_override("separation", 0)
+		col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		tab.add_child(col)
+		var ic := TextureRect.new()
+		ic.texture = _page_icon(p)
+		ic.custom_minimum_size = Vector2(0, 52)
+		ic.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		col.add_child(ic)
+		tab.set_meta("icon", ic)
+		var lb := Label.new()
+		lb.text = ("★ " if owned == count else "") + "%d/%d" % [owned, count]
+		lb.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		lb.add_theme_font_override("font", Palette.font(800))
+		lb.add_theme_font_size_override("font_size", 20)
+		lb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		col.add_child(lb)
+		tab.set_meta("label", lb)
+		_style_key(tab, true)
+		# Página com carta nova ainda não vista: bolinha vermelha na aba.
+		for id in State.page_cards(p):
+			if State.cards.has(str(id)) and not State.seen_cards.has(str(id)) and p != _album_page:
+				var dot := Panel.new()
+				var db := Palette._box(Palette.ALERT, 12)
+				db.border_color = Palette.INK
+				db.set_border_width_all(2)
+				dot.add_theme_stylebox_override("panel", db)
+				dot.size = Vector2(24, 24)
+				dot.position = Vector2(4, 4)
+				dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+				tab.add_child(dot)
+				break
+		tab.pressed.connect(func() -> void:
+			Sfx.play("toque-botao")
+			_album_page = p
+			_refresh_album())
+		_juice(tab)
+		_album_tabs.add_child(tab)
+	# Página aberta
+	var page_owned := State.page_owned(_album_page)
+	var page_ids := State.page_cards(_album_page)
+	_album_page_title.text = "%s  ·  %d/%d%s" % [tr(State.ALBUM_PAGES[_album_page][1]), page_owned, page_ids.size(), "  ★" if page_owned == page_ids.size() else ""]
 	for c in _album_grid.get_children():
 		c.queue_free()
-	for id in State.card_ids():
-		var info := State.card_info(id)
-		var owned := State.cards.has(str(id))
-		var b := Button.new()
-		b.custom_minimum_size = Vector2(192, 176)
-		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		b.add_theme_font_size_override("font_size", 22)
-		var color: Color = Palette.RARITY.get(info.get("rarity", "comum"), Palette.TEXT)
-		# Carta que a criança tem = papel com a borda da raridade; carta que falta = chapa escura.
-		var box: StyleBoxFlat = Palette.paper(color) if owned else Palette.plate()
-		box.content_margin_left = 10
-		box.content_margin_right = 10
-		box.shadow_offset = Vector2(4, 5)
-		for s in ["normal", "hover", "pressed", "disabled"]:
-			b.add_theme_stylebox_override(s, box)
-		b.add_theme_color_override("font_color", Palette.INK if owned else Palette.TEXT.darkened(0.3))
-		b.add_theme_color_override("font_disabled_color", Palette.TEXT.darkened(0.3))
-		if owned:
-			b.text = tr("CARD_%d_NAME" % id)
-			var photo := "res://ui/cards/%s" % info.get("photo_file", "")
-			if str(info.get("photo_file", "")) != "" and ResourceLoader.exists(photo):
-				b.icon = load(photo)
-				b.expand_icon = true
-				b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-				b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-				b.add_theme_font_size_override("font_size", 18)
-				b.custom_minimum_size = Vector2(150, 190)
-			b.pressed.connect(_queue_card.bind(id, false))
-		else:
-			b.text = "?"
-			b.add_theme_font_size_override("font_size", 48)
-			# Carta que falta: o toque diz como ganhar.
-			b.pressed.connect(func() -> void: _show_info(tr("HOW_TITLE"), State.card_hint(id), Callable()))
-		_album_grid.add_child(b)
+	for id in page_ids:
+		_album_grid.add_child(_album_tile(id))
+	# Viu a página: as cartas novas dela deixam de ser novas (o selo some na próxima vez).
+	for id in page_ids:
+		if State.cards.has(str(id)):
+			State.seen_cards[str(id)] = true
 
 
 # ───────────── Dados da NASA ─────────────
@@ -1023,6 +1082,9 @@ func _refresh() -> void:
 	_btn_labels.build.text = tr("BTN_BUILD")
 	_btn_labels.album.text = tr("BTN_ALBUM")
 	_btn_labels.photo.text = tr("BTN_PHOTO")
+	var unseen := State.unseen_count()
+	_album_badge.visible = unseen > 0
+	(_album_badge.get_node("N") as Label).text = str(unseen)
 	_btn_labels.settings.text = tr("BTN_SETTINGS")
 	if State.exploring():
 		_btn_labels.explore.text = _sols(tr("EXPLORING").format({"n": State.explore_left}))
@@ -1143,6 +1205,9 @@ func _plant_icon(p: String) -> Texture2D:
 	vp.render_target_update_mode = SubViewport.UPDATE_ONCE
 	add_child(vp)
 	var model: Node3D = base._load_model(file, 1.0, 1.0)
+	if model == null and p == "potato":
+		model = base.potato_model()
+		model.position.y = -0.1
 	if model:
 		vp.add_child(model)
 	var env := WorldEnvironment.new()
@@ -2061,6 +2126,24 @@ func _build_bottom() -> void:
 	_buttons.explore.pressed.connect(_on_explore)
 	_buttons.album.pressed.connect(_on_album)
 	_buttons.photo.pressed.connect(_on_photo)
+	_album_badge = PanelContainer.new()
+	var ab := Palette._box(Palette.ALERT, 18)
+	ab.border_color = Palette.INK
+	ab.set_border_width_all(3)
+	ab.content_margin_left = 10
+	ab.content_margin_right = 10
+	ab.content_margin_top = 0
+	ab.content_margin_bottom = 2
+	_album_badge.add_theme_stylebox_override("panel", ab)
+	_album_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_album_badge.position = Vector2(-10, -14)
+	var abl := Label.new()
+	abl.name = "N"
+	abl.add_theme_font_override("font", Palette.font(800))
+	abl.add_theme_font_size_override("font_size", 22)
+	abl.add_theme_color_override("font_color", Color.WHITE)
+	_album_badge.add_child(abl)
+	_buttons.album.add_child(_album_badge)
 	_buttons.settings.pressed.connect(_open_settings)
 	_gear = _buttons.settings
 
@@ -2111,10 +2194,12 @@ func _build_messages() -> void:
 	col.add_child(_toast_label)
 
 
+## Álbum como um livro de figurinhas: 5 páginas (uma por tema), cada uma com o seu progresso.
+## A carta que falta mostra a moldura da raridade e um "?" (dá vontade de achar); a nova ganha o selo NOVA.
 func _build_album() -> void:
 	_album = PanelContainer.new()
 	_album.set_anchors_preset(Control.PRESET_FULL_RECT)
-	var album_box := Palette._box(Palette.BG, 0)
+	var album_box := Palette._box(Palette.BG.darkened(0.15), 0)
 	album_box.content_margin_left = 32
 	album_box.content_margin_right = 32
 	album_box.content_margin_top = 32
@@ -2125,27 +2210,56 @@ func _build_album() -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 16)
 	_album.add_child(box)
+	# Cabeçalho: nome do álbum, NASA e o X.
 	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 16)
 	box.add_child(head)
 	_album_title = Label.new()
 	_album_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_album_title.add_theme_font_size_override("font_size", 40)
+	_album_title.add_theme_font_override("font", Palette.font(800))
+	_album_title.add_theme_font_size_override("font_size", 38)
 	_album_title.add_theme_color_override("font_color", Palette.GOLD)
 	head.add_child(_album_title)
-	var nasa := Button.new()
+	var nasa := _key_button(_on_nasa, true)
 	nasa.text = "NASA"
-	nasa.custom_minimum_size = Vector2(120, 80)
-	nasa.pressed.connect(_on_nasa)
+	nasa.custom_minimum_size = Vector2(136, 88)
+	nasa.size_flags_horizontal = Control.SIZE_SHRINK_END
 	head.add_child(nasa)
-	var close := Button.new()
-	close.text = "X"
-	close.custom_minimum_size = Vector2(96, 96)
-	for s in ["normal", "hover", "pressed", "focus"]:
-		close.add_theme_stylebox_override(s, Palette._box(Palette.ALERT, 48))
-	for c in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
-		close.add_theme_color_override(c, Color.WHITE)
-	close.pressed.connect(func() -> void: _album.visible = false)
-	head.add_child(close)
+	head.add_child(_red_x(func() -> void:
+		_album.visible = false
+		_refresh()))
+	# Progresso: tubo dourado com "17 / 35" e o próximo prêmio.
+	var prog := VBoxContainer.new()
+	prog.add_theme_constant_override("separation", 8)
+	box.add_child(prog)
+	_album_bar = TubeBar.new()
+	_album_bar.color = Palette.GOLD
+	_album_bar.custom_minimum_size = Vector2(0, 40)
+	prog.add_child(_album_bar)
+	_album_count = Label.new()
+	_album_count.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_album_count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_album_count.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_album_count.add_theme_font_override("font", Palette.font(800))
+	_album_count.add_theme_font_size_override("font_size", 24)
+	_album_count.add_theme_color_override("font_color", Palette.INK)
+	_album_bar.add_child(_album_count)
+	_album_next = Label.new()
+	_album_next.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_album_next.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_album_next.add_theme_font_override("font", Palette.font(700))
+	_album_next.add_theme_font_size_override("font_size", 22)
+	_album_next.add_theme_color_override("font_color", Palette.TEXT)
+	prog.add_child(_album_next)
+	# Abas: uma por página, com o ícone 3D do tema e "4/7" (estrela quando completa).
+	_album_tabs = HBoxContainer.new()
+	_album_tabs.add_theme_constant_override("separation", 8)
+	box.add_child(_album_tabs)
+	_album_page_title = Label.new()
+	_album_page_title.add_theme_font_override("font", Palette.font(800))
+	_album_page_title.add_theme_font_size_override("font_size", 30)
+	_album_page_title.add_theme_color_override("font_color", Palette.TEXT)
+	box.add_child(_album_page_title)
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -2154,8 +2268,146 @@ func _build_album() -> void:
 	_album_grid.columns = 3
 	_album_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_album_grid.add_theme_constant_override("h_separation", 16)
-	_album_grid.add_theme_constant_override("v_separation", 16)
+	_album_grid.add_theme_constant_override("v_separation", 24)
 	scroll.add_child(_album_grid)
+
+
+func _page_icon(page: int) -> Texture2D:
+	match State.ALBUM_PAGES[page][0]:
+		"plants":
+			return _plant_icon("lettuce")
+		"tech":
+			return _thumb("solar")
+		"minerals":
+			if not _icon_cache.has("page_minerals"):
+				var holder := Node3D.new()
+				var m: Node3D = base._load_model(State.model_file("hematita"), 1.0, 1.0)
+				if m:
+					m.position.y -= 0.5
+					holder.add_child(m)
+				_icon_cache["page_minerals"] = Icons3D.render(self, holder, 160, 1.3)
+			return _icon_cache["page_minerals"]
+		"discoveries":
+			return _icon("explore")
+		"sky":
+			if not _icon_cache.has("page_sky"):
+				_icon_cache["page_sky"] = Icons3D.render(self, Icons3D.sun(), 160, 1.4)
+			return _icon_cache["page_sky"]
+	return null
+
+
+## Figurinha do álbum: a carta em miniatura (moldura da raridade, foto, número e nome).
+func _album_tile(id: int) -> Control:
+	var info := State.card_info(id)
+	var owned := State.cards.has(str(id))
+	var rarity: String = info.get("rarity", "comum")
+	var w := 192.0
+	var k := w / 1066.0
+	var b := Button.new()
+	b.custom_minimum_size = Vector2(w, 1280.0 * k)
+	b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	for st in ["normal", "hover", "pressed", "focus", "disabled"]:
+		b.add_theme_stylebox_override(st, StyleBoxEmpty.new())
+	_juice(b)
+	var window := Rect2(Vector2(60, 236) * k, Vector2(944, 614) * k)
+	if owned:
+		var photo := TextureRect.new()
+		var file := "res://ui/cards/%s" % info.get("photo_file", "")
+		if str(info.get("photo_file", "")) != "" and ResourceLoader.exists(file):
+			photo.texture = load(file)
+		photo.position = window.position
+		photo.size = window.size
+		photo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		photo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		photo.clip_contents = true
+		photo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		b.add_child(photo)
+	else:
+		# Ainda não tem: a janela fica escura com um "?" dourado (a moldura já mostra a raridade).
+		var dark := ColorRect.new()
+		dark.color = Palette.PLATE
+		dark.position = window.position
+		dark.size = window.size
+		dark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		b.add_child(dark)
+		var q := Label.new()
+		q.text = "?"
+		q.position = window.position
+		q.size = window.size
+		q.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		q.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		q.add_theme_font_override("font", Palette.font(800))
+		q.add_theme_font_size_override("font_size", 64)
+		q.add_theme_color_override("font_color", Palette.GOLD)
+		q.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		b.add_child(q)
+	var frame := TextureRect.new()
+	var frame_file := "res://ui/frames/moldura-carta-%s.png" % FRAME.get(rarity, "comum")
+	if ResourceLoader.exists(frame_file):
+		frame.texture = load(frame_file)
+	frame.size = b.custom_minimum_size
+	frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	frame.stretch_mode = TextureRect.STRETCH_SCALE
+	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if not owned:
+		frame.modulate = Color(0.8, 0.8, 0.8)
+	b.add_child(frame)
+	# Número da figurinha no topo; nome embaixo (no lugar do fato).
+	var num := Label.new()
+	num.text = tr("CARD_NUMBER").format({"n": id})
+	num.position = Vector2(107, 92) * k
+	num.size = Vector2(855, 108) * k
+	num.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	num.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	num.add_theme_font_override("font", Palette.font(800))
+	num.add_theme_font_size_override("font_size", 15)
+	num.add_theme_color_override("font_color", Palette.BG)
+	num.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	b.add_child(num)
+	var name_label := Label.new()
+	name_label.text = tr("CARD_%d_NAME" % id) if owned else "???"
+	name_label.position = Vector2(84, 866) * k
+	name_label.size = Vector2(906, 268) * k
+	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	name_label.add_theme_font_override("font", Palette.font(700))
+	name_label.add_theme_font_size_override("font_size", 16)
+	name_label.add_theme_color_override("font_color", Color("3a261c"))
+	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	b.add_child(name_label)
+	# Carta nova (ainda não vista no álbum): selo NOVA inclinado.
+	if owned and not State.seen_cards.has(str(id)):
+		var badge := PanelContainer.new()
+		var bb := Palette._box(Palette.ALERT, 10)
+		bb.border_color = Palette.INK
+		bb.set_border_width_all(2)
+		bb.content_margin_left = 8
+		bb.content_margin_right = 8
+		bb.content_margin_top = 2
+		bb.content_margin_bottom = 2
+		badge.add_theme_stylebox_override("panel", bb)
+		badge.rotation_degrees = -16.0
+		badge.position = Vector2(-10, -8)
+		badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var bt := Label.new()
+		bt.text = tr("CARD_NEW_BADGE")
+		bt.add_theme_font_override("font", Palette.font(800))
+		bt.add_theme_font_size_override("font_size", 16)
+		bt.add_theme_color_override("font_color", Color.WHITE)
+		badge.add_child(bt)
+		b.add_child(badge)
+	# Lendária que a criança tem: brilha devagar.
+	if owned and rarity == "lendário":
+		var glow := create_tween().set_loops()
+		glow.tween_property(frame, "modulate", Color(1.35, 1.25, 0.9), 0.8).set_trans(Tween.TRANS_SINE)
+		glow.tween_property(frame, "modulate", Color.WHITE, 0.8).set_trans(Tween.TRANS_SINE)
+		b.tree_exiting.connect(glow.kill)
+	if owned:
+		b.pressed.connect(_queue_card.bind(id, false))
+	else:
+		b.pressed.connect(func() -> void: _show_info(tr("HOW_TITLE"), State.card_hint(id), Callable()))
+	return b
 
 
 func _build_popups() -> void:

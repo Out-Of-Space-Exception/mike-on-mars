@@ -312,6 +312,16 @@ static func trash() -> Node3D:
 	return root
 
 
+static func sun() -> Node3D:
+	var root := Node3D.new()
+	root.add_child(part(ball(0.32), GOLD))
+	for i in 8:
+		var a := TAU * i / 8.0
+		var ray := part(cyl(0.0, 0.2, 0.09), GOLD, Vector3(cos(a) * 0.5, sin(a) * 0.5, 0.0), Vector3(0, 0, rad_to_deg(a) - 90.0))
+		root.add_child(ray)
+	return root
+
+
 static func flag(texture: Texture2D) -> Node3D:
 	var root := Node3D.new()
 	root.add_child(part(cyl(0.035, 1.1), STEEL, Vector3(-0.4, -0.05, 0), Vector3.ZERO, 0.3, 0.6))
