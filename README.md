@@ -3,7 +3,8 @@
 **Mike on Mars** is a free web game for kids aged 7 to 12, made by team **Out of Space Exception** for the NASA Space Apps Challenge 2026 (*Junior Astronaut Mission Trainer*). Kids build Mike's base in Gale Crater, grow plants like the ones astronauts grew in space, face solar storms taken from NASA's DONKI space weather data and collect 36 science cards, each with its NASA source. It plays in the browser, on phones and computers, in English, Portuguese, Spanish and French.
 
 🎮 **Play:** https://out-of-space-exception.github.io/mike-on-mars/  
-🎬 **Pitch (29 s video):** https://youtu.be/a0S8g7tr5jQ
+🎬 **Pitch (29 s video):** https://youtu.be/a0S8g7tr5jQ  
+🏆 **5th place** at NASA Space Apps Challenge 2026 in Sorocaba, Brazil, out of 25 projects ([Demo Day, Nov 19, 2026](https://noticias.sorocaba.sp.gov.br/demo-day-apresenta-projetos-do-hackathon-da-nasa-e-define-equipes-que-poderao-representar-sorocaba-na-etapa-global/))
 
 ---
 
@@ -13,6 +14,7 @@ Jogo do time **Out of Space Exception** para o NASA Space Apps Challenge 2026 (d
 
 - 🎮 **Jogar a versão do momento:** https://out-of-space-exception.github.io/mike-on-mars/ (no celular, aponte a câmera para o QR abaixo)
 - 🎬 **Pitch em vídeo (29 s, inglês):** https://youtu.be/a0S8g7tr5jQ
+- 🏆 **5º lugar** no NASA Space Apps Challenge 2026 de Sorocaba, entre 25 projetos ([Demo Day de 19/11/2026](https://noticias.sorocaba.sp.gov.br/demo-day-apresenta-projetos-do-hackathon-da-nasa-e-define-equipes-que-poderao-representar-sorocaba-na-etapa-global/), no Parque Tecnológico de Sorocaba)
 
 <img src="ferramentas/qr-code.png" width="180" alt="QR code do jogo">
 
