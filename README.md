@@ -6,6 +6,8 @@
 🎬 **Pitch (29 s video):** https://youtu.be/a0S8g7tr5jQ  
 🏆 **5th place** at NASA Space Apps Challenge 2026 in Sorocaba, Brazil, out of 25 projects ([Demo Day, Nov 19, 2026](https://noticias.sorocaba.sp.gov.br/demo-day-apresenta-projetos-do-hackathon-da-nasa-e-define-equipes-que-poderao-representar-sorocaba-na-etapa-global/))
 
+<img src="dev/10-envio/demo-day-sorocaba.jpg" width="420" alt="Team Out of Space Exception on stage at the NASA Space Apps Sorocaba Demo Day">
+
 ---
 
 ## Para o time (PT-BR)
